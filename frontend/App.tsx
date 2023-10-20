@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Icon from "@expo/vector-icons/Ionicons";
 import { Feed } from "@screens/Feed";
 import { Search } from "@screens/Search";
+import theme from "theme";
 
 const Tab = createBottomTabNavigator();
 
@@ -15,7 +16,7 @@ export default function App() {
         screenOptions={{
           headerShown: false,
           tabBarLabelStyle: {
-            color: "#3a5a40",
+            color: theme.primary,
             fontWeight: "bold",
           },
         }}
@@ -28,7 +29,7 @@ export default function App() {
               <Icon
                 size={size}
                 name={focused ? "book" : "book-outline"}
-                color="#3a5a40"
+                color={theme.primary}
               />
             ),
           }}
@@ -41,7 +42,7 @@ export default function App() {
               <Icon
                 size={size}
                 name={focused ? "search" : "search-outline"}
-                color="#3a5a40"
+                color={theme.primary}
               />
             ),
           }}
