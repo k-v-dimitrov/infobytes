@@ -1,6 +1,6 @@
 import React from "react";
-import { Text } from "react-native";
 import { Screen } from "@layout/Screen";
+import { Text } from "@components/Text";
 
 export const Search = () => {
   return (
