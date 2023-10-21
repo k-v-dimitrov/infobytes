@@ -1,6 +1,7 @@
-import { StatusBar } from "expo-status-bar";
 import React, { ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
+import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
+import { StatusBar } from "expo-status-bar";
 import theme from "theme";
 
 interface Props {
@@ -9,11 +10,13 @@ interface Props {
 
 export const Screen = ({ children }: Props) => {
   return (
-    <View style={styles.container}>
-      <StatusBar style="light" />
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.container}>
+        <StatusBar style="light" />
 
-      {children}
-    </View>
+        {children}
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 };
 
@@ -23,5 +26,6 @@ const styles = StyleSheet.create({
     backgroundColor: theme.primary,
     alignItems: "center",
     justifyContent: "center",
+    paddingHorizontal: 16,
   },
 });
