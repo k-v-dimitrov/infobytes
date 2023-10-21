@@ -25,9 +25,9 @@ export default function App() {
           name="Feed"
           component={Feed}
           options={{
-            tabBarIcon: ({ size, focused }) => (
+            tabBarIcon: ({ focused }) => (
               <Icon
-                size={size}
+                size={36}
                 name={focused ? "book" : "book-outline"}
                 color={theme.primary}
               />
@@ -38,9 +38,9 @@ export default function App() {
           name="Search"
           component={Search}
           options={{
-            tabBarIcon: ({ size, focused }) => (
+            tabBarIcon: ({ focused }) => (
               <Icon
-                size={size}
+                size={36}
                 name={focused ? "search" : "search-outline"}
                 color={theme.primary}
               />
