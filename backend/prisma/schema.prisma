@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum FactCategories {
+  history
+  cinema
+  technology
+  art
+  sport
+  fashion
+  science
+  geography
+}
+
+model Fact {
+  id        String   @id @unique @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title     String
+  text      String
+  sourceUrl String
+
+  categoryType FactCategories?
+
+  @@map("facts")
+}
+
+model FeedUser {
+  id        String   @id @unique @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("feed_users")
+}
+
+model ViewedFact {
+  id        String   @id @unique @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user_id String
+  fact_id String
+
+  @@unique([user_id, fact_id], name: "userViewedFactIdentifier")
+  @@index([user_id])
+  @@map("viewed_facts")
+}
