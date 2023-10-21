@@ -1,0 +1,202 @@
+{
+    "client": "Thunder Client",
+    "collectionName": "infobytes",
+    "dateExported": "2023-10-21T16:29:25.203Z",
+    "version": "1.1",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "8fec66ca-3942-4c42-99db-aa4e60ff77f9",
+            "colId": "fb1b648e-4a8b-4fe5-8d4b-a61510c11920",
+            "containerId": "",
+            "name": "create-fact",
+            "url": "localhost:3000/fact",
+            "method": "POST",
+            "sortNum": 10000,
+            "created": "2023-10-21T09:30:35.004Z",
+            "modified": "2023-10-21T10:28:21.753Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"title\": \"Hitler on drasugs\",\n  \"text\": \"Hitler was known for his big drug usage\",\n  \"sourceUrl\": \"www.somerandomsite.com\",\n  \"category\": \"history\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "07158f39-d9e8-43dc-b865-593a56cad644",
+            "colId": "fb1b648e-4a8b-4fe5-8d4b-a61510c11920",
+            "containerId": "",
+            "name": "get-fact",
+            "url": "localhost:3000/fact/c73f9851-e420-4a86-95ce-9cad31af21bf",
+            "method": "GET",
+            "sortNum": 12500,
+            "created": "2023-10-21T10:05:39.192Z",
+            "modified": "2023-10-21T10:32:48.178Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "id",
+                    "value": "c73f9851-e420-4a86-95ce-9cad31af21bf",
+                    "isDisabled": true,
+                    "isPath": false
+                }
+            ],
+            "tests": []
+        },
+        {
+            "_id": "3fc2c2d4-1e2d-4d59-b8e0-f3bffce678c7",
+            "colId": "fb1b648e-4a8b-4fe5-8d4b-a61510c11920",
+            "containerId": "",
+            "name": "delete-fact",
+            "url": "localhost:3000/fact/c73f9851-e420-4a86-95ce-9cad31af21bf",
+            "method": "DELETE",
+            "sortNum": 13750,
+            "created": "2023-10-21T10:28:27.730Z",
+            "modified": "2023-10-21T10:32:45.304Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "id",
+                    "value": "c73f9851-e420-4a86-95ce-9cad31af21bf",
+                    "isDisabled": true,
+                    "isPath": false
+                }
+            ],
+            "tests": []
+        },
+        {
+            "_id": "e4a53088-e50a-44bd-8a26-d784e45b61ba",
+            "colId": "fb1b648e-4a8b-4fe5-8d4b-a61510c11920",
+            "containerId": "",
+            "name": "put-fact",
+            "url": "localhost:3000/fact",
+            "method": "PUT",
+            "sortNum": 15000,
+            "created": "2023-10-21T09:56:30.245Z",
+            "modified": "2023-10-21T09:58:49.236Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"factId\": \"c73f9851-e420-4a86-95ce-9cad31af21bf\",\n  \"title\": \"Dancho test\",\n  \"text\": \"Lorem ipsum dolor amet i taka natatyk\",\n  \"sourceUrl\": \"www.facebook.com\",\n  \"category\": \"art\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "672a20b4-d094-43a2-afe7-4654ceb70fd4",
+            "colId": "fb1b648e-4a8b-4fe5-8d4b-a61510c11920",
+            "containerId": "",
+            "name": "patch-fact",
+            "url": "localhost:3000/fact",
+            "method": "PATCH",
+            "sortNum": 20000,
+            "created": "2023-10-21T09:45:00.752Z",
+            "modified": "2023-10-21T09:54:58.145Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"factId\": \"c73f9851-e420-4a86-95ce-9cad31af21bf\",\n  \"title\": \"Hitles was not on drugs!\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "0ca8873a-5db1-4f93-96ba-752c55825608",
+            "colId": "fb1b648e-4a8b-4fe5-8d4b-a61510c11920",
+            "containerId": "",
+            "name": "get-categories",
+            "url": "localhost:3000/category/all",
+            "method": "GET",
+            "sortNum": 30000,
+            "created": "2023-10-21T11:52:53.915Z",
+            "modified": "2023-10-21T12:00:32.640Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "id",
+                    "value": "c73f9851-e420-4a86-95ce-9cad31af21bf",
+                    "isDisabled": true,
+                    "isPath": false
+                }
+            ],
+            "tests": []
+        },
+        {
+            "_id": "ccf60d36-b49a-426d-b675-c0b10ffc039c",
+            "colId": "fb1b648e-4a8b-4fe5-8d4b-a61510c11920",
+            "containerId": "",
+            "name": "get-all-facts-by-category",
+            "url": "localhost:3000/category/history",
+            "method": "GET",
+            "sortNum": 40000,
+            "created": "2023-10-21T11:59:59.680Z",
+            "modified": "2023-10-21T12:00:59.981Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "fcf70102-15cd-4e1c-a8b7-2e9214ebb6ae",
+            "colId": "fb1b648e-4a8b-4fe5-8d4b-a61510c11920",
+            "containerId": "",
+            "name": "search-fact",
+            "url": "localhost:3000/fact?search=Mon",
+            "method": "GET",
+            "sortNum": 50000,
+            "created": "2023-10-21T12:35:27.709Z",
+            "modified": "2023-10-21T12:42:51.251Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "search",
+                    "value": "Mon",
+                    "isPath": false
+                }
+            ],
+            "tests": []
+        },
+        {
+            "_id": "93519681-c853-49f7-bbfa-00ad6090a4ca",
+            "colId": "fb1b648e-4a8b-4fe5-8d4b-a61510c11920",
+            "containerId": "",
+            "name": "subsribe-user-to-feed",
+            "url": "localhost:3000/feed/user",
+            "method": "GET",
+            "sortNum": 60000,
+            "created": "2023-10-21T13:01:27.359Z",
+            "modified": "2023-10-21T13:02:32.309Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "3c68d1be-f7df-444a-a9d6-2c71f0991bf8",
+            "colId": "fb1b648e-4a8b-4fe5-8d4b-a61510c11920",
+            "containerId": "",
+            "name": "get-user-feed",
+            "url": "localhost:3000/feed?userId=406c592f-656a-4892-b1ef-e8ef5b76844b&size=2",
+            "method": "GET",
+            "sortNum": 70000,
+            "created": "2023-10-21T13:03:22.694Z",
+            "modified": "2023-10-21T16:26:58.187Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "userId",
+                    "value": "406c592f-656a-4892-b1ef-e8ef5b76844b",
+                    "isPath": false
+                },
+                {
+                    "name": "size",
+                    "value": "2",
+                    "isPath": false
+                }
+            ],
+            "tests": []
+        }
+    ]
+}

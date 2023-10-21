@@ -1,0 +1,124 @@
+{
+  "facts": [
+    {
+      "text": "The Great Wall of China is the longest wall in the world, stretching over 13,000 miles.",
+      "sourceUrl": "https://www.history.com/topics/great-wall-of-china",
+      "title": "Great Wall of China",
+      "categoryType": "history"
+    },
+    {
+      "text": "The movie 'The Shawshank Redemption' is often regarded as one of the greatest films of all time.",
+      "sourceUrl": "https://www.imdb.com/title/tt0111161/",
+      "title": "The Shawshank Redemption",
+      "categoryType": "cinema"
+    },
+    {
+      "text": "The first programmable computer, the Z3, was created by Konrad Zuse in 1941.",
+      "sourceUrl": "https://www.computerhistory.org/revolution/calculators/1/48",
+      "title": "Z3 Computer",
+      "categoryType": "technology"
+    },
+    {
+      "text": "Leonardo da Vinci's 'Mona Lisa' is one of the most famous paintings in the world.",
+      "sourceUrl": "https://www.louvre.fr/en/oeuvre-notices/mona-lisa",
+      "title": "Mona Lisa",
+      "categoryType": "art"
+    },
+    {
+      "text": "Usain Bolt holds the world record for the fastest 100m and 200m sprints.",
+      "sourceUrl": "https://olympics.com/en/olympic-games/rio-2016/athletics",
+      "title": "Usain Bolt's Records",
+      "categoryType": "sport"
+    },
+    {
+      "text": "Coco Chanel revolutionized fashion with the 'Little Black Dress' and the Chanel suit.",
+      "sourceUrl": "https://www.vogue.com/article/little-black-dress-history",
+      "title": "Coco Chanel's Fashion",
+      "categoryType": "fashion"
+    },
+    {
+      "text": "Marie Curie was the first woman to win a Nobel Prize and remains the only person to win Nobel Prizes in two different scientific fields.",
+      "sourceUrl": "https://www.nobelprize.org/prizes/physics/1903/marie-curie/biographical/",
+      "title": "Marie Curie",
+      "categoryType": "science"
+    },
+    {
+      "text": "The Sahara Desert is the largest hot desert in the world, covering most of North Africa.",
+      "sourceUrl": "https://www.britannica.com/place/Sahara-desert",
+      "title": "Sahara Desert",
+      "categoryType": "geography"
+    },
+    {
+      "text": "The construction of the Eiffel Tower was completed in 1889 and it was the tallest man-made structure in the world at the time.",
+      "sourceUrl": "https://www.toureiffel.paris/en",
+      "title": "Eiffel Tower",
+      "categoryType": "history"
+    },
+    {
+      "text": "The film 'Star Wars' was directed by George Lucas and first released in 1977.",
+      "sourceUrl": "https://www.starwars.com/",
+      "title": "Star Wars",
+      "categoryType": "cinema"
+    },
+    {
+      "text": "The World Wide Web was created by Tim Berners-Lee in 1989, revolutionizing the internet.",
+      "sourceUrl": "https://www.w3.org/People/Berners-Lee/",
+      "title": "World Wide Web",
+      "categoryType": "technology"
+    },
+    {
+      "text": "Vincent van Gogh's 'Starry Night' is considered one of the most iconic paintings in art history.",
+      "sourceUrl": "https://www.moma.org/collection/works/79802",
+      "title": "Starry Night",
+      "categoryType": "art"
+    },
+    {
+      "text": "The Olympics, with their origins in ancient Greece, have been held for over 2,700 years.",
+      "sourceUrl": "https://olympics.com/en/olympic-games/olympic-games",
+      "title": "Olympic Games",
+      "categoryType": "sport"
+    },
+    {
+      "text": "The little black dress (LBD) became a fashion staple after being popularized by Coco Chanel.",
+      "sourceUrl": "https://www.vogue.com/article/little-black-dress-history",
+      "title": "Little Black Dress",
+      "categoryType": "fashion"
+    },
+    {
+      "text": "Albert Einstein's theory of relativity transformed our understanding of space and time.",
+      "sourceUrl": "https://www.einstein-website.de/z_biography/index.html",
+      "title": "Albert Einstein",
+      "categoryType": "science"
+    },
+    {
+      "text": "The Amazon Rainforest is the largest tropical rainforest in the world, spanning several countries in South America.",
+      "sourceUrl": "https://www.worldwildlife.org/places/amazon",
+      "title": "Amazon Rainforest",
+      "categoryType": "geography"
+    },
+    {
+      "text": "The Statue of Liberty was a gift from France to the United States and was dedicated in 1886.",
+      "sourceUrl": "https://www.nps.gov/stli/index.htm",
+      "title": "Statue of Liberty",
+      "categoryType": "history"
+    },
+    {
+      "text": "The first 'Jurassic Park' film, directed by Steven Spielberg, was released in 1993 and became a blockbuster hit.",
+      "sourceUrl": "https://www.jurassicpark.com/",
+      "title": "Jurassic Park",
+      "categoryType": "cinema"
+    },
+    {
+      "text": "The invention of the light bulb is often attributed to Thomas Edison, who patented it in 1879.",
+      "sourceUrl": "https://www.loc.gov/item/today-in-history/october-21/",
+      "title": "Light Bulb Invention",
+      "categoryType": "technology"
+    },
+    {
+      "text": "The 'Mona Lisa' is housed in the Louvre Museum in Paris, France, and is one of the museum's most famous artworks.",
+      "sourceUrl": "https://www.louvre.fr/en/oeuvre-notices/mona-lisa",
+      "title": "Mona Lisa at the Louvre",
+      "categoryType": "art"
+    }
+  ]
+}
