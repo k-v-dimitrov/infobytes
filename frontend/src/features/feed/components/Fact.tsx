@@ -1,7 +1,7 @@
 import React from "react";
 import { Text } from "components/Text";
 import { View } from "components/View";
-import { Actions } from "./components/Actions";
+import { Actions } from "./FactActions";
 
 interface Props {
   title: string;

@@ -1,24 +1,27 @@
-import React from "react";
-import { Dimensions, FlatList, Text, View } from "react-native";
-import { Screen } from "@layout/Screen";
-import { Fact } from "@features/facts";
-
-import data from "../../data.json";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import React, { useEffect } from "react";
+import { Alert, FlatList, View } from "react-native";
 import { useSafeAreaFrame } from "react-native-safe-area-context";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { Screen } from "@layout/Screen";
+import { Fact, useGetUserFacts } from "@features/feed";
 
 export const Feed = () => {
   const bottomBarHeight = useBottomTabBarHeight();
   const { height } = useSafeAreaFrame();
+  const { loading, facts, getUserFacts } = useGetUserFacts();
+
+  useEffect(() => {
+    getUserFacts();
+  }, []);
 
   return (
-    <Screen>
+    <Screen loading={loading}>
       <FlatList
         showsVerticalScrollIndicator={false}
         snapToAlignment="start"
         decelerationRate="fast"
         snapToInterval={height - bottomBarHeight - 50}
-        data={data}
+        data={facts}
         renderItem={({ item }) => (
           <View
             style={{
@@ -27,8 +30,8 @@ export const Feed = () => {
           >
             <Fact
               title={item.title}
-              summary={item.summary}
-              source={item.source}
+              summary={item.text}
+              source={item.sourceUrl}
             />
           </View>
         )}
