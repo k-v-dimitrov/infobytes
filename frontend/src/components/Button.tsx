@@ -4,15 +4,24 @@ import {
   ButtonProps,
   StyleSheet,
   View,
+  Pressable,
+  PressableProps,
 } from "react-native";
+import { Text } from "./Text";
 import theme from "theme";
 
-interface Props extends ButtonProps {}
+interface Props extends PressableProps {
+  title: string;
+}
 
 export const Button = (props: Props) => {
+  const { title, ...rest } = props;
+
   return (
     <View style={styles.button}>
-      <ReactNativeButton {...props} />
+      <Pressable {...rest}>
+        <Text style={styles.text}>{title}</Text>
+      </Pressable>
     </View>
   );
 };
@@ -26,5 +35,10 @@ const styles = StyleSheet.create({
     borderWidth: theme.borderWidth,
     borderColor: theme.white,
     borderRadius: theme.borderRadius,
+  },
+  text: {
+    paddingVertical: 7,
+    textAlign: "center",
+    fontSize: 16
   },
 });
