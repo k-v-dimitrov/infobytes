@@ -10,6 +10,7 @@
       "@layout/*": ["src/layout/*"],
       "@components/*": ["src/components/*"],
       "@features/*": ["src/features/*"],
+      "@utils/*": ["src/utils/*"],
     }
   }
 }
