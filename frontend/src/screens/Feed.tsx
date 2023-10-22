@@ -1,13 +1,12 @@
 import React, { useEffect } from "react";
-import { Alert, FlatList, View } from "react-native";
-import { useSafeAreaFrame } from "react-native-safe-area-context";
+import { Dimensions, FlatList, View } from "react-native";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { Screen } from "@layout/Screen";
 import { Fact, useGetUserFacts } from "@features/feed";
 
 export const Feed = () => {
   const bottomBarHeight = useBottomTabBarHeight();
-  const { height } = useSafeAreaFrame();
+  const height = Dimensions.get("screen").height;
   const { loading, facts, getUserFacts } = useGetUserFacts();
 
   useEffect(() => {
