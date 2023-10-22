@@ -20,4 +20,4 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.INFOBYTE_EC2_PEM_FILE }}
           REMOTE_HOST: ${{ secrets.INFOBYTE_REMOTE_HOST }}
           REMOTE_USER: ubuntu
-          TARGET: /infobyte
+          TARGET: /home/ubuntu/infobyte
