@@ -23,7 +23,7 @@ jobs:
           TARGET: /home/ubuntu/infobyte
           EXCLUDE: "/frontend/, /backend/node_modules/, /backend/dist/"
           SCRIPT_AFTER: |
-            cd /infobyte/backend
+            cd ~/infobyte/backend
             yarn
             prisma migrate deploy
             yarn build
