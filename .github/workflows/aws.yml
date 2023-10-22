@@ -21,3 +21,10 @@ jobs:
           REMOTE_HOST: ${{ secrets.INFOBYTE_REMOTE_HOST }}
           REMOTE_USER: ubuntu
           TARGET: /home/ubuntu/infobyte
+          EXCLUDE: "/frontend/, /backend/node_modules/, /backend/dist/"
+        SCRIPT_AFTER: |
+          cd /infobyte/backend
+          yarn
+          prisma migrate deploy
+          yarn build
+          yarn start:prod
