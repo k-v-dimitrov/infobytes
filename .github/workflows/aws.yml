@@ -1,4 +1,4 @@
-name: Deploy to EC2
+name: Deploy InfoBytes Backend
 
 on:
   create:
@@ -6,8 +6,8 @@ on:
       - "*"
 
 jobs:
-  deploy:
-    name: Deploy to EC2 on master branch push
+  upload:
+    name: Upload to EC2 from tag branch
     runs-on: ubuntu-latest
 
     steps:
@@ -22,7 +22,18 @@ jobs:
           REMOTE_USER: ubuntu
           TARGET: /home/ubuntu/infobyte
           EXCLUDE: "/frontend/, /backend/node_modules/, /backend/dist/"
-          SCRIPT_AFTER: |
+
+  build:
+    name: Build And Run
+    runs-on: ubuntu-latest
+    steps:
+      - name: Executing remote ssh commands using ssh key
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.INFOBYTE_REMOTE_HOST }}
+          username: ubuntu
+          key: ${{ secrets.INFOBYTE_EC2_PEM_FILE }}
+          script: |
             cd ~/infobyte/backend
             yarn
             prisma migrate deploy
