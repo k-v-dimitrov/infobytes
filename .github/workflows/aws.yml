@@ -22,9 +22,9 @@ jobs:
           REMOTE_USER: ubuntu
           TARGET: /home/ubuntu/infobyte
           EXCLUDE: "/frontend/, /backend/node_modules/, /backend/dist/"
-        SCRIPT_AFTER: |
-          cd /infobyte/backend
-          yarn
-          prisma migrate deploy
-          yarn build
-          yarn start:prod
+          SCRIPT_AFTER: |
+            cd /infobyte/backend
+            yarn
+            prisma migrate deploy
+            yarn build
+            yarn start:prod
