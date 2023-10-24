@@ -1,8 +1,7 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Icon from "@expo/vector-icons/Ionicons";
-import { useGetUserFeed } from "@features/feed";
 import { Feed } from "@screens/Feed";
 import { Search } from "@screens/Search";
 import theme from "theme";
@@ -10,12 +9,6 @@ import theme from "theme";
 const Tab = createBottomTabNavigator();
 
 export default function App() {
-  const { getUserFeed } = useGetUserFeed();
-
-  useEffect(() => {
-    getUserFeed();
-  }, []);
-
   return (
     <NavigationContainer>
       <Tab.Navigator
