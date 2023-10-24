@@ -2,15 +2,15 @@ import React, { useEffect } from "react";
 import { Dimensions, FlatList, View } from "react-native";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { Screen } from "@layout/Screen";
-import { Fact, useGetUserFacts } from "@features/feed";
+import { Fact, useGetUserFeed } from "@features/feed";
 
 export const Feed = () => {
   const bottomBarHeight = useBottomTabBarHeight();
   const height = Dimensions.get("screen").height;
-  const { loading, facts, getUserFacts } = useGetUserFacts();
+  const { loading, facts, getUserFeed } = useGetUserFeed();
 
   useEffect(() => {
-    getUserFacts();
+    getUserFeed();
   }, []);
 
   return (
