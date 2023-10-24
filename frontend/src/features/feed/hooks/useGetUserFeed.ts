@@ -2,28 +2,43 @@ import { useState } from "react";
 import { Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "@utils/axios";
+import { Fact } from "../types";
 
 export const useGetUserFeed = () => {
   const [loading, setLoading] = useState(false);
+  const [facts, setFacts] = useState<Fact[]>([]);
 
   const getUserFeed = async () => {
     setLoading(true);
 
     try {
       const existingUserId = await AsyncStorage.getItem("userId");
-      if (existingUserId) return;
 
-      const { data } = await axios.get("feed/user");
+      if (existingUserId) {
+        const { data } = await axios.get(`feed?userId=${existingUserId}`);
 
-      await AsyncStorage.setItem("userId", data.userId);
+        setFacts(data);
+
+        return;
+      }
+
+      const response = await axios.get("feed/user");
+
+      const { userId } = response.data;
+
+      await AsyncStorage.setItem("userId", userId);
+
+      const { data } = await axios.get(`feed?userId=${userId}`);
+
+      setFacts(data);
     } catch (err) {
       const castedErr = err as Error;
 
-      Alert.alert("Failed to get user feed!", castedErr.message);
+      console.error("[useGetUserFeed.ts] -", castedErr.message, castedErr);
     } finally {
       setLoading(false);
     }
   };
 
-  return { loading, getUserFeed };
+  return { loading, facts, getUserFeed };
 };
