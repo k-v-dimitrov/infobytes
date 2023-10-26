@@ -15,7 +15,7 @@ export const useGetCategories = () => {
     } catch (error) {
       const castedErr = error as Error;
 
-      console.error("[useGetUserFeed.ts] -", castedErr.message, castedErr);
+      console.error("[useGetCategories.ts] -", castedErr.message, castedErr);
     } finally {
       setLoading(false);
     }
