@@ -8,16 +8,23 @@ export const useGetUserFeed = () => {
   const [loading, setLoading] = useState(false);
   const [facts, setFacts] = useState<Fact[]>([]);
 
-  const getUserFeed = async () => {
+  const getUserFeed = async (category?: string) => {
     setLoading(true);
 
     try {
       const existingUserId = await AsyncStorage.getItem("userId");
 
       if (existingUserId) {
-        const { data } = await axios.get(`feed?userId=${existingUserId}`);
+        const { data } = await axios.get<Fact[]>(
+          `feed?userId=${existingUserId}`
+        );
 
-        setFacts(data);
+        // temporary
+        const filtered = category
+          ? data.filter((fact) => fact.categoryType === category)
+          : data;
+
+        setFacts(filtered);
 
         return;
       }
