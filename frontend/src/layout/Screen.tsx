@@ -28,6 +28,6 @@ const styles = StyleSheet.create({
     backgroundColor: theme.primary,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 16,
+    paddingHorizontal: 8,
   },
 });
