@@ -3,10 +3,18 @@ import { TextInput, StyleSheet } from "react-native";
 import { View } from "@components/View";
 import theme from "theme";
 
-export const SearchInput = () => {
+interface Props {
+  handleSearch: (search: string) => void;
+}
+
+export const SearchInput = ({ handleSearch }: Props) => {
   const [inputValue, setInputValue] = useState("");
 
-  const handleSubmit = () => {};
+  const handleSubmit = () => {
+    if (!inputValue) return;
+
+    handleSearch(inputValue);
+  };
 
   return (
     <View>
@@ -28,6 +36,7 @@ export const SearchInput = () => {
 const styles = StyleSheet.create({
   search: {
     marginTop: 16,
+    marginBottom: 56,
     borderWidth: theme.borderWidth,
     borderRadius: theme.borderRadius,
     borderColor: theme.white,
