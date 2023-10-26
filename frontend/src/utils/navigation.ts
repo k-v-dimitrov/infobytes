@@ -14,7 +14,7 @@ export enum Screens {
 }
 
 export type RootStackParamList = {
-  Feed: { category?: string };
+  Feed?: { category?: string };
   Search: undefined;
 };
 
