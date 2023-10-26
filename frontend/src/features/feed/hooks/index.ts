@@ -1,2 +1,1 @@
-export * from './useGetUserFeed'
-export * from './useGetUserFacts'
+export * from "./useGetUserFeed";

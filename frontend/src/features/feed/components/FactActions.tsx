@@ -40,6 +40,7 @@ const styles = StyleSheet.create({
   actions: {
     flexDirection: "row",
     gap: 8,
+    marginBottom: 24
   },
 
   icon: {

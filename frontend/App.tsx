@@ -1,25 +1,19 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Icon from "@expo/vector-icons/Ionicons";
-import { useGetUserFeed } from "@features/feed";
 import { Feed } from "@screens/Feed";
 import { Search } from "@screens/Search";
+import { Screens, RootStackParamList } from "@utils/navigation";
 import theme from "theme";
 
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator<RootStackParamList>();
 
 export default function App() {
-  const { getUserFeed } = useGetUserFeed();
-
-  useEffect(() => {
-    getUserFeed();
-  }, []);
-
   return (
     <NavigationContainer>
       <Tab.Navigator
-        initialRouteName="feed"
+        initialRouteName={Screens.FEED}
         screenOptions={{
           headerShown: false,
           tabBarLabelStyle: {
@@ -29,7 +23,7 @@ export default function App() {
         }}
       >
         <Tab.Screen
-          name="Feed"
+          name={Screens.FEED}
           component={Feed}
           options={{
             tabBarIcon: ({ focused }) => (
@@ -42,7 +36,7 @@ export default function App() {
           }}
         />
         <Tab.Screen
-          name="Search"
+          name={Screens.SEARCH}
           component={Search}
           options={{
             tabBarIcon: ({ focused }) => (
