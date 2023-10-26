@@ -8,9 +8,10 @@
       "theme": ["src/theme"],
       "@screens/*": ["src/screens/*"],
       "@layout/*": ["src/layout/*"],
+      "@components*": ["src/components"],
       "@components/*": ["src/components/*"],
       "@features/*": ["src/features/*"],
-      "@utils/*": ["src/utils/*"],
+      "@utils/*": ["src/utils/*"]
     }
   }
 }
