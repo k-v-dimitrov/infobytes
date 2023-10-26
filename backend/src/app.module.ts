@@ -5,6 +5,7 @@ import { DatabaseModule } from './database/database.module';
 import { FactModule } from './fact/fact.module';
 import { CategoryModule } from './category/category.module';
 import { FeedModule } from './feed/feed.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { FeedModule } from './feed/feed.module';
     FactModule,
     CategoryModule,
     FeedModule,
+    AuthModule,
   ],
 })
 export class AppModule {}

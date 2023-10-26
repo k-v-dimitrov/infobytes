@@ -8,6 +8,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { FactService } from './fact.service';
 import {
@@ -17,6 +18,7 @@ import {
   PutFactDto,
   SearchFactDto,
 } from './dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('fact')
 export class FactController {
@@ -29,6 +31,7 @@ export class FactController {
   }
 
   // Read
+  @UseGuards(AuthGuard('basic'))
   @Get(':id')
   get(@Param() factId: FactIdDto) {
     return this.factService.get(factId);
