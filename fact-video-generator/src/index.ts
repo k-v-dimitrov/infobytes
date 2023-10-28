@@ -4,10 +4,11 @@ import Konva from 'konva';
 
 const OUTPUT_DIR = './frames';
 const FPS = 25;
-const videoLength = 10; // in seconds
-const frameLength = videoLength * FPS;
 const VIDEO_WIDTH = 1080;
 const VIDEO_HEIGHT = 1920;
+
+const videoLength = 10; // in seconds
+const frameLength = videoLength * FPS;
 
 async function renderFrame(currentFrame: number) {
   //@ts-expect-error
