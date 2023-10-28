@@ -1,35 +1,54 @@
-import path from 'path';
 import * as fs from 'fs';
-
+import path from 'path';
 import Konva from 'konva';
-// import execa from 'execa';
-
-import shelljs from 'shelljs';
 
 const OUTPUT_DIR = './frames';
-
 const FPS = 25;
 const videoLength = 10; // in seconds
 const frameLength = videoLength * FPS;
+const VIDEO_WIDTH = 1080;
+const VIDEO_HEIGHT = 1920;
 
 async function renderFrame(currentFrame: number) {
   //@ts-expect-error
   const stage = new Konva.Stage({
-    width: 500,
-    height: 500,
+    width: VIDEO_WIDTH,
+    height: VIDEO_HEIGHT,
   });
 
   const layer1 = new Konva.Layer();
 
+  const currentSecond = currentFrame / FPS;
+
   const rect = new Konva.Rect({
-    width: 500,
-    height: 500,
-    cornerRadius: 36,
-    fill: `rgb(${currentFrame}, ${currentFrame}, ${currentFrame})`,
+    width: VIDEO_WIDTH,
+    height: VIDEO_HEIGHT,
+    fill: `black`,
+  });
+
+  const TEXTBOX_WIDTH = 975;
+
+  const textBox = new Konva.Text({
+    text:
+      currentSecond < 5
+        ? 'The Great Wall of China is the longest wall in the world,'
+        : 'stretching over 13,000 miles.',
+    fontSize: 140,
+    fontFamily: 'Helvetica',
+    fill: 'white',
+    width: TEXTBOX_WIDTH,
+    align: 'center',
+  });
+
+  const TEXTBOT_HEIGHT = textBox.getHeight();
+
+  textBox.setPosition({
+    x: VIDEO_WIDTH / 2 - TEXTBOX_WIDTH / 2,
+    y: VIDEO_HEIGHT / 2 - TEXTBOT_HEIGHT / 2,
   });
 
   layer1.add(rect);
-
+  layer1.add(textBox);
   stage.add(layer1);
 
   saveFrame({ stage, outputDir: OUTPUT_DIR, frame: currentFrame });
@@ -59,43 +78,15 @@ async function saveFrame({
   await fs.promises.writeFile(fileName, base64Data, 'base64');
 }
 
-async function createVideo() {
-  // ffmpeg -framerate 25 -pattern_type glob -i './frames/*.png' -c:v libx264 -pix_fmt yuv420p out.mp4
-  // ffmpeg -framerate 25 -pattern_type glob -i './frames/*.png'   -c:v libx264 -pix_fmt yuv420p out.mp4
-  // await execa('ffmpeg', [
-  //   '-framerate',
-  //   String(FPS), // Set the frame rate
-  //   '-pattern_type',
-  //   'glob', // Specify the pattern type
-  //   '-i',
-  //   './frames/*.png', // Input file pattern
-  //   '-c:v',
-  //   'libx264', // Video codec
-  //   '-pix_fmt',
-  //   'yuv420p', // Pixel format
-  //   './out.mp4', // Output file name
-  // ]);
-
-  // process.exec;
-  shelljs.echo('test');
-  shelljs.echo(process.cwd());
-
-  shelljs.config.verbose = true;
-  shelljs.exec(
-    `cd ${process.cwd()} && ffmpeg -framerate 25 -pattern_type glob -i ./frames/*.png -c:v libx264 -pix_fmt yuv420p out.mp4`
-  );
-}
-
 async function main() {
   for (let i = 0; i < frameLength; i++) {
     await renderFrame(i);
   }
-
-  await createVideo();
 }
 
 main();
 
+// ANIMATION PREPARATION
 // function makeAnimation(
 //   callback: (delta: number) => void,
 //   { startFrame, duration }: { startFrame: number; duration: number }
