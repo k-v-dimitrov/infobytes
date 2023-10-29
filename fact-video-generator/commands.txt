@@ -1,0 +1,5 @@
+Audio:
+ffmpeg -f concat -safe 0 -i .\audio\segments.txt .\audio\output.mp3
+
+Video:
+ffmpeg -y -framerate 25 -i './frames/frame-%d.png' -i ./audio/output.mp3 -c:v libx264 -pix_fmt yuv420p out.mp4
