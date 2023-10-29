@@ -1,16 +1,21 @@
 import * as fs from 'fs';
 import path from 'path';
 import Konva from 'konva';
+import getAudioDurationInSeconds from 'get-audio-duration';
 
 const OUTPUT_DIR = './frames';
 const FPS = 25;
 const VIDEO_WIDTH = 1080;
 const VIDEO_HEIGHT = 1920;
 
-const videoLength = 10; // in seconds
-const frameLength = videoLength * FPS;
-
-async function renderFrame(currentFrame: number) {
+async function renderFrame(
+  currentFrame: number,
+  subtitleTimestampMap: {
+    subtitle: string;
+    startTime: number;
+    endTime: number;
+  }[]
+) {
   //@ts-expect-error
   const stage = new Konva.Stage({
     width: VIDEO_WIDTH,
@@ -29,11 +34,13 @@ async function renderFrame(currentFrame: number) {
 
   const TEXTBOX_WIDTH = 975;
 
+  console.log(currentSecond);
+  const { subtitle } = subtitleTimestampMap.find(
+    stm => currentSecond < stm.endTime && currentSecond >= stm.startTime
+  );
+
   const textBox = new Konva.Text({
-    text:
-      currentSecond < 5
-        ? 'The Great Wall of China is the longest wall in the world,'
-        : 'stretching over 13,000 miles.',
+    text: subtitle,
     fontSize: 140,
     fontFamily: 'Helvetica',
     fill: 'white',
@@ -69,45 +76,64 @@ async function saveFrame({
   // remove the data header
   const base64Data = data.substring('data:image/png;base64,'.length);
 
-  const fileNamePadding = Math.floor(Math.log10(frameLength)) + 1;
-
-  const fileName = path.join(
-    outputDir,
-    `frame-${String(frame + 1).padStart(fileNamePadding, '0')}.png`
-  );
+  const fileName = path.join(outputDir, `frame-${String(frame + 1)}.png`);
 
   await fs.promises.writeFile(fileName, base64Data, 'base64');
 }
 
+async function getAudioFileLength(filePath: string) {
+  return parseFloat((await getAudioDurationInSeconds(filePath)).toFixed(2));
+}
+
 async function main() {
+  const allAudioFiles = fs.readdirSync('./audio');
+
+  const allAudioFilesLengths = await Promise.all(
+    allAudioFiles.map(audioFilePath => {
+      return getAudioFileLength(`./audio/${audioFilePath}`);
+    })
+  );
+
+  const combinedAudioLength = parseFloat(
+    allAudioFilesLengths
+      .reduce(
+        (combinedFilesLength, currentAudioFileLength) =>
+          combinedFilesLength + currentAudioFileLength,
+        0
+      )
+      .toFixed(2)
+  );
+
+  const subtitleTimestampMap = allAudioFilesLengths.reduce<
+    {
+      subtitle: string;
+      startTime: number;
+      endTime: number;
+    }[]
+  >((acc, audioLength, i) => {
+    return [
+      ...acc,
+      {
+        subtitle:
+          i === 0
+            ? 'The Great Wall of China is the longest wall in the world,'
+            : ' stretching over 13,000 miles.',
+        startTime: i === 0 ? 0 : acc[i - 1].endTime,
+        endTime: i === 0 ? audioLength : acc[i - 1].endTime + audioLength,
+      },
+    ];
+  }, []);
+
+  console.log(subtitleTimestampMap);
+
+  const videoLength = combinedAudioLength;
+  const frameLength = videoLength * FPS;
+
+  console.log(videoLength);
+
   for (let i = 0; i < frameLength; i++) {
-    await renderFrame(i);
+    await renderFrame(i, subtitleTimestampMap);
   }
 }
 
 main();
-
-// ANIMATION PREPARATION
-// function makeAnimation(
-//   callback: (delta: number) => void,
-//   { startFrame, duration }: { startFrame: number; duration: number }
-// ) {
-//   return (frame: number) => {
-//     const thisFrame = frame - startFrame;
-//     if (thisFrame > 0 && thisFrame <= duration) {
-//       callback(thisFrame / duration);
-//     }
-//   };
-// }
-
-// function combineAnimations(
-//   ...animations: ((delta: number) => void)[] | undefined
-// ) {
-//   return (delta: number) => {
-//     for (const animation of animations) {
-//       if (animation) {
-//         animation(delta);
-//       }
-//     }
-//   };
-// }
