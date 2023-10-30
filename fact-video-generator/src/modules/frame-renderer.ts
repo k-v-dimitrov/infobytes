@@ -1,5 +1,11 @@
 import Konva from 'konva';
 
+interface Subtitle {
+  subtitle: string;
+  startTime: number;
+  endTime: number;
+}
+
 interface Options {
   videoWidth: number;
   videoHeight: number;
@@ -16,7 +22,7 @@ interface RenderFrameParams {
 export async function renderFrame({
   currentFrame,
   subtitles,
-  options: { frameOutputDir, videoHeight, videoWidth, framesPerSecond },
+  options: { videoHeight, videoWidth, framesPerSecond },
 }: RenderFrameParams) {
   //@ts-expect-error
   const stage = new Konva.Stage({
