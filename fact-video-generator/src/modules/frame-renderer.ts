@@ -1,11 +1,4 @@
 import Konva from 'konva';
-import { saveFrame } from './frame-saver';
-
-interface Subtitle {
-  subtitle: string;
-  startTime: number;
-  endTime: number;
-}
 
 interface Options {
   videoWidth: number;
@@ -67,9 +60,5 @@ export async function renderFrame({
   layer1.add(textBox);
   stage.add(layer1);
 
-  saveFrame({
-    outputDir: frameOutputDir,
-    frameIndex: currentFrame,
-    frameDataUrl: stage.toDataURL(),
-  });
+  return stage.toDataURL();
 }
