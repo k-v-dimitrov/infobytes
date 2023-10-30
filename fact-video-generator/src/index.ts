@@ -124,12 +124,8 @@ async function main() {
     ];
   }, []);
 
-  console.log(subtitleTimestampMap);
-
   const videoLength = combinedAudioLength;
   const frameLength = videoLength * FPS;
-
-  console.log(videoLength);
 
   for (let i = 0; i < frameLength; i++) {
     await renderFrame(i, subtitleTimestampMap);
