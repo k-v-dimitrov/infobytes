@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@types/node": "^20.8.9",
+    "@types/node-fetch": "^2.6.7",
     "@types/shelljs": "^0.8.14",
     "canvas": "^2.11.2",
     "canvas-node": "^0.3.23",
@@ -34,6 +35,7 @@
     "get-audio-duration": "^4.0.1",
     "knex": "^3.0.1",
     "konva": "^9.2.2",
+    "node-fetch": "^2.6.6",
     "pg": "^8.11.3",
     "shelljs": "^0.8.5"
   }
