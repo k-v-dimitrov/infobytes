@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import dotenv from 'dotenv';
-import { renderFrame } from './modules/render';
+import { renderFrame } from './modules/frame-renderer';
 import { getAudioFileLength } from './utils';
 dotenv.config();
 
