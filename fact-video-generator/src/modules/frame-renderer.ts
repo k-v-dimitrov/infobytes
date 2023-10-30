@@ -1,5 +1,5 @@
 import Konva from 'konva';
-import { saveFrame } from './save';
+import { saveFrame } from './frame-saver';
 
 interface Subtitle {
   subtitle: string;
