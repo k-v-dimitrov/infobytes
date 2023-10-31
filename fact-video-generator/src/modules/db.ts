@@ -26,6 +26,10 @@ const db = async () => {
       log('DB', 'Retrieved all facts');
       return allFacts;
     },
+    getFactById: (id: string) => {
+      log('DB', 'Retrieved fact by id');
+      return allFacts.find(fact => fact.id === id);
+    },
   };
 };
 
