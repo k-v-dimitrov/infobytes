@@ -10,6 +10,12 @@ while IFS= read -r line; do
   frames_path=$(echo "$program_output" | grep "video:" | awk '{print $2}')
   output_path=$(echo "$program_output" | grep "output:" | awk '{print $2}')
 
+  if [ ! -d "$output_path" ]; then
+  # output_path directory does not exist, so create it
+    mkdir "$output_path"
+    echo "Folder '$output_path' did not exists so it was created."
+  fi
+
   ffmpeg -f concat -safe 0 -i "$audio_path/segments.txt" "$audio_path/generated-audio.mp3"
   ffmpeg -y -framerate 25 -i "$frames_path/frame-%d.png" -i "$audio_path/generated-audio.mp3" -c:v libx264 -pix_fmt yuv420p "$output_path/out.mp4"
 
@@ -19,8 +25,8 @@ while IFS= read -r line; do
   
   yarn start:hook:post
 
-  echo "--- Cleaning output folder $output_path"
-  rm -rf $output_path
+  # echo "--- Cleaning output folder $output_path"
+  # rm -rf $output_path
 done <<< "$pre_hook_output"
 
 
