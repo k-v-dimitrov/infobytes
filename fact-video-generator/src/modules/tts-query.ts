@@ -1,6 +1,9 @@
 import fetch from 'node-fetch';
+import { log } from '@/utils';
 
 export const queryTts = async (textToConvert: string) => {
+  log('TTS', `Querying TTS...`);
+
   const audioIdRaw = await fetch(
     'https://support.readaloud.app/ttstool/createParts',
     {
@@ -48,6 +51,8 @@ export const queryTts = async (textToConvert: string) => {
   );
 
   const audioBuffer = await audioRaw.buffer();
+
+  log('TTS', `Finished Querying TTS!`);
 
   return audioBuffer;
 };

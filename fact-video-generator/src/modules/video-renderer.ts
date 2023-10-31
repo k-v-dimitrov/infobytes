@@ -1,3 +1,4 @@
+import { log } from '@/utils';
 import { renderFrame } from './frame-renderer';
 import { saveFrame } from './frame-saver';
 
@@ -24,12 +25,13 @@ export async function renderVideo({
   videoWidth,
   subtitles,
 }: RenderVideoParams) {
+  log('VIDEO_RENDERER', 'Started video rendering...');
   const videoLength = combinedAudioLength;
 
   const frames = new Array(Math.ceil(videoLength * framesPerSecond)).fill('');
 
   const renderFramePromises = frames.map(async (_, currentFrame) => {
-    console.log(`   Rendering frame ${currentFrame}`);
+    log('VIDEO_RENDERER', `   Rendering frame ${currentFrame}...`);
     const renderedFrame = await renderFrame({
       currentFrame,
       options: {
@@ -49,4 +51,6 @@ export async function renderVideo({
   });
 
   await Promise.all(renderFramePromises);
+
+  log('VIDEO_RENDERER', 'Finished rendering video!');
 }

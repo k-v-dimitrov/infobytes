@@ -8,6 +8,7 @@ export async function getAudioFileLength(filePath: string) {
 }
 
 export async function getAudioDetailsInDir(audioDir: string) {
+  log('UTILS', `Getting audio details...`);
   const allFilesInAudioDir = fs.readdirSync(audioDir);
 
   const allAudioFiles = allFilesInAudioDir.filter(
@@ -29,6 +30,8 @@ export async function getAudioDetailsInDir(audioDir: string) {
       )
       .toFixed(2)
   );
+
+  log('UTILS', `Finished getting audio details!`);
 
   return {
     audioFilesDurationsInSeconds,
@@ -63,6 +66,8 @@ export function breakString(inputString: string): string[] {
     }
   });
 
+  log('UTILS', 'Finished breaking fact to substrings!');
+
   return brokenSentences;
 }
 
@@ -76,23 +81,26 @@ export function buildSubtitleSegments(
   factSubstrings: string[],
   audioFilesDurationsInSeconds: number[]
 ) {
-  return audioFilesDurationsInSeconds.reduce<SubtitleSegment[]>(
-    (acc, audioDuration, i) => {
-      const startTime = i === 0 ? 0 : acc[i - 1].endTime;
-      const endTime =
-        i === 0 ? audioDuration : acc[i - 1].endTime + audioDuration;
+  log('UTILS', 'Building subtitle segments...');
+  const subtitleSegments = audioFilesDurationsInSeconds.reduce<
+    SubtitleSegment[]
+  >((acc, audioDuration, i) => {
+    const startTime = i === 0 ? 0 : acc[i - 1].endTime;
+    const endTime =
+      i === 0 ? audioDuration : acc[i - 1].endTime + audioDuration;
 
-      return [
-        ...acc,
-        {
-          subtitle: factSubstrings[i],
-          startTime,
-          endTime,
-        },
-      ];
-    },
-    []
-  );
+    return [
+      ...acc,
+      {
+        subtitle: factSubstrings[i],
+        startTime,
+        endTime,
+      },
+    ];
+  }, []);
+
+  log('UTILS', 'Finished building subtitle segments!');
+  return subtitleSegments;
 }
 
 export const createFileAndWriteBuffer = (
@@ -117,7 +125,20 @@ export const makeTempFolder = async ({ prefix }: { prefix: string }) => {
         rej(err);
       }
 
+      log('UTILS', `Generated temp folder: ${folder}`);
       res(folder);
     });
   });
 };
+
+const { VERBOSE } = process.env;
+
+function shouldLog() {
+  return VERBOSE === 'true';
+}
+
+export function log(module = 'MAIN', ...messages: any[]) {
+  if (shouldLog()) {
+    console.log(`[${module}]: `, ...messages);
+  }
+}

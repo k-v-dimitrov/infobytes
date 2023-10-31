@@ -1,3 +1,4 @@
+import { log } from '@/utils';
 import knex from 'knex';
 
 const { DATABASE_URL } = process.env;
@@ -18,9 +19,13 @@ const db = async () => {
 
   const query = db.queryBuilder();
   const allFacts: Array<Fact> = await query.select('*').from('facts');
+  log('DB', 'Pulled facts from db');
 
   return {
-    getAllFacts: () => allFacts,
+    getAllFacts: () => {
+      log('DB', 'Retrieved all facts');
+      return allFacts;
+    },
   };
 };
 
