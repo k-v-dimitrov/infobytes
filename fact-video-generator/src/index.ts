@@ -4,6 +4,9 @@ dotenv.config();
 import fs from 'fs';
 import path from 'path';
 
+import yargs from 'yargs/yargs';
+import { hideBin } from 'yargs/helpers';
+
 import db from './modules/db';
 import { queryTts } from './modules/tts-query';
 import {
@@ -32,9 +35,23 @@ const FRAMES_OUTPUT_DIR = './frames';
 
 async function main() {
   try {
-    const allFacts = (await db()).getAllFacts();
+    // TODO: Refactor yargs parsing
+    const { id: factId } = yargs(hideBin(process.argv)).argv as unknown as {
+      id: string;
+    };
+
+    if (!factId) {
+      throw new Error('FactId was not provided, use --id=[factId]');
+    }
+
+    const factToProcess = (await db()).getFactById(factId);
+
+    if (!factToProcess) {
+      throw new Error(`Could not find fact with id=${factId}`);
+    }
+
     const folder = await makeTempFolder({ prefix: 'video-generator-' });
-    const factSubstrings = breakString(allFacts[0].text);
+    const factSubstrings = breakString(factToProcess.text);
     for (let i = 0; i < factSubstrings.length; i++) {
       const audioBuffer = await queryTts(factSubstrings[i]);
       const writtenAudioFilePath = await writeAudioSegment(
@@ -70,6 +87,7 @@ async function main() {
 
     process.exit(0);
   } catch (err) {
+    // TODO: clean temp folder
     console.log(err);
   }
 }
