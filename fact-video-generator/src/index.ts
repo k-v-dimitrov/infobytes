@@ -79,11 +79,13 @@ async function main() {
     });
 
     const { FINAL_VIDEO_DIR } = process.env;
+    const finalVideoFileName = `${factId}.mp4`;
 
     console.log('------ Results ------');
     console.log('audio: ', folder);
-    console.log('video: ', framesOutputDir);
-    console.log('output: ', FINAL_VIDEO_DIR);
+    console.log('frames: ', framesOutputDir);
+    console.log('output_dir: ', FINAL_VIDEO_DIR);
+    console.log('video_name: ', finalVideoFileName);
 
     process.exit(0);
   } catch (err) {

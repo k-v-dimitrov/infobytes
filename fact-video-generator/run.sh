@@ -7,8 +7,9 @@ while IFS= read -r line; do
   # Run the command with the current line as the ID
   program_output=$(yarn start --id=$line 2>&1 | tee /dev/tty)
   audio_path=$(echo "$program_output" | grep "audio:" | awk '{print $2}')
-  frames_path=$(echo "$program_output" | grep "video:" | awk '{print $2}')
-  output_path=$(echo "$program_output" | grep "output:" | awk '{print $2}')
+  frames_path=$(echo "$program_output" | grep "frames:" | awk '{print $2}')
+  output_path=$(echo "$program_output" | grep "output_dir:" | awk '{print $2}')
+  video_name=$(echo "$program_output" | grep "video_name:" | awk '{print $2}')
 
   if [ ! -d "$output_path" ]; then
   # output_path directory does not exist, so create it
@@ -17,7 +18,7 @@ while IFS= read -r line; do
   fi
 
   ffmpeg -f concat -safe 0 -i "$audio_path/segments.txt" "$audio_path/generated-audio.mp3"
-  ffmpeg -y -framerate 25 -i "$frames_path/frame-%d.png" -i "$audio_path/generated-audio.mp3" -c:v libx264 -pix_fmt yuv420p "$output_path/out.mp4"
+  ffmpeg -y -framerate 25 -i "$frames_path/frame-%d.png" -i "$audio_path/generated-audio.mp3" -c:v libx264 -pix_fmt yuv420p "$output_path"/"$video_name"
 
   # Clean temp folder
   echo "--- Cleaning temp folder $audio_path"
