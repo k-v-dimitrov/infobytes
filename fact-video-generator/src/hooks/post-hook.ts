@@ -1,17 +1,11 @@
 import AWS from 'aws-sdk';
 import fs from 'fs';
 
-// import yargs from 'yargs/yargs';
-// import { hideBin } from 'yargs/helpers';
+import yargs from 'yargs/yargs';
+import { hideBin } from 'yargs/helpers';
 
 import dotenv from 'dotenv';
 dotenv.config();
-
-// const { id: factId } = yargs(hideBin(process.argv)).argv as unknown as {
-//   id: string;
-// };
-
-const factId = `b35037a-1f4c-4849-80d6-477001b811b9`;
 
 const {
   AWS_S3_ACCESS_KEY,
@@ -26,14 +20,17 @@ AWS.config.update({
   region: AWS_S3_REGION,
 });
 
+const { videoPath, factId } = yargs(hideBin(process.argv)).argv as unknown as {
+  videoPath: string;
+  factId: string;
+};
 // Specify the S3 bucket and file information
 const bucketName = AWS_S3_BUCKET_NAME;
-const fileName = `fact-video/${factId}.mp4`; // The name you want to give to the file in S3
-// TODO: properly set the file path
-const filePath = `/home/kiril/workspace/infobytes/fact-video-generator/generated-videos/4b35037a-1f4c-4849-80d6-477001b811b9.mp4`;
+// The name you want to give to the file in S3
+const fileName = `fact-video/${factId}.mp4`;
 
 // Read the file from your local filesystem
-const fileContent = fs.readFileSync(filePath);
+const fileContent = fs.readFileSync(videoPath);
 
 // Define S3 parameters for the upload
 const params: AWS.S3.PutObjectRequest = {
