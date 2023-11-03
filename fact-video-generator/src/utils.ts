@@ -1,6 +1,8 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
+import { SpawnOptionsWithoutStdio, spawn } from 'child_process';
+
 import getAudioDurationInSeconds from 'get-audio-duration';
 
 export async function getAudioFileLength(filePath: string) {
@@ -142,3 +144,31 @@ export function log(module = 'MAIN', ...messages: any[]) {
     console.log(`[${module}]: `, ...messages);
   }
 }
+
+export const spawnPromise = (
+  command: string,
+  options?: SpawnOptionsWithoutStdio
+) => {
+  return new Promise<string>((res, rej) => {
+    const cmd = spawn(command, { ...options, shell: true });
+    let cmdOutput: string = '';
+
+    cmd.stdout.on('data', stdout => {
+      const dataString = stdout.toString();
+      console.log(dataString);
+      cmdOutput += dataString;
+    });
+
+    cmd.stderr.on('data', err => {
+      console.error(`stderr: ${err}`);
+    });
+
+    cmd.on('close', code => {
+      if (code !== 0) {
+        rej(code);
+      }
+
+      res(cmdOutput);
+    });
+  });
+};
