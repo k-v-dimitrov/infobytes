@@ -1,10 +1,10 @@
 import React from "react";
 import { Text, View } from "@gluestack-ui/themed";
 
-export const Search = () => {
+export const Profile = () => {
   return (
     <View>
-      <Text>Search screen</Text>
+      <Text>Profile screen</Text>
     </View>
   );
 };
