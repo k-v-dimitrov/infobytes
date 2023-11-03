@@ -2,6 +2,16 @@
 
 The generator is comprised of three main components: the pre-hook, the video generator, and the post-hook. Additionally, there is a main `index.ts` file that acts as the driver, coordinating the flow between these components. 
 
+## Disclaimer
+
+**This generator was built to be run in Unix environments. It also requires ffmpeg**
+
+Developed and tested on:
+
+**Ubuntu 22.04.3 LTS x86_64**
+
+**ffmpeg version 4.4.2-0ubuntu0.22.04.**
+
 ## Pre-Hook
 
 The pre-hook's primary responsibility is to extract facts from the provided database. It will then log each fact's unique ID on separate lines in the console so they can later be parsed by the main driver.
@@ -102,7 +112,9 @@ Make sure to adjust .env.
 
 - [ ] Fix video length calculation: For some reason the calculated video length is a bit higher than the end timestamp of the last subtitle fragment. It is currently patched by handling undefined current subtitle for displaying:
 
-`frame-renderer:54`
+
+
+frame-renderer:`frame-renderer:54`
 ```typescript
   const subtitle = subtitles.find(
     stm => currentSecond < stm.endTime && currentSecond >= stm.startTime
