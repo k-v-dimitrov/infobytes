@@ -2,7 +2,7 @@ import React from "react";
 import { Path } from "react-native-svg";
 import { createIcon } from "@gluestack-ui/themed";
 
-export const PersonCircle = createIcon({
+export const PersonCircleIcon = createIcon({
   viewBox: "0 0 512 512",
   path: (
     <>
