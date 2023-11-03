@@ -150,15 +150,18 @@ export function log(module = 'MAIN', ...messages: any[]) {
 
 export const spawnPromise = (
   command: string,
-  options?: SpawnOptionsWithoutStdio
+  shouldLog: boolean,
+  spawnOptions?: SpawnOptionsWithoutStdio
 ) => {
   return new Promise<string>((res, rej) => {
-    const cmd = spawn(command, { ...options, shell: true });
+    const cmd = spawn(command, { ...spawnOptions, shell: true });
     let cmdOutput: string = '';
 
     cmd.stdout.on('data', stdout => {
       const dataString = stdout.toString();
-      console.log(dataString);
+      if (shouldLog) {
+        console.log(dataString);
+      }
       cmdOutput += dataString;
     });
 

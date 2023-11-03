@@ -1,5 +1,4 @@
 import { log, spawnPromise } from '@/utils';
-import { renderFrame } from './frame-renderer';
 import { saveFrame } from './frame-saver';
 
 interface Subtitle {
@@ -50,6 +49,7 @@ export async function renderVideo({
             subtitles,
           })
         )}`,
+        false,
         { shell: true }
       );
     });
@@ -69,6 +69,8 @@ export async function renderVideo({
         frameIndex: currentFrame,
       });
     }
+
+    log('VIDEO_RENDERER', `Frames ${i} / ${frames.length} done!`);
   }
 
   log('VIDEO_RENDERER', 'Finished rendering video!');

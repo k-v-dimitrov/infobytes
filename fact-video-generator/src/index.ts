@@ -15,6 +15,7 @@ async function main() {
     try {
       const generatorOutput = await spawnPromise(
         `yarn start:generator --id=${factId}`,
+        true,
         { shell: true }
       );
 
