@@ -66,5 +66,10 @@ export async function renderFrame({
   layer1.add(textBox);
   stage.add(layer1);
 
-  return stage.toDataURL();
+  const stageData = stage.toDataURL();
+
+  // Release memory to prevent build up
+  stage.destroy();
+
+  return stageData;
 }
