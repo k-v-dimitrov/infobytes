@@ -72,8 +72,6 @@ async function main() {
       audioFilesDurationsInSeconds
     );
 
-    console.log(subtitleSegments);
-
     const framesOutputDir = path.join(folder, FRAMES_OUTPUT_DIR);
     fs.mkdirSync(framesOutputDir);
     await renderVideo({
