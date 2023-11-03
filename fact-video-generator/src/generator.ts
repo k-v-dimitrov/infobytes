@@ -21,6 +21,7 @@ import {
   makeTempFolder,
 } from './utils';
 import { renderVideo } from './modules/video-renderer';
+import { queryStableDiffusion, saveBgImage } from './modules/bg-query';
 
 const {
   FPS: configFPS,
@@ -71,6 +72,10 @@ async function main() {
       factSubstrings,
       audioFilesDurationsInSeconds
     );
+
+    const bgImageBase64 = await queryStableDiffusion(factToProcess.text);
+
+    await saveBgImage(folder, bgImageBase64);
 
     const framesOutputDir = path.join(folder, FRAMES_OUTPUT_DIR);
     fs.mkdirSync(framesOutputDir);
