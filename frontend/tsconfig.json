@@ -1,17 +1,13 @@
 {
-  "extends": "expo/tsconfig.base",
+  "extends": "@tsconfig/react-native/tsconfig.json",
   "compilerOptions": {
-    "strict": true,
     "baseUrl": ".",
     "paths": {
-      "*": ["src/*"],
-      "theme": ["src/theme"],
-      "@screens/*": ["src/screens/*"],
-      "@layout/*": ["src/layout/*"],
-      "@components*": ["src/components"],
-      "@components/*": ["src/components/*"],
-      "@features/*": ["src/features/*"],
-      "@utils/*": ["src/utils/*"]
+      "@src/*": ["src/*"],
+      "@icons": ["src/icons"],
+      "@icons/*": ["src/icons/*"],
+      "@screens": ["src/screens"],
+      "@screens/*": ["src/screens/*"]
     }
   }
 }
