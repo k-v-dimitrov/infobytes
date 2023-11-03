@@ -1,4 +1,4 @@
-import { log } from '@/utils';
+import { log, spawnPromise } from '@/utils';
 import { renderFrame } from './frame-renderer';
 import { saveFrame } from './frame-saver';
 
@@ -28,29 +28,48 @@ export async function renderVideo({
   log('VIDEO_RENDERER', 'Started video rendering...');
   const videoLength = combinedAudioLength;
 
-  const frames = new Array(Math.ceil(videoLength * framesPerSecond)).fill('');
+  const frames = new Array(Math.ceil(videoLength * framesPerSecond))
+    .fill('')
+    .map((_, i) => i + 1);
 
-  const renderFramePromises = frames.map(async (_, currentFrame) => {
-    log('VIDEO_RENDERER', `   Rendering frame ${currentFrame}...`);
-    const renderedFrame = await renderFrame({
-      currentFrame,
-      options: {
-        frameOutputDir: framesOutputDir,
-        framesPerSecond,
-        videoHeight,
-        videoWidth,
-      },
-      subtitles,
+  const chunkSize = 10;
+  for (let i = 0; i < frames.length; i += chunkSize) {
+    const chunk = frames.slice(i, i + chunkSize);
+
+    const renderingChunk = chunk.map(currentFrame => {
+      return spawnPromise(
+        `yarn start:frame-renderer --params=${JSON.stringify(
+          JSON.stringify({
+            currentFrame,
+            options: {
+              frameOutputDir: framesOutputDir,
+              framesPerSecond,
+              videoHeight,
+              videoWidth,
+            },
+            subtitles,
+          })
+        )}`,
+        { shell: true }
+      );
     });
 
-    await saveFrame({
-      outputDir: framesOutputDir,
-      frameDataUrl: renderedFrame,
-      frameIndex: currentFrame,
-    });
-  });
+    const renderResults = await Promise.all(renderingChunk);
 
-  await Promise.all(renderFramePromises);
+    for (const renderResult of renderResults) {
+      const currentFrame = Number.parseInt(
+        renderResult.match(/currentFrame:\s*(.+)/)[1]
+      );
+
+      const renderedFrame = renderResult.match(/stageData:\s*(.+)/)[1];
+
+      await saveFrame({
+        outputDir: framesOutputDir,
+        frameDataUrl: renderedFrame,
+        frameIndex: currentFrame,
+      });
+    }
+  }
 
   log('VIDEO_RENDERER', 'Finished rendering video!');
 }

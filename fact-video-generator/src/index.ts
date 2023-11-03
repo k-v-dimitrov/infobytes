@@ -13,11 +13,6 @@ async function main() {
 
   for (const factId of factIdsToProcess) {
     try {
-      // const generatorOutput = execSync(`yarn start:generator --id=${factId}`, {
-      //   encoding: 'utf-8',
-      //   stdio: 'inherit',
-      // });
-
       const generatorOutput = await spawnPromise(
         `yarn start:generator --id=${factId}`,
         { shell: true }

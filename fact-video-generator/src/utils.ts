@@ -87,9 +87,12 @@ export function buildSubtitleSegments(
   const subtitleSegments = audioFilesDurationsInSeconds.reduce<
     SubtitleSegment[]
   >((acc, audioDuration, i) => {
-    const startTime = i === 0 ? 0 : acc[i - 1].endTime;
+    const startTime =
+      i === 0 ? 0 : Number.parseFloat(acc[i - 1].endTime.toFixed(2));
     const endTime =
-      i === 0 ? audioDuration : acc[i - 1].endTime + audioDuration;
+      i === 0
+        ? audioDuration
+        : Number.parseFloat((acc[i - 1].endTime + audioDuration).toFixed(2));
 
     return [
       ...acc,

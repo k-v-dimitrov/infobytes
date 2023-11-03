@@ -1,3 +1,6 @@
+import yargs from 'yargs/yargs';
+import { hideBin } from 'yargs/helpers';
+
 import Konva from 'konva';
 
 interface Subtitle {
@@ -19,11 +22,17 @@ interface RenderFrameParams {
   options: Options;
 }
 
-export async function renderFrame({
-  currentFrame,
-  subtitles,
-  options: { videoHeight, videoWidth, framesPerSecond },
-}: RenderFrameParams) {
+export async function renderFrame() {
+  const { params } = yargs(hideBin(process.argv)).argv as unknown as {
+    params: string;
+  };
+
+  const {
+    currentFrame,
+    subtitles,
+    options: { videoHeight, videoWidth, framesPerSecond },
+  } = JSON.parse(params) as RenderFrameParams;
+
   //@ts-expect-error
   const stage = new Konva.Stage({
     width: videoWidth,
@@ -42,9 +51,9 @@ export async function renderFrame({
 
   const TEXTBOX_WIDTH = 975;
 
-  const { subtitle } = subtitles.find(
+  const subtitle = subtitles.find(
     stm => currentSecond < stm.endTime && currentSecond >= stm.startTime
-  );
+  )?.subtitle;
 
   const textBox = new Konva.Text({
     text: subtitle,
@@ -71,5 +80,11 @@ export async function renderFrame({
   // Release memory to prevent build up
   stage.destroy();
 
-  return stageData;
+  console.log('---- Results ----');
+
+  console.log(`currentFrame: ${currentFrame}`);
+  console.log(`stageData: ${stageData}`);
+  process.exit(0);
 }
+
+renderFrame();

@@ -9,6 +9,7 @@
     "dev:hook:post": "ts-node-dev -r tsconfig-paths/register ./src/hooks/post-hook.ts",
     "start": "node ./dist/index.js",
     "start:generator": "node ./dist/generator.js",
+    "start:frame-renderer": "node ./dist/modules/frame-renderer.js",
     "start:hook:pre": "node ./dist/hooks/pre-hook.js",
     "start:hook:post": "node ./dist/hooks/post-hook.js",
     "lint": "eslint \"./src/**/*.ts\"",
