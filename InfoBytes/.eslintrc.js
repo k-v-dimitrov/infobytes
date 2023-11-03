@@ -3,5 +3,6 @@ module.exports = {
   extends: "@react-native",
   rules: {
     quotes: ["warn", "double"],
+    "react/no-unstable-nested-components": ["off"],
   },
 };
