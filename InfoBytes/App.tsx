@@ -1,19 +1,15 @@
 import React from "react";
 import { StatusBar, useColorScheme } from "react-native";
 import { config } from "@gluestack-ui/config";
-import { GluestackUIProvider, Icon, Text, View } from "@gluestack-ui/themed";
+import { GluestackUIProvider, Icon } from "@gluestack-ui/themed";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Book, Search, PersonCircle } from "./src/icons";
+import { BookIcon, PersonCircleIcon, SearchIcon } from "@icons";
+import { Feed, Search, Profile } from "@screens";
 
 const Tab = createBottomTabNavigator();
 
 // temporary
-const Screen = () => (
-  <View>
-    <Text>Screen</Text>
-  </View>
-);
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === "dark";
@@ -30,39 +26,39 @@ function App(): JSX.Element {
           }}>
           <Tab.Screen
             name="Feed"
-            component={Screen}
+            component={Feed}
             options={{
               tabBarIcon: ({ focused }) => (
                 <Icon
                   size="xl"
                   color={focused ? "$blue500" : "$black"}
-                  as={Book}
+                  as={BookIcon}
                 />
               ),
             }}
           />
           <Tab.Screen
             name="Search"
-            component={Screen}
+            component={Search}
             options={{
               tabBarIcon: ({ focused }) => (
                 <Icon
                   size="xl"
                   color={focused ? "$blue500" : "$black"}
-                  as={Search}
+                  as={SearchIcon}
                 />
               ),
             }}
           />
           <Tab.Screen
             name="Profile"
-            component={Screen}
+            component={Profile}
             options={{
               tabBarIcon: ({ focused }) => (
                 <Icon
                   size="xl"
                   color={focused ? "$blue500" : "$black"}
-                  as={PersonCircle}
+                  as={PersonCircleIcon}
                 />
               ),
             }}
