@@ -1,96 +1,65 @@
-import dotenv from 'dotenv';
-dotenv.config();
-
-import fs from 'fs';
+import { execSync } from 'child_process';
 import path from 'path';
-
-import yargs from 'yargs/yargs';
-import { hideBin } from 'yargs/helpers';
-
-import db from './modules/db';
-import { queryTts } from './modules/tts-query';
-import {
-  registerAudioSegment,
-  writeAudioSegment,
-} from './modules/audio-segment-writer';
-
-import {
-  breakString,
-  buildSubtitleSegments,
-  getAudioDetailsInDir,
-  makeTempFolder,
-} from './utils';
-import { renderVideo } from './modules/video-renderer';
-
-const {
-  FPS: configFPS,
-  VIDEO_WIDTH: configVideoWidth,
-  VIDEO_HEIGHT: configVideoHeight,
-} = process.env;
-
-const FPS = Number.parseInt(configFPS);
-const VIDEO_WIDTH = Number.parseInt(configVideoWidth);
-const VIDEO_HEIGHT = Number.parseInt(configVideoHeight);
-const FRAMES_OUTPUT_DIR = './frames';
+import fs from 'fs';
+import { spawnPromise } from './utils';
 
 async function main() {
-  try {
-    // TODO: Refactor yargs parsing
-    const { id: factId } = yargs(hideBin(process.argv)).argv as unknown as {
-      id: string;
-    };
+  const preHook = execSync('yarn start:hook:pre', { encoding: 'utf-8' });
 
-    if (!factId) {
-      throw new Error('FactId was not provided, use --id=[factId]');
-    }
+  const factIdsToProcess = preHook
+    .split('\n')
+    .map(fc => fc.includes('fact-id') && fc.split(' ')[1])
+    .filter(d => d);
 
-    const factToProcess = (await db()).getFactById(factId);
+  for (const factId of factIdsToProcess) {
+    try {
+      // const generatorOutput = execSync(`yarn start:generator --id=${factId}`, {
+      //   encoding: 'utf-8',
+      //   stdio: 'inherit',
+      // });
 
-    if (!factToProcess) {
-      throw new Error(`Could not find fact with id=${factId}`);
-    }
-
-    const folder = await makeTempFolder({ prefix: 'video-generator-' });
-    const factSubstrings = breakString(factToProcess.text);
-    for (let i = 0; i < factSubstrings.length; i++) {
-      const audioBuffer = await queryTts(factSubstrings[i]);
-      const writtenAudioFilePath = await writeAudioSegment(
-        folder,
-        audioBuffer,
-        i
+      const generatorOutput = await spawnPromise(
+        `yarn start:generator --id=${factId}`,
+        { shell: true }
       );
-      registerAudioSegment(folder, writtenAudioFilePath);
+
+      const audioPath = path.resolve(generatorOutput.match(/audio:\s*(.+)/)[1]);
+      const framesPath = path.resolve(
+        generatorOutput.match(/frames:\s*(.+)/)[1]
+      );
+      const outputDir = path.resolve(
+        generatorOutput.match(/output_dir:\s*(.+)/)[1]
+      );
+      const videoName = generatorOutput.match(/video_name:\s*(.+)/)[1];
+
+      if (!fs.existsSync(outputDir)) {
+        console.log(outputDir);
+        fs.mkdirSync(outputDir, { recursive: true });
+        console.log(`Folder '${outputDir}' did not exist, so it was created.`);
+      }
+
+      execSync(
+        `ffmpeg -f concat -safe 0 -i "${audioPath}/segments.txt" "${audioPath}/generated-audio.mp3"`,
+        { stdio: 'inherit' }
+      );
+      execSync(
+        `ffmpeg -y -framerate 25 -i "${framesPath}/frame-%d.png" -i "${audioPath}/generated-audio.mp3"` +
+          ` -c:v libx264 -pix_fmt yuv420p "${outputDir}/${videoName}"`,
+        { stdio: 'inherit' }
+      );
+
+      console.log(`--- Cleaning temp folder ${audioPath}`);
+      fs.rmdirSync(audioPath, { recursive: true });
+
+      execSync(
+        `yarn start:hook:post --videoPath=${outputDir}/${videoName} --factId=${factId}`,
+        {
+          stdio: 'inherit',
+        }
+      );
+    } catch (err) {
+      console.log(err);
     }
-    const { audioFilesDurationsInSeconds, combinedAudioLength } =
-      await getAudioDetailsInDir(folder);
-    const subtitleSegments = buildSubtitleSegments(
-      factSubstrings,
-      audioFilesDurationsInSeconds
-    );
-    const framesOutputDir = path.join(folder, FRAMES_OUTPUT_DIR);
-    fs.mkdirSync(framesOutputDir);
-    await renderVideo({
-      framesOutputDir,
-      framesPerSecond: FPS,
-      subtitles: subtitleSegments,
-      videoHeight: VIDEO_HEIGHT,
-      videoWidth: VIDEO_WIDTH,
-      combinedAudioLength,
-    });
-
-    const { FINAL_VIDEO_DIR } = process.env;
-    const finalVideoFileName = `${factId}.mp4`;
-
-    console.log('------ Results ------');
-    console.log('audio: ', folder);
-    console.log('frames: ', framesOutputDir);
-    console.log('output_dir: ', FINAL_VIDEO_DIR);
-    console.log('video_name: ', finalVideoFileName);
-
-    process.exit(0);
-  } catch (err) {
-    // TODO: clean temp folder
-    console.log(err);
   }
 }
 
