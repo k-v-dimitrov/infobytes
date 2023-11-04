@@ -113,10 +113,12 @@ export async function renderFrame() {
   // Release memory to prevent build up
   stage.destroy();
 
-  console.log('---- Results ----');
+  await saveFrame({
+    outputDir: frameOutputDir,
+    frameDataUrl: stageData,
+    frameIndex: currentFrame,
+  });
 
-  console.log(`currentFrame: ${currentFrame}`);
-  console.log(`stageData: ${stageData}`);
   process.exit(0);
 }
 

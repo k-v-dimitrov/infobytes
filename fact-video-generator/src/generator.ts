@@ -80,6 +80,7 @@ async function main() {
     const framesOutputDir = path.join(folder, FRAMES_OUTPUT_DIR);
     fs.mkdirSync(framesOutputDir);
     await renderVideo({
+      tempFolderPath: folder,
       framesOutputDir,
       framesPerSecond: FPS,
       subtitles: subtitleSegments,

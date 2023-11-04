@@ -14,6 +14,7 @@ interface RenderVideoParams {
   videoHeight: number;
   subtitles: Array<Subtitle>;
   combinedAudioLength: number;
+  tempFolderPath: string;
 }
 
 export async function renderVideo({
@@ -23,6 +24,7 @@ export async function renderVideo({
   videoHeight,
   videoWidth,
   subtitles,
+  tempFolderPath,
 }: RenderVideoParams) {
   log('VIDEO_RENDERER', 'Started video rendering...');
   const videoLength = combinedAudioLength;
@@ -39,6 +41,7 @@ export async function renderVideo({
       return spawnPromise(
         `yarn start:frame-renderer --params=${JSON.stringify(
           JSON.stringify({
+            tempFolderPath,
             currentFrame,
             options: {
               frameOutputDir: framesOutputDir,
@@ -54,22 +57,7 @@ export async function renderVideo({
       );
     });
 
-    const renderResults = await Promise.all(renderingChunk);
-
-    for (const renderResult of renderResults) {
-      const currentFrame = Number.parseInt(
-        renderResult.match(/currentFrame:\s*(.+)/)[1]
-      );
-
-      const renderedFrame = renderResult.match(/stageData:\s*(.+)/)[1];
-
-      await saveFrame({
-        outputDir: framesOutputDir,
-        frameDataUrl: renderedFrame,
-        frameIndex: currentFrame,
-      });
-    }
-
+    await Promise.all(renderingChunk);
     log('VIDEO_RENDERER', `Frames ${i} / ${frames.length} done!`);
   }
 
