@@ -30,9 +30,11 @@ The video generator performs the most complex tasks in the process, transforming
 
 3. **Audio Generation**: The generator queries a text-to-speech (TTS) tool to create audio for each subtitle. These audio files are saved in the temporary directory under `/audio`. Additionally, it registers (writes) the corresponding audio file name  to `segments.txt`, which is needed by ffmpeg for merging the generated audio files.
 
-4. **Subtitle Timestamps**: The generator builds a `subtitleSegments` object that contains the subtitle, its start and end time timestamps. This information is later used by the frame renderer to determine when and which subtitles to display.
+4. **Background Image Generation**: The generator queries Stable Diffusion model with the fact' text to create a background image for the video. When the `frame renderer` applies that image, it will also put an overlay to make the text easier to read.
 
-5. **Video Rendering**: The video renderer calculates the video length based on the combined audio files' duration. It then spawns multiple processes (currently set to 10) to parallelize the frame rendering process. The output frames are saved under the `tmp/frames` directory.
+5. **Subtitle Timestamps**: The generator builds a `subtitleSegments` object that contains the subtitle, its start and end time timestamps. This information is later used by the frame renderer to determine when and which subtitles to display.
+
+6. **Video Rendering**: The video renderer calculates the video length based on the combined audio files' duration. It then spawns multiple processes (currently set to 10) to parallelize the frame rendering process. The output frames are saved under the `tmp/frames` directory.
 
 ## FFmpeg Processing
 
@@ -122,6 +124,6 @@ frame-renderer:`frame-renderer:54`
 ```
 
 - [ ] Add video padding - e.g. start displaying subtitles and play audio 0.5s after the start or the end of the video.
-- [ ] Create new module for querying deep-infra or other Stable Diffusion model to generate background image for the fact.
-- [ ] Utilize the background image in `frame-renderer`
+- [x] Create new module for querying deep-infra or other Stable Diffusion model to generate background image for the fact.
+- [x] Utilize the background image in `frame-renderer`
 - [ ] Add support for background image effect - blur or other effect to make the text pop out. 
