@@ -7,6 +7,9 @@ import { CategoryModule } from './category/category.module';
 import { FeedModule } from './feed/feed.module';
 import { AuthModule } from './auth/auth.module';
 
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -15,6 +18,12 @@ import { AuthModule } from './auth/auth.module';
     CategoryModule,
     FeedModule,
     AuthModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..'),
+      serveStaticOptions: {
+        index: '/index.html',
+      },
+    }),
   ],
 })
 export class AppModule {}
