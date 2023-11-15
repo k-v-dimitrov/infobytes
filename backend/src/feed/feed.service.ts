@@ -2,19 +2,22 @@ import { Injectable } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { UserFeedDto } from './dto';
 import { Fact } from '@prisma/client';
+import { UserInjected } from 'src/interceptors';
 
 @Injectable()
 export class FeedService {
   constructor(private db: DatabaseService) {}
 
-  async subscribeUserToFeed() {
-    const user = await this.db.feedUser.create({ data: {} });
-    return { userId: user.id };
+  async subscribeUserToFeed({ user }: UserInjected<void>) {
+    const feedUser = await this.db.feedUser.create({
+      data: { user_id: user.id },
+    });
+    return { feedUserId: feedUser.id };
   }
 
-  async getFeedForUser({ userId, size = 5 }: UserFeedDto) {
+  async getFeedForUser({ userFeedId, size = 5 }: UserFeedDto) {
     const viewedFactIdsByUser =
-      await this.getFactsIdsViewedByCurrentUser(userId);
+      await this.getFactsIdsViewedByCurrentUser(userFeedId);
 
     const currentUserFeed = await this.generateFeedForUser({
       excludeFactIds: viewedFactIdsByUser,
@@ -22,7 +25,7 @@ export class FeedService {
       shouldRandomize: true,
     });
 
-    await this.markFactsAsViewed(currentUserFeed, userId);
+    await this.markFactsAsViewed(currentUserFeed, userFeedId);
 
     return currentUserFeed;
   }
@@ -56,10 +59,10 @@ export class FeedService {
     return factsFeed;
   }
 
-  private async markFactsAsViewed(factsFeed, userId: string) {
+  private async markFactsAsViewed(factsFeed: Fact[], userFeedId: string) {
     const factsFeedAndCurrentUserIds = factsFeed.map(({ id }) => ({
       fact_id: id,
-      user_id: userId,
+      user_feed_id: userFeedId,
     }));
 
     await this.db.viewedFact.createMany({
@@ -67,9 +70,9 @@ export class FeedService {
     });
   }
 
-  private async getFactsIdsViewedByCurrentUser(userId: string) {
+  private async getFactsIdsViewedByCurrentUser(userFeedId: string) {
     const alreadySeenFactsByUser = await this.db.viewedFact.findMany({
-      where: { user_id: userId },
+      where: { user_feed_id: userFeedId },
     });
 
     // get all facts count
@@ -80,7 +83,9 @@ export class FeedService {
     const hasSeenAll = alreadySeenFactsByUser.length === allFactsCount;
 
     if (hasSeenAll) {
-      await this.db.viewedFact.deleteMany({ where: { user_id: userId } });
+      await this.db.viewedFact.deleteMany({
+        where: { user_feed_id: userFeedId },
+      });
       return [];
     }
 

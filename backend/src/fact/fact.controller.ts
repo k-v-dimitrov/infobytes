@@ -24,38 +24,39 @@ import { AuthGuard } from '@nestjs/passport';
 export class FactController {
   constructor(private factService: FactService) {}
 
-  // Create
-  @Post()
-  create(@Body() dto: CreateFactDto) {
-    return this.factService.create(dto);
-  }
-
-  // Read
-  @UseGuards(AuthGuard('basic'))
+  @UseGuards(AuthGuard('jwt'))
   @Get(':id')
   get(@Param() factId: FactIdDto) {
     return this.factService.get(factId);
   }
 
-  // Update
+  @UseGuards(AuthGuard('jwt'))
+  @Get()
+  search(@Query() searchDto: SearchFactDto) {
+    return this.factService.search(searchDto.search);
+  }
+
+  @UseGuards(AuthGuard('admin'))
+  @Post()
+  create(@Body() dto: CreateFactDto) {
+    return this.factService.create(dto);
+  }
+
+  @UseGuards(AuthGuard('admin'))
   @Put()
   put(@Body() dto: PutFactDto) {
     return this.factService.put(dto);
   }
 
+  @UseGuards(AuthGuard('admin'))
   @Patch()
   patch(@Body() dto: PatchFactDto) {
     return this.factService.patch(dto);
   }
 
-  // Delete
+  @UseGuards(AuthGuard('admin'))
   @Delete(':id')
   delete(@Param() factId: FactIdDto) {
     return this.factService.delete(factId);
-  }
-
-  @Get()
-  factsSearch(@Query() searchDto: SearchFactDto) {
-    return this.factService.search(searchDto.search);
   }
 }
