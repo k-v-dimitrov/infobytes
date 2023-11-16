@@ -27,6 +27,10 @@ This backend utilizes NestJS.
 
         sudo scp -i ~/Documents/infobytes-servers-key.pem infobytes-[VERSION].zip ubuntu@ec2-18-192-124-201.eu-central-1.compute.amazonaws.com:/home/ubuntu
 
+Unzip the archive
+
+        unzip infobytes-[VERSION].zip
+
 6. Copy .env.prod to .env
 
         cp .env.prod .env
