@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="description" content="" />
+    <meta name="author" content="TemplateMo" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>InfoBytes Reset Password</title>
+
+    <!-- Additional CSS Files -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="../assets/css/bootstrap.min.css"
+    />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="../assets/css/font-awesome.css"
+    />
+
+    <link rel="stylesheet" href="../assets/css/templatemo-lava.css" />
+
+    <link rel="stylesheet" href="../assets/css/owl-carousel.css" />
+  </head>
+
+  <body>
+    <div id="preloader">
+      <div class="jumper">
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+    </div>
+
+    <div class="left-image-decor" style="pointer-events: none"></div>
+    <h1 class="text-center mt-4">Reset Your Password</h1>
+
+    <section id="reset-form" class="section" style="display: none">
+      <div class="container d-flex justify-content-center">
+        <div class="mt-4">
+          <p id="error_message" style="color: red; display: none">
+            Unknown error
+          </p>
+
+          <form>
+            <label for="password">New Password:</label><br />
+            <input type="password" id="password" name="password" /><br />
+            <label for="repeat_password" class="mt-4">Repeat password</label
+            ><br />
+            <input
+              id="repeat_password"
+              name="repeat_password"
+              type="password"
+            /><br /><br />
+            <input type="submit" value="Reset Password" />
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section id="error-section" class="section" style="display: none">
+      <div class="container">
+        <div class="mx-auto mt-4 text-center">
+          <p>Oops, It appears that this link is no longer valid.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="success-section" class="section" style="display: none">
+      <div class="container">
+        <div class="mx-auto mt-4 text-center">
+          <p>Your password was reset successfully.</p>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      const errorBox = document.querySelector('#error_message');
+
+      function setError(errorMsg) {
+        errorBox.style.display = 'block';
+        errorBox.textContent = errorMsg;
+      }
+
+      function clearError() {
+        errorBox.style.display = 'none';
+        errorBox.textContent = '';
+      }
+    </script>
+
+    <script>
+      const checkUrl = `${window.location.origin}/auth/reset/check`;
+
+      async function post(url = '', data = {}) {
+        const response = await fetch(url, {
+          method: 'POST', // *GET, POST, PUT, DELETE, etc.
+          mode: 'cors', // no-cors, *cors, same-origin
+          cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data), // body data type must match "Content-Type" header
+        });
+
+        if (!response.ok) {
+          const err = await response.json();
+
+          if (err.message[0]) {
+            const errMessage = err.message[0];
+
+            const capitalizedErr =
+              errMessage.charAt(0).toUpperCase() + errMessage.slice(1);
+
+            throw new Error(capitalizedErr);
+          } else {
+            throw new Error('Internal Server Error');
+          }
+        }
+
+        return response;
+      }
+
+      async function checkValidity() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const requestPasswordChangeId = urlParams.get('rprid');
+        const email = urlParams.get('usr');
+
+        try {
+          const res = await post(checkUrl, {
+            requestPasswordChangeId,
+            email,
+          });
+          document.querySelector('#reset-form').style.display = 'block';
+        } catch (err) {
+          document.querySelector('#error-section').style.display = 'block';
+        } finally {
+          document.querySelector('#preloader').style.display = 'none';
+        }
+      }
+
+      checkValidity();
+    </script>
+
+    <script>
+      const resetUrl = `${window.location.origin}/auth/reset`;
+
+      const form = document.querySelector('#reset-form');
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearError();
+
+        const formData = new FormData(e.target);
+
+        const pass = formData.get('password');
+        const rep = formData.get('repeat_password');
+
+        if (pass !== rep) {
+          setError('Repeated password does not match new password!');
+          return;
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const requestPasswordChangeId = urlParams.get('rprid');
+        const email = urlParams.get('usr');
+
+        try {
+          await post(resetUrl, {
+            email,
+            requestPasswordChangeId,
+            password: pass,
+          });
+          document.querySelector('#reset-form').style.display = 'none';
+          document.querySelector('#success-section').style.display = 'block';
+        } catch (err) {
+          setError(`${err.toString()}`);
+        } finally {
+          document.querySelector('#preloader').style.display = 'none';
+        }
+      });
+    </script>
+  </body>
+</html>

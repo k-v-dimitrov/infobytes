@@ -26,3 +26,9 @@ export class ForgedUserPayloadError extends HttpException {
     );
   }
 }
+
+export class InvalidPasswordRequestLink extends HttpException {
+  constructor() {
+    super(`Password Request Link is no longer valid`, HttpStatus.FORBIDDEN);
+  }
+}

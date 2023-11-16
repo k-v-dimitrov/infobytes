@@ -10,20 +10,29 @@ import * as bcrypt from 'bcrypt';
 import { DatabaseService } from 'src/database/database.service';
 
 import { JwtPayload } from './type';
-import { LoginDto, RegisterDto } from './dto';
+import {
+  LoginDto,
+  RegisterDto,
+  ResetPasswordCheckDto,
+  ResetPasswordDto,
+  ResetPasswordRequestDto,
+} from './dto';
 
 import {
   ForgedUserPayloadError,
   IncorrectLoginCredentialsError,
+  InvalidPasswordRequestLink,
   UserAlreadyExistsError,
   UserNotFoundError,
 } from './exceptions';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     private db: DatabaseService,
     private jwtService: JwtService,
+    private configService: ConfigService,
   ) {}
 
   async createUser({ email, password }: RegisterDto) {
@@ -56,6 +65,56 @@ export class AuthService {
     });
   }
 
+  async resetPasswordRequest({ email }: ResetPasswordRequestDto) {
+    const { id: userId, email: userEmail } = await this.getUserBy({ email });
+
+    const passwordRequest = await this.getPasswordResetRequest({ userId });
+    const hasPasswordRequest = !!passwordRequest;
+
+    if (hasPasswordRequest) {
+      await this.removePasswordResetRequest({ userId });
+    }
+
+    const resetPasswordRequestId = await this.createPasswordResetRequest({
+      userId,
+    });
+
+    const resetPassportLink = this.buildResetPasswordLink({
+      resetPasswordRequestId,
+      userEmail,
+    });
+
+    return { resetPassportLink };
+  }
+
+  async resetPasswordCheck({
+    email,
+    requestPasswordChangeId,
+  }: ResetPasswordCheckDto) {
+    const { id: userId } = await this.getUserBy({ email });
+
+    const passwordRequest = await this.getPasswordResetRequest({ userId });
+    const hasPasswordRequest = !!passwordRequest;
+
+    if (!hasPasswordRequest || passwordRequest.id !== requestPasswordChangeId) {
+      throw new InvalidPasswordRequestLink();
+    }
+
+    return;
+  }
+
+  async resetPassword({
+    email,
+    password,
+    requestPasswordChangeId,
+  }: ResetPasswordDto) {
+    await this.resetPasswordCheck({ email, requestPasswordChangeId });
+    const user = await this.getUserBy({ email });
+    const newEncryptedPassword = await bcrypt.hash(password, 6);
+    await this.updateUserPassword(newEncryptedPassword, user.id);
+    await this.removePasswordResetRequest({ userId: user.id });
+  }
+
   async validateUser(email: string, id: string) {
     const user = await this.getUserBy({ email });
 
@@ -75,6 +134,13 @@ export class AuthService {
     }
 
     return null;
+  }
+
+  private async updateUserPassword(encryptedPassword: string, userId: string) {
+    await this.db.user.update({
+      data: { password: encryptedPassword },
+      where: { id: userId },
+    });
   }
 
   async getUserBy({
@@ -102,6 +168,52 @@ export class AuthService {
       } else {
         throw error;
       }
+    }
+  }
+
+  private buildResetPasswordLink({
+    resetPasswordRequestId,
+    userEmail,
+  }: {
+    resetPasswordRequestId: string;
+    userEmail: string;
+  }) {
+    const params = new URLSearchParams();
+    params.append('rprid', resetPasswordRequestId);
+    params.append('usr', userEmail);
+
+    return `${this.configService.get<string>(
+      'DOMAIN_URL',
+    )}/reset-password?${params.toString()}`;
+  }
+
+  private async createPasswordResetRequest({ userId }: { userId: string }) {
+    const { id: passwordRequestId } = await this.db.resetPassword.create({
+      data: { userId: userId },
+    });
+
+    return passwordRequestId;
+  }
+
+  private async removePasswordResetRequest({ userId }: { userId: string }) {
+    await this.db.resetPassword.delete({
+      where: { userId },
+    });
+  }
+
+  private async getPasswordResetRequest({ userId }: { userId: string }) {
+    try {
+      return await this.db.resetPassword.findFirstOrThrow({
+        where: { userId },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === PrismaError.RecordsNotFound) {
+          return;
+        }
+      }
+
+      throw error;
     }
   }
 
