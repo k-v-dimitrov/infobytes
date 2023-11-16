@@ -3,7 +3,7 @@ import { IsNumber, IsOptional, IsUUID, Max, Min } from 'class-validator';
 
 export class UserFeedDto {
   @IsUUID()
-  userId: string;
+  userFeedId: string;
 
   @IsOptional()
   @Type(() => Number)
