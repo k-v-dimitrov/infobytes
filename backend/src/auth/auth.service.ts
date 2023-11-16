@@ -244,10 +244,8 @@ export class AuthService {
       await this.getUserBy({ email });
       return true;
     } catch (error) {
-      if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === PrismaError.RecordsNotFound) {
-          return false;
-        }
+      if (error instanceof UserNotFoundError) {
+        return false;
       }
 
       throw error;
