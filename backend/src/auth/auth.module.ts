@@ -7,6 +7,7 @@ import { UserAuthStrategy } from './strategies/user.strategy';
 import { AuthController } from './auth.controller';
 import { JWT_SECRET } from './constants';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { SendGridModule } from 'src/sendgrid/sendgrid.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
       secret: JWT_SECRET,
     }),
     ThrottlerModule.forRoot([{ ttl: 1000 * 60 * 30, limit: 10 }]),
+    SendGridModule,
   ],
   providers: [AuthService, PassportModule, AdminAuthStrategy, UserAuthStrategy],
   controllers: [AuthController],

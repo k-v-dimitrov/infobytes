@@ -12,12 +12,13 @@ export class SendGridService {
     sgMail.setApiKey(configService.get<string>('SENDGRID_API_KEY'));
   }
 
-  async testMail() {
-    await this.sendTemplateEmail('kir4agi@gmail.com');
-    console.log('email was send');
-  }
-
-  async sendTemplateEmail(to: string) {
+  async sendResetPasswordMail({
+    to,
+    resetPasswordLink,
+  }: {
+    to: string;
+    resetPasswordLink: string;
+  }) {
     await sgMail.send({
       from: NO_REPLY,
       templateId: RESET_PASSWORD_TEMPLATE,
@@ -25,7 +26,7 @@ export class SendGridService {
         {
           to: [{ email: to }],
           dynamicTemplateData: {
-            reset_password_link: 'https://google.com',
+            reset_password_link: resetPasswordLink,
           },
         },
       ],

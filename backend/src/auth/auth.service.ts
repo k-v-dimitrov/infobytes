@@ -26,6 +26,7 @@ import {
   UserNotFoundError,
 } from './exceptions';
 import { ConfigService } from '@nestjs/config';
+import { SendGridService } from 'src/sendgrid/sendgrid.service';
 
 @Injectable()
 export class AuthService {
@@ -33,6 +34,7 @@ export class AuthService {
     private db: DatabaseService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private sendGridService: SendGridService,
   ) {}
 
   async createUser({ email, password }: RegisterDto) {
@@ -79,12 +81,15 @@ export class AuthService {
       userId,
     });
 
-    const resetPassportLink = this.buildResetPasswordLink({
+    const resetPasswordLink = this.buildResetPasswordLink({
       resetPasswordRequestId,
       userEmail,
     });
 
-    return { resetPassportLink };
+    await this.sendGridService.sendResetPasswordMail({
+      to: email,
+      resetPasswordLink,
+    });
   }
 
   async resetPasswordCheck({
