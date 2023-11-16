@@ -1,20 +1,20 @@
 {
     "client": "Thunder Client",
     "collectionName": "infobytes",
-    "dateExported": "2023-10-21T16:29:25.203Z",
+    "dateExported": "2023-11-16T19:15:24.490Z",
     "version": "1.1",
     "folders": [],
     "requests": [
         {
-            "_id": "8fec66ca-3942-4c42-99db-aa4e60ff77f9",
-            "colId": "fb1b648e-4a8b-4fe5-8d4b-a61510c11920",
+            "_id": "afe337bd-527c-4cb6-a104-5ef5e8fc0570",
+            "colId": "0fd5f0e2-0b5a-482b-a3bb-75a604930b09",
             "containerId": "",
             "name": "create-fact",
-            "url": "localhost:3000/fact",
+            "url": "{{api_url}}/fact",
             "method": "POST",
             "sortNum": 10000,
-            "created": "2023-10-21T09:30:35.004Z",
-            "modified": "2023-10-21T10:28:21.753Z",
+            "created": "2023-10-26T16:31:26.511Z",
+            "modified": "2023-11-16T19:13:08.845Z",
             "headers": [],
             "params": [],
             "body": {
@@ -22,19 +22,32 @@
                 "raw": "{\n  \"title\": \"Hitler on drasugs\",\n  \"text\": \"Hitler was known for his big drug usage\",\n  \"sourceUrl\": \"www.somerandomsite.com\",\n  \"category\": \"history\"\n}",
                 "form": []
             },
+            "auth": {
+                "type": "basic",
+                "basic": {
+                    "username": "KIRIL",
+                    "password": "123456"
+                }
+            },
             "tests": []
         },
         {
-            "_id": "07158f39-d9e8-43dc-b865-593a56cad644",
-            "colId": "fb1b648e-4a8b-4fe5-8d4b-a61510c11920",
+            "_id": "4f64e733-8ee6-45ea-93c2-678e3783f67f",
+            "colId": "0fd5f0e2-0b5a-482b-a3bb-75a604930b09",
             "containerId": "",
             "name": "get-fact",
-            "url": "localhost:3000/fact/c73f9851-e420-4a86-95ce-9cad31af21bf",
+            "url": "{{api_url}}/fact/c73f9851-e420-4a86-95ce-9cad31af21bf",
             "method": "GET",
             "sortNum": 12500,
-            "created": "2023-10-21T10:05:39.192Z",
-            "modified": "2023-10-21T10:32:48.178Z",
-            "headers": [],
+            "created": "2023-10-26T16:31:26.514Z",
+            "modified": "2023-11-16T19:13:08.364Z",
+            "headers": [
+                {
+                    "name": "Authorization",
+                    "value": "Basic Kiril 123456",
+                    "isDisabled": true
+                }
+            ],
             "params": [
                 {
                     "name": "id",
@@ -43,18 +56,25 @@
                     "isPath": false
                 }
             ],
+            "auth": {
+                "type": "basic",
+                "basic": {
+                    "username": "KIRIL",
+                    "password": "123456"
+                }
+            },
             "tests": []
         },
         {
-            "_id": "3fc2c2d4-1e2d-4d59-b8e0-f3bffce678c7",
-            "colId": "fb1b648e-4a8b-4fe5-8d4b-a61510c11920",
+            "_id": "065dec1d-e37f-4f52-bd6b-770c9d7f94a3",
+            "colId": "0fd5f0e2-0b5a-482b-a3bb-75a604930b09",
             "containerId": "",
             "name": "delete-fact",
-            "url": "localhost:3000/fact/c73f9851-e420-4a86-95ce-9cad31af21bf",
+            "url": "{{api_url}}/fact/c73f9851-e420-4a86-95ce-9cad31af21bf",
             "method": "DELETE",
             "sortNum": 13750,
-            "created": "2023-10-21T10:28:27.730Z",
-            "modified": "2023-10-21T10:32:45.304Z",
+            "created": "2023-10-26T16:31:26.515Z",
+            "modified": "2023-11-16T19:13:07.600Z",
             "headers": [],
             "params": [
                 {
@@ -67,15 +87,15 @@
             "tests": []
         },
         {
-            "_id": "e4a53088-e50a-44bd-8a26-d784e45b61ba",
-            "colId": "fb1b648e-4a8b-4fe5-8d4b-a61510c11920",
+            "_id": "f807d774-7246-4ee0-8990-a3f601986e0a",
+            "colId": "0fd5f0e2-0b5a-482b-a3bb-75a604930b09",
             "containerId": "",
             "name": "put-fact",
-            "url": "localhost:3000/fact",
+            "url": "{{api_url}}/fact",
             "method": "PUT",
             "sortNum": 15000,
-            "created": "2023-10-21T09:56:30.245Z",
-            "modified": "2023-10-21T09:58:49.236Z",
+            "created": "2023-10-26T16:31:26.513Z",
+            "modified": "2023-11-16T19:13:13.284Z",
             "headers": [],
             "params": [],
             "body": {
@@ -86,15 +106,15 @@
             "tests": []
         },
         {
-            "_id": "672a20b4-d094-43a2-afe7-4654ceb70fd4",
-            "colId": "fb1b648e-4a8b-4fe5-8d4b-a61510c11920",
+            "_id": "9118bd86-1516-4fc6-884d-3bc8d1b19db6",
+            "colId": "0fd5f0e2-0b5a-482b-a3bb-75a604930b09",
             "containerId": "",
             "name": "patch-fact",
-            "url": "localhost:3000/fact",
+            "url": "{{api_url}}/fact",
             "method": "PATCH",
             "sortNum": 20000,
-            "created": "2023-10-21T09:45:00.752Z",
-            "modified": "2023-10-21T09:54:58.145Z",
+            "created": "2023-10-26T16:31:26.512Z",
+            "modified": "2023-11-16T19:13:17.265Z",
             "headers": [],
             "params": [],
             "body": {
@@ -105,15 +125,15 @@
             "tests": []
         },
         {
-            "_id": "0ca8873a-5db1-4f93-96ba-752c55825608",
-            "colId": "fb1b648e-4a8b-4fe5-8d4b-a61510c11920",
+            "_id": "2d5d0fd7-5105-457d-b16f-424b2255d109",
+            "colId": "0fd5f0e2-0b5a-482b-a3bb-75a604930b09",
             "containerId": "",
             "name": "get-categories",
-            "url": "localhost:3000/category/all",
+            "url": "{{api_url}}/category/all",
             "method": "GET",
             "sortNum": 30000,
-            "created": "2023-10-21T11:52:53.915Z",
-            "modified": "2023-10-21T12:00:32.640Z",
+            "created": "2023-10-26T16:31:26.516Z",
+            "modified": "2023-11-16T19:13:20.615Z",
             "headers": [],
             "params": [
                 {
@@ -126,29 +146,29 @@
             "tests": []
         },
         {
-            "_id": "ccf60d36-b49a-426d-b675-c0b10ffc039c",
-            "colId": "fb1b648e-4a8b-4fe5-8d4b-a61510c11920",
+            "_id": "020f80f4-7bbf-428a-85fb-42f894271165",
+            "colId": "0fd5f0e2-0b5a-482b-a3bb-75a604930b09",
             "containerId": "",
             "name": "get-all-facts-by-category",
-            "url": "localhost:3000/category/history",
+            "url": "{{api_url}}/category/history",
             "method": "GET",
             "sortNum": 40000,
-            "created": "2023-10-21T11:59:59.680Z",
-            "modified": "2023-10-21T12:00:59.981Z",
+            "created": "2023-10-26T16:31:26.517Z",
+            "modified": "2023-11-16T19:13:24.635Z",
             "headers": [],
             "params": [],
             "tests": []
         },
         {
-            "_id": "fcf70102-15cd-4e1c-a8b7-2e9214ebb6ae",
-            "colId": "fb1b648e-4a8b-4fe5-8d4b-a61510c11920",
+            "_id": "34ce209f-89c9-49ff-944f-33cf95506d38",
+            "colId": "0fd5f0e2-0b5a-482b-a3bb-75a604930b09",
             "containerId": "",
             "name": "search-fact",
-            "url": "localhost:3000/fact?search=Mon",
+            "url": "{{api_url}}/fact?search=Mon",
             "method": "GET",
             "sortNum": 50000,
-            "created": "2023-10-21T12:35:27.709Z",
-            "modified": "2023-10-21T12:42:51.251Z",
+            "created": "2023-10-26T16:31:26.518Z",
+            "modified": "2023-11-16T19:13:28.351Z",
             "headers": [],
             "params": [
                 {
@@ -157,32 +177,36 @@
                     "isPath": false
                 }
             ],
+            "auth": {
+                "type": "bearer",
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjFhZGU0ODM5LTUxNzItNGUyOS05M2RkLTM2ZTJmNDk4Njc1YSIsImVtYWlsIjoia2lyNGFnaSt0ZXN0QGdtYWlsLmNvbSIsImlhdCI6MTcwMDA3MDc5N30.tO1e8LjJv5epuyQtsnMiR5WT3V04CYJOfhywxFfCtM0"
+            },
             "tests": []
         },
         {
-            "_id": "93519681-c853-49f7-bbfa-00ad6090a4ca",
-            "colId": "fb1b648e-4a8b-4fe5-8d4b-a61510c11920",
+            "_id": "f11eedf3-9f6d-4571-a9b5-48289e0b308a",
+            "colId": "0fd5f0e2-0b5a-482b-a3bb-75a604930b09",
             "containerId": "",
             "name": "subsribe-user-to-feed",
-            "url": "localhost:3000/feed/user",
+            "url": "{{api_url}}/feed/user",
             "method": "GET",
             "sortNum": 60000,
-            "created": "2023-10-21T13:01:27.359Z",
-            "modified": "2023-10-21T13:02:32.309Z",
+            "created": "2023-10-26T16:31:26.519Z",
+            "modified": "2023-11-16T19:13:32.629Z",
             "headers": [],
             "params": [],
             "tests": []
         },
         {
-            "_id": "3c68d1be-f7df-444a-a9d6-2c71f0991bf8",
-            "colId": "fb1b648e-4a8b-4fe5-8d4b-a61510c11920",
+            "_id": "57d79a83-2e71-4446-8d15-54c0edfa29e2",
+            "colId": "0fd5f0e2-0b5a-482b-a3bb-75a604930b09",
             "containerId": "",
             "name": "get-user-feed",
-            "url": "localhost:3000/feed?userId=406c592f-656a-4892-b1ef-e8ef5b76844b&size=2",
+            "url": "{{api_url}}/feed?userId=406c592f-656a-4892-b1ef-e8ef5b76844b&size=2",
             "method": "GET",
             "sortNum": 70000,
-            "created": "2023-10-21T13:03:22.694Z",
-            "modified": "2023-10-21T16:26:58.187Z",
+            "created": "2023-10-26T16:31:26.520Z",
+            "modified": "2023-11-16T19:13:36.390Z",
             "headers": [],
             "params": [
                 {
@@ -196,6 +220,101 @@
                     "isPath": false
                 }
             ],
+            "tests": []
+        },
+        {
+            "_id": "6883f97b-e35e-4349-98cb-c38eef8c5d27",
+            "colId": "0fd5f0e2-0b5a-482b-a3bb-75a604930b09",
+            "containerId": "",
+            "name": "register user",
+            "url": "{{api_url}}/auth/register",
+            "method": "POST",
+            "sortNum": 70625,
+            "created": "2023-11-15T11:41:26.507Z",
+            "modified": "2023-11-16T19:12:49.595Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"email\": \"kir4agi@gmail.com\",\n  \"password\": \"123456\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "06f12f97-611e-4aaa-9172-71a9ffa89cb6",
+            "colId": "0fd5f0e2-0b5a-482b-a3bb-75a604930b09",
+            "containerId": "",
+            "name": "login user",
+            "url": "{{api_url}}/auth/login",
+            "method": "POST",
+            "sortNum": 71250,
+            "created": "2023-11-15T17:07:39.331Z",
+            "modified": "2023-11-16T19:13:44.145Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"email\": \"kir4agi@gmail.com\",\n  \"password\": \"qazwsx\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "003202bb-9ce3-41e7-84b2-c1aba59255dd",
+            "colId": "0fd5f0e2-0b5a-482b-a3bb-75a604930b09",
+            "containerId": "",
+            "name": "reset-password-user-request",
+            "url": "{{api_url}}/auth/reset/request",
+            "method": "POST",
+            "sortNum": 72500,
+            "created": "2023-11-16T09:00:22.805Z",
+            "modified": "2023-11-16T19:13:47.511Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"email\": \"kir4agi@gmail.com\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "21fe7e2b-6bd0-4bb0-bb04-a8154f748e86",
+            "colId": "0fd5f0e2-0b5a-482b-a3bb-75a604930b09",
+            "containerId": "",
+            "name": "reset-password-check",
+            "url": "{{api_url}}/auth/reset/check",
+            "method": "POST",
+            "sortNum": 75000,
+            "created": "2023-11-16T18:29:20.201Z",
+            "modified": "2023-11-16T19:13:51.116Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"email\": \"kir4agi+test@gmail.com\",\n  \"requestPasswordChangeId\": \"67f45fb6-0ad4-46fa-a151-ef9707eaebf4\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "ae73af22-6096-45b2-b5d9-d04dea84a3a9",
+            "colId": "0fd5f0e2-0b5a-482b-a3bb-75a604930b09",
+            "containerId": "",
+            "name": "reset-password-user",
+            "url": "{{api_url}}/auth/reset",
+            "method": "POST",
+            "sortNum": 80000,
+            "created": "2023-11-16T18:29:21.572Z",
+            "modified": "2023-11-16T19:13:54.001Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"email\": \"kir4agi+test@gmail.com\",\n    \"requestPasswordChangeId\": \"67f45fb6-0ad4-46fa-a151-ef9707eaebf4\",\n  \"password\": \"123456asd\"\n}",
+                "form": []
+            },
             "tests": []
         }
     ]
