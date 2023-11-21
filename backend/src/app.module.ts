@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { SendGridModule } from './sendgrid/sendgrid.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { SendGridModule } from './sendgrid/sendgrid.module';
       },
     }),
     SendGridModule,
+    UserModule,
   ],
 })
 export class AppModule {}
