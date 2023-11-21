@@ -1,22 +1,26 @@
 import { Instance, SnapshotOut, types } from "mobx-state-tree"
 
-const UserModel = types.model("User").props({
-  id: types.string,
-  email: types.string,
-  username: types.maybe(types.string),
-})
-
 export const AuthenticationStoreModel = types
   .model("AuthenticationStore")
   .props({
-    user: types.maybeNull(types.reference(UserModel)),
+    id: types.string,
+    email: types.string,
   })
   .views((store) => ({
     get isAuthenticated() {
-      return !!store.user
+      return Boolean(store.id)
     },
   }))
-// .actions(() => ({}))
+  .actions((store) => ({
+    authenticate({ id, email }) {
+      store.id = id
+      store.email = email
+    },
+    logout() {
+      store.id = ""
+      store.email = ""
+    },
+  }))
 
 export interface AuthenticationStore extends Instance<typeof AuthenticationStoreModel> {}
 export interface AuthenticationStoreSnapshot extends SnapshotOut<typeof AuthenticationStoreModel> {}
