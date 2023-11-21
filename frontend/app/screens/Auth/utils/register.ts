@@ -15,7 +15,7 @@ export const initialState: RegisterState = {
 export const validateRegister = (registerState: RegisterState) => {
   const { email, password, repeatPassword } = registerState
   const errors: Partial<RegisterState> = {}
-  const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/
+  const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w\w+)+$/
 
   Object.entries(registerState).forEach(([key, value]) => {
     if (!value) {
