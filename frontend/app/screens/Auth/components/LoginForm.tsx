@@ -8,16 +8,21 @@ import {
   ButtonText,
   Input,
   LinkText,
+  AlertText,
+  Alert,
+  AlertIcon,
+  InfoIcon,
 } from "@gluestack-ui/themed"
 import React, { useState } from "react"
 import { LoginState, initialState, validateLogin } from "../utils/login"
+import { useLogin } from "../hooks/useLogin"
 
 interface Props {
   toggleIsLogin: () => void
-  onSubmitSuccess: () => void
 }
 
-export const LoginForm = ({ toggleIsLogin, onSubmitSuccess }: Props) => {
+export const LoginForm = ({ toggleIsLogin }: Props) => {
+  const { login, loading, error } = useLogin()
   const [formState, setFormState] = useState<LoginState>(initialState)
   const [formErrors, setFormErrors] = useState<Partial<LoginState>>({})
 
@@ -37,16 +42,12 @@ export const LoginForm = ({ toggleIsLogin, onSubmitSuccess }: Props) => {
 
   const handleSubmit = async () => {
     const errors = validateLogin(formState)
-
     const hasErrors = Object.keys(errors).length > 0
-
     if (hasErrors) {
       setFormErrors(errors)
-
       return
     }
-
-    onSubmitSuccess()
+    login(formState)
   }
 
   return (
@@ -54,6 +55,13 @@ export const LoginForm = ({ toggleIsLogin, onSubmitSuccess }: Props) => {
       <Heading textAlign="center" size="2xl">
         Welcome back
       </Heading>
+
+      {error && (
+        <Alert action="error" variant="accent">
+          <AlertIcon as={InfoIcon} mr="$3" />
+          <AlertText>{error}</AlertText>
+        </Alert>
+      )}
 
       <VStack>
         <Text>Email</Text>
@@ -88,7 +96,13 @@ export const LoginForm = ({ toggleIsLogin, onSubmitSuccess }: Props) => {
         )}
       </VStack>
 
-      <Button onPress={handleSubmit} size="md" variant="solid" action="primary">
+      <Button
+        isDisabled={loading}
+        onPress={handleSubmit}
+        size="md"
+        variant="solid"
+        action="primary"
+      >
         <ButtonText textTransform="uppercase">Sign In</ButtonText>
       </Button>
 
