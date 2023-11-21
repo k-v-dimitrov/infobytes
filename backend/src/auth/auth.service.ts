@@ -23,10 +23,10 @@ import {
   IncorrectLoginCredentialsError,
   InvalidPasswordRequestLink,
   UserAlreadyExistsError,
-  UserNotFoundError,
 } from './exceptions';
 import { ConfigService } from '@nestjs/config';
 import { SendGridService } from 'src/sendgrid/sendgrid.service';
+import { UserNotFoundError } from 'src/database/exceptions';
 
 @Injectable()
 export class AuthService {
@@ -53,7 +53,7 @@ export class AuthService {
   }
 
   async login({ email, password }: LoginDto) {
-    const user = await this.getUserBy({ email });
+    const user = await this.db.getUserBy({ email });
 
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
 
@@ -68,7 +68,7 @@ export class AuthService {
   }
 
   async resetPasswordRequest({ email }: ResetPasswordRequestDto) {
-    const { id: userId, email: userEmail } = await this.getUserBy({ email });
+    const { id: userId, email: userEmail } = await this.db.getUserBy({ email });
 
     const passwordRequest = await this.getPasswordResetRequest({ userId });
     const hasPasswordRequest = !!passwordRequest;
@@ -96,7 +96,7 @@ export class AuthService {
     email,
     requestPasswordChangeId,
   }: ResetPasswordCheckDto) {
-    const { id: userId } = await this.getUserBy({ email });
+    const { id: userId } = await this.db.getUserBy({ email });
 
     const passwordRequest = await this.getPasswordResetRequest({ userId });
     const hasPasswordRequest = !!passwordRequest;
@@ -114,14 +114,14 @@ export class AuthService {
     requestPasswordChangeId,
   }: ResetPasswordDto) {
     await this.resetPasswordCheck({ email, requestPasswordChangeId });
-    const user = await this.getUserBy({ email });
+    const user = await this.db.getUserBy({ email });
     const newEncryptedPassword = await bcrypt.hash(password, 6);
     await this.updateUserPassword(newEncryptedPassword, user.id);
     await this.removePasswordResetRequest({ userId: user.id });
   }
 
   async validateUser(email: string, id: string) {
-    const user = await this.getUserBy({ email });
+    const user = await this.db.getUserBy({ email });
 
     if (user.id !== id) {
       throw new ForgedUserPayloadError();
@@ -146,34 +146,6 @@ export class AuthService {
       data: { password: encryptedPassword },
       where: { id: userId },
     });
-  }
-
-  async getUserBy({
-    email,
-    id,
-  }: {
-    email?: string;
-    id?: string;
-  }): Promise<User> {
-    if (!email && !id) {
-      throw new Error('No user email or id was provided!');
-    }
-
-    try {
-      const user = await this.db.user.findFirstOrThrow({
-        where: { email, id },
-      });
-
-      return user;
-    } catch (error) {
-      if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === PrismaError.RecordsNotFound) {
-          throw new UserNotFoundError();
-        }
-      } else {
-        throw error;
-      }
-    }
   }
 
   private buildResetPasswordLink({
@@ -241,7 +213,7 @@ export class AuthService {
 
   private async isEmailAlreadyInUse(email: string) {
     try {
-      await this.getUserBy({ email });
+      await this.db.getUserBy({ email });
       return true;
     } catch (error) {
       if (error instanceof UserNotFoundError) {

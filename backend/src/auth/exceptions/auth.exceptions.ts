@@ -6,12 +6,6 @@ export class UserAlreadyExistsError extends HttpException {
   }
 }
 
-export class UserNotFoundError extends HttpException {
-  constructor() {
-    super(`User not found`, HttpStatus.NOT_FOUND);
-  }
-}
-
 export class IncorrectLoginCredentialsError extends HttpException {
   constructor() {
     super(`Email or password is incorrect`, HttpStatus.BAD_REQUEST);

@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient, User } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { PrismaError } from 'prisma-error-enum';
+import { UserNotFoundError } from './exceptions';
 
 @Injectable()
 export class DatabaseService extends PrismaClient {
@@ -12,5 +15,38 @@ export class DatabaseService extends PrismaClient {
         },
       },
     });
+  }
+
+  // Utils
+
+  async getUserBy({
+    email,
+    id,
+    include,
+  }: {
+    email?: string;
+    id?: string;
+    include?: Prisma.UserInclude;
+  }): Promise<User> {
+    if (!email && !id) {
+      throw new Error('No user email or id was provided!');
+    }
+
+    try {
+      const user = await this.user.findFirstOrThrow({
+        where: { email, id },
+        include,
+      });
+
+      return user;
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === PrismaError.RecordsNotFound) {
+          throw new UserNotFoundError();
+        }
+      } else {
+        throw error;
+      }
+    }
   }
 }

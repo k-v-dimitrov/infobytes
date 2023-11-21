@@ -6,14 +6,14 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
-import { AuthService } from 'src/auth/auth.service';
 import { JwtPayload } from 'src/auth/type';
+import { DatabaseService } from 'src/database/database.service';
 
 @Injectable()
 export class InjectUserInBody implements NestInterceptor {
   constructor(
     private jwtService: JwtService,
-    private authService: AuthService,
+    private db: DatabaseService,
   ) {}
 
   async intercept(context: ExecutionContext, next: CallHandler) {
@@ -21,7 +21,10 @@ export class InjectUserInBody implements NestInterceptor {
     this.checkAndThrowOnMissingAuthorization(request);
     const token = this.tryToExtractJwtToken(request);
     const decodedToken = this.jwtService.decode<JwtPayload>(token);
-    const user = await this.authService.getUserBy({ id: decodedToken.id });
+    const user = await this.db.getUserBy({
+      id: decodedToken.id,
+      include: { UserFactCategory: true },
+    });
     this.attachUserToRequestBody(request, user);
     return next.handle();
   }
