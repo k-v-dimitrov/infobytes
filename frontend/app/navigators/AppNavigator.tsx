@@ -14,8 +14,9 @@ import { observer } from "mobx-react-lite"
 import React from "react"
 import Config from "../config"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
-import { Auth, Feed, Onboarding } from "app/screens"
+import { Auth, Feed, Onboarding, Profile } from "app/screens"
 import { config } from "@gluestack-ui/themed"
+import { useStores } from "app/models"
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -34,7 +35,7 @@ export type AppStackParamList = {
   Auth: undefined
   Onboarding: undefined
   Feed: undefined
-  // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
+  Profile: undefined
 }
 
 /**
@@ -57,9 +58,12 @@ export type AppStackScreenProps<T extends keyof AppStackParamList> = BottomTabNa
 const Tab = createBottomTabNavigator<AppStackParamList>()
 
 const AppStack = observer(function AppStack() {
+  const { authenticationStore } = useStores()
+  const { isAuthenticated } = authenticationStore
+
   return (
     <Tab.Navigator
-      initialRouteName="Auth"
+      initialRouteName={isAuthenticated ? "Feed" : "Auth"}
       screenOptions={{
         headerShown: false,
         tabBarItemStyle: { backgroundColor: config.theme.tokens.colors.backgroundDark700 },
@@ -68,10 +72,17 @@ const AppStack = observer(function AppStack() {
         },
       }}
     >
-      {/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREENS */}
-      <Tab.Screen options={hideTabBar} name="Auth" component={Auth} />
-      <Tab.Screen options={hideTabBar} name="Onboarding" component={Onboarding} />
-      <Tab.Screen name="Feed" component={Feed} />
+      {isAuthenticated ? (
+        <>
+          <Tab.Screen name="Feed" component={Feed} />
+          <Tab.Screen name="Profile" component={Profile} />
+        </>
+      ) : (
+        <>
+          <Tab.Screen options={hideTabBar} name="Auth" component={Auth} />
+          <Tab.Screen options={hideTabBar} name="Onboarding" component={Onboarding} />
+        </>
+      )}
     </Tab.Navigator>
   )
 })
