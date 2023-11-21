@@ -48,3 +48,17 @@ export interface ApiConfig {
    */
   timeout: number
 }
+
+export interface Credentials {
+  email: string
+  password: string
+}
+
+export interface ApiAuthResponseData {
+  user: {
+    id: string
+    email: string
+  }
+  token: string
+  message?: string
+}
