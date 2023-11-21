@@ -1,7 +1,7 @@
 {
     "client": "Thunder Client",
     "collectionName": "infobytes",
-    "dateExported": "2023-11-16T19:15:24.490Z",
+    "dateExported": "2023-11-21T18:17:47.303Z",
     "version": "1.1",
     "folders": [],
     "requests": [
@@ -168,7 +168,7 @@
             "method": "GET",
             "sortNum": 50000,
             "created": "2023-10-26T16:31:26.518Z",
-            "modified": "2023-11-16T19:13:28.351Z",
+            "modified": "2023-11-16T19:26:21.953Z",
             "headers": [],
             "params": [
                 {
@@ -179,7 +179,7 @@
             ],
             "auth": {
                 "type": "bearer",
-                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjFhZGU0ODM5LTUxNzItNGUyOS05M2RkLTM2ZTJmNDk4Njc1YSIsImVtYWlsIjoia2lyNGFnaSt0ZXN0QGdtYWlsLmNvbSIsImlhdCI6MTcwMDA3MDc5N30.tO1e8LjJv5epuyQtsnMiR5WT3V04CYJOfhywxFfCtM0"
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjgzOTQ4MGJiLWM1ODAtNGY5My1hNzYyLTY5YTU3NmJmYWZiYiIsImVtYWlsIjoia2lyNGFnaStuZXdAZ21haWwuY29tIiwiaWF0IjoxNzAwMTYyMjYwfQ.J8kVVsN31zLWO61EL_cTZ3Y8RmARk6PI1COxIZ2zVOE"
             },
             "tests": []
         },
@@ -231,7 +231,7 @@
             "method": "POST",
             "sortNum": 70625,
             "created": "2023-11-15T11:41:26.507Z",
-            "modified": "2023-11-16T19:12:49.595Z",
+            "modified": "2023-11-21T15:43:22.303Z",
             "headers": [],
             "params": [],
             "body": {
@@ -250,12 +250,12 @@
             "method": "POST",
             "sortNum": 71250,
             "created": "2023-11-15T17:07:39.331Z",
-            "modified": "2023-11-16T19:13:44.145Z",
+            "modified": "2023-11-16T19:19:04.208Z",
             "headers": [],
             "params": [],
             "body": {
                 "type": "json",
-                "raw": "{\n  \"email\": \"kir4agi@gmail.com\",\n  \"password\": \"qazwsx\"\n}",
+                "raw": "{\n  \"email\": \"kir4agi+new@gmail.com\",\n  \"password\": \"sasdasdasd\"\n}",
                 "form": []
             },
             "tests": []
@@ -269,12 +269,12 @@
             "method": "POST",
             "sortNum": 72500,
             "created": "2023-11-16T09:00:22.805Z",
-            "modified": "2023-11-16T19:13:47.511Z",
+            "modified": "2023-11-16T19:18:12.677Z",
             "headers": [],
             "params": [],
             "body": {
                 "type": "json",
-                "raw": "{\n  \"email\": \"kir4agi@gmail.com\"\n}",
+                "raw": "{\n  \"email\": \"kir4agi+new@gmail.com\"\n}",
                 "form": []
             },
             "tests": []
@@ -314,6 +314,47 @@
                 "type": "json",
                 "raw": "{\n  \"email\": \"kir4agi+test@gmail.com\",\n    \"requestPasswordChangeId\": \"67f45fb6-0ad4-46fa-a151-ef9707eaebf4\",\n  \"password\": \"123456asd\"\n}",
                 "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "68759533-4b97-478e-9f20-1b9a2a3ee505",
+            "colId": "0fd5f0e2-0b5a-482b-a3bb-75a604930b09",
+            "containerId": "",
+            "name": "get-current-user",
+            "url": "{{api_url}}/user",
+            "method": "GET",
+            "sortNum": 90000,
+            "created": "2023-11-21T16:24:13.970Z",
+            "modified": "2023-11-21T18:17:28.985Z",
+            "headers": [],
+            "params": [],
+            "auth": {
+                "type": "bearer",
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImVhNzBlMjFlLTdlOGItNGJkNy1hMzJmLTcwZGQxMzU1YjQxNyIsImVtYWlsIjoia2lyNGFnaUBnbWFpbC5jb20iLCJkaXNwbGF5TmFtZSI6IiIsImlzT25ib2FyZGVkIjpmYWxzZSwiaWF0IjoxNzAwNTgzODQyfQ.Brhhijz330XsfKP_aaggr-_qhpbFyT-7ngWWZ7KT1do"
+            },
+            "tests": []
+        },
+        {
+            "_id": "0a436a89-7b05-4c01-8dc1-1d6a02c6bcd1",
+            "colId": "0fd5f0e2-0b5a-482b-a3bb-75a604930b09",
+            "containerId": "",
+            "name": "patch-user",
+            "url": "{{api_url}}/user",
+            "method": "PATCH",
+            "sortNum": 100000,
+            "created": "2023-11-21T17:09:15.305Z",
+            "modified": "2023-11-21T18:14:46.670Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"isOnboarded\": true,\n  \"displayName\": \"kir4agi\",\n  \"categories\": [\"art\"]\n}",
+                "form": []
+            },
+            "auth": {
+                "type": "bearer",
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImVhNzBlMjFlLTdlOGItNGJkNy1hMzJmLTcwZGQxMzU1YjQxNyIsImVtYWlsIjoia2lyNGFnaUBnbWFpbC5jb20iLCJkaXNwbGF5TmFtZSI6IiIsImlzT25ib2FyZGVkIjpmYWxzZSwiaWF0IjoxNzAwNTgzODQyfQ.Brhhijz330XsfKP_aaggr-_qhpbFyT-7ngWWZ7KT1do"
             },
             "tests": []
         }
