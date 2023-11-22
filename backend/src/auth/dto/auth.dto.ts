@@ -1,3 +1,4 @@
+import { Exclude, Expose, Type } from 'class-transformer';
 import {
   IsEmail,
   IsNotEmpty,
@@ -49,3 +50,29 @@ export class LoginDto {
 }
 
 export class RegisterDto extends LoginDto {}
+
+export class UserLoginResponseDto {
+  @Expose()
+  id: string;
+
+  @Expose()
+  email: string;
+
+  @Exclude()
+  password: string;
+
+  @Expose()
+  displayName: string;
+
+  @Expose()
+  isOnboarded: boolean;
+}
+
+export class LoginResponseDto {
+  @Expose()
+  token: string;
+
+  @Expose({ name: 'user' })
+  @Type(() => UserLoginResponseDto)
+  user: UserLoginResponseDto;
+}
