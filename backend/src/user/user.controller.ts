@@ -9,8 +9,9 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 
 import { CurrentUser, InjectUserInBody } from 'src/interceptors';
-import { PatchUserDto } from './dto/user.dto';
+import { PatchUserDto, UserResponseDto } from './dto/user.dto';
 import { UserService } from './user.service';
+import { plainToInstance } from 'class-transformer';
 
 @Controller('user')
 export class UserController {
@@ -20,8 +21,9 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(InjectUserInBody)
   getCurrentUser(@CurrentUser() user) {
-    delete user.password;
-    return user;
+    return plainToInstance(UserResponseDto, user, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @UseGuards(AuthGuard('jwt'))
