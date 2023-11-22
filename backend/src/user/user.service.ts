@@ -6,21 +6,20 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
-import { UserInjected } from 'src/interceptors';
 import { DatabaseService } from 'src/database/database.service';
 
 import { PatchUserDto } from './dto/user.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { isArray } from 'class-validator';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class UserService {
   private readonly logger = new Logger(UserService.name);
   constructor(private db: DatabaseService) {}
 
-  async patch(dto: PatchUserDto) {
+  async patch(dto: PatchUserDto, user: User) {
     try {
-      const { user } = dto as UserInjected<PatchUserDto>;
       await this.db.userFactCategory.deleteMany({ where: { userId: user.id } });
 
       const patchedUser = await this.db.user.update({

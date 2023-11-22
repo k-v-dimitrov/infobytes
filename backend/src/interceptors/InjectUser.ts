@@ -3,6 +3,7 @@ import {
   NestInterceptor,
   ExecutionContext,
   CallHandler,
+  createParamDecorator,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
@@ -25,12 +26,12 @@ export class InjectUserInBody implements NestInterceptor {
       id: decodedToken.id,
       include: { UserFactCategory: true },
     });
-    this.attachUserToRequestBody(request, user);
+    this.attachUserToRequestContext(request, user);
     return next.handle();
   }
 
-  private attachUserToRequestBody(request: any, user: User) {
-    request.body.user = user;
+  private attachUserToRequestContext(request: any, user: User) {
+    request.user = user;
   }
 
   private tryToExtractJwtToken(request: any) {
@@ -54,6 +55,9 @@ export class InjectUserInBody implements NestInterceptor {
   }
 }
 
-export type UserInjected<T> = {
-  user: User;
-} & T;
+export const CurrentUser = createParamDecorator(
+  (data: unknown, context: ExecutionContext) => {
+    const request = context.switchToHttp().getRequest();
+    return request.user as User;
+  },
+);
