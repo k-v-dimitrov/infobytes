@@ -32,6 +32,7 @@ model Fact {
   sourceUrl String
 
   categoryType FactCategories?
+  FactReview   FactReview[]
 
   @@map("facts")
 }
@@ -59,6 +60,9 @@ model FactReview {
   id        String   @id @unique @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  fact   Fact   @relation(fields: [factId], references: [id])
+  factId String
 
   user   User   @relation(fields: [userId], references: [id])
   userId String
