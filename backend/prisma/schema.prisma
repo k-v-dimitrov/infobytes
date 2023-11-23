@@ -32,12 +32,16 @@ model Fact {
   sourceUrl String
 
   categoryType FactCategories?
+  FactReview   FactReview[]
 
   @@map("facts")
 }
 
 model User {
-  id       String @id @unique @default(uuid())
+  id        String   @id @unique @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
   email    String @unique
   password String
 
@@ -47,12 +51,30 @@ model User {
   FeedUser         FeedUser?
   ResetPassword    ResetPassword?
   UserFactCategory UserFactCategory[]
+  FactReview       FactReview[]
 
   @@map("users")
 }
 
+model FactReview {
+  id        String   @id @unique @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  fact   Fact   @relation(fields: [factId], references: [id])
+  factId String
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  @@map("fact_reviews")
+}
+
 model UserFactCategory {
-  id       String         @id @unique @default(uuid())
+  id        String   @id @unique @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
   category FactCategories
 
   user   User   @relation(fields: [userId], references: [id])
@@ -62,7 +84,9 @@ model UserFactCategory {
 }
 
 model ResetPassword {
-  id String @id @unique @default(uuid())
+  id        String   @id @unique @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
   User   User   @relation(fields: [userId], references: [id])
   userId String @unique

@@ -6,9 +6,24 @@ import {
   Logger,
 } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
-import { CreateFactDto, FactIdDto, PatchFactDto, PutFactDto } from './dto';
+import {
+  CreateFactDto,
+  FactIdDto,
+  FactResponseDto,
+  PatchFactDto,
+  PutFactDto,
+} from './dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { PrismaError } from 'prisma-error-enum';
+import { isArray } from 'class-validator';
+import {
+  PageableParamsDto,
+  PageableResponseDto,
+  validateSortKeys,
+  generateOrderBySortKeys,
+} from 'src/utils/pageable';
+import { plainToInstance } from 'class-transformer';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class FactService {
@@ -27,7 +42,9 @@ export class FactService {
         },
       });
 
-      return { createdFact };
+      return plainToInstance(FactResponseDto, createdFact, {
+        excludeExtraneousValues: true,
+      });
     } catch (error) {
       this.logger.error(error);
     }
@@ -41,7 +58,9 @@ export class FactService {
         },
       });
 
-      return { fact };
+      return plainToInstance(FactResponseDto, fact, {
+        excludeExtraneousValues: true,
+      });
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === PrismaError.RecordsNotFound) {
@@ -61,7 +80,7 @@ export class FactService {
 
   async put(dto: PutFactDto) {
     try {
-      const patchedFact = await this.db.fact.update({
+      const putFact = await this.db.fact.update({
         where: {
           id: dto.factId,
         },
@@ -74,7 +93,9 @@ export class FactService {
         },
       });
 
-      return { patchedFact };
+      return plainToInstance(FactResponseDto, putFact, {
+        excludeExtraneousValues: true,
+      });
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === PrismaError.RecordsNotFound) {
@@ -107,7 +128,9 @@ export class FactService {
         },
       });
 
-      return { patchedFact };
+      return plainToInstance(FactResponseDto, patchedFact, {
+        excludeExtraneousValues: true,
+      });
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === PrismaError.RecordsNotFound) {
@@ -133,7 +156,9 @@ export class FactService {
         },
       });
 
-      return { fact };
+      return plainToInstance(FactResponseDto, fact, {
+        excludeExtraneousValues: true,
+      });
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === PrismaError.RecordsNotFound) {
@@ -174,7 +199,9 @@ export class FactService {
         },
       });
 
-      return { results };
+      return plainToInstance(Array<FactResponseDto>, results, {
+        excludeExtraneousValues: true,
+      });
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -183,5 +210,50 @@ export class FactService {
       this.logger.error(error);
       throw new InternalServerErrorException();
     }
+  }
+
+  async getFactsForReview(dto: PageableParamsDto, user: User) {
+    const reviewFactSortableKeys = ['createdAt', 'updatedAt'];
+
+    const hasProvidedSortKeys = dto.sortBy && isArray(dto.sortBy);
+    hasProvidedSortKeys &&
+      validateSortKeys({
+        knownKeys: reviewFactSortableKeys,
+        keys: dto.sortBy,
+      });
+
+    const orderBy =
+      hasProvidedSortKeys && generateOrderBySortKeys(dto.sortBy, 'desc');
+
+    const hasProvidedPageableProps = dto.page && dto.size;
+
+    const factReviewList = await this.db.factReview.findMany({
+      skip: hasProvidedPageableProps && (dto.page - 1) * dto.size,
+      where: { userId: user.id },
+      include: { fact: true },
+      orderBy,
+      take: hasProvidedPageableProps && dto.size,
+    });
+
+    const factReviewTotalEntries = await this.db.factReview.count({
+      where: { userId: user.id },
+    });
+
+    const pageable =
+      hasProvidedPageableProps &&
+      plainToInstance(
+        PageableResponseDto,
+        new PageableResponseDto(dto.page, dto.size, factReviewTotalEntries),
+      );
+
+    const factsForReview = plainToInstance(
+      FactResponseDto,
+      factReviewList.map(({ fact }) => fact),
+      {
+        excludeExtraneousValues: true,
+      },
+    );
+
+    return { results: factsForReview, pageable };
   }
 }

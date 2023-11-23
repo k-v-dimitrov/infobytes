@@ -3,30 +3,40 @@ import {
   Controller,
   Delete,
   Get,
-  Param,
   Patch,
   Post,
   Put,
   Query,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
-import { FactService } from './fact.service';
 import {
+  AddFactForReviewDto,
   CreateFactDto,
+  DeleteFactForReviewDto,
   FactIdDto,
   PatchFactDto,
   PutFactDto,
   SearchFactDto,
 } from './dto';
 import { AuthGuard } from '@nestjs/passport';
+import { CurrentUser, InjectUser } from 'src/interceptors';
+
+import { UserService } from 'src/user/user.service';
+import { FactService } from './fact.service';
+import { PageableParamsDto } from 'src/utils/pageable';
+import { User } from '@prisma/client';
 
 @Controller('fact')
 export class FactController {
-  constructor(private factService: FactService) {}
+  constructor(
+    private factService: FactService,
+    private userService: UserService,
+  ) {}
 
   @UseGuards(AuthGuard('jwt'))
-  @Get(':id')
-  get(@Param() factId: FactIdDto) {
+  @Get()
+  get(@Query() factId: FactIdDto) {
     return this.factService.get(factId);
   }
 
@@ -55,8 +65,35 @@ export class FactController {
   }
 
   @UseGuards(AuthGuard('admin'))
-  @Delete(':id')
-  delete(@Param() factId: FactIdDto) {
+  @Delete()
+  delete(@Query() factId: FactIdDto) {
     return this.factService.delete(factId);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @UseInterceptors(InjectUser)
+  @Get('review')
+  getFactsForReview(@Body() dto: PageableParamsDto, @CurrentUser() user: User) {
+    return this.factService.getFactsForReview(dto, user);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @UseInterceptors(InjectUser)
+  @Post('review')
+  addFactForReview(
+    @Body() dto: AddFactForReviewDto,
+    @CurrentUser() user: User,
+  ) {
+    return this.userService.addFactForReview(dto, user);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @UseInterceptors(InjectUser)
+  @Delete('review')
+  deleteFactForReview(
+    @Body() dto: DeleteFactForReviewDto,
+    @CurrentUser() user: User,
+  ) {
+    return this.userService.deleteFactForReview(dto, user);
   }
 }

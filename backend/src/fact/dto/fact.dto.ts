@@ -1,4 +1,5 @@
-import { FactCategories } from '@prisma/client';
+import { $Enums, FactCategories } from '@prisma/client';
+import { Expose } from 'class-transformer';
 import {
   IsEnum,
   IsNotEmpty,
@@ -60,4 +61,37 @@ export class SearchFactDto {
   @IsString()
   @IsNotEmpty()
   search: string;
+}
+
+export class AddFactForReviewDto {
+  @IsUUID()
+  factId: string;
+}
+
+export class DeleteFactForReviewDto {
+  @IsUUID()
+  factId: string;
+}
+
+export class FactResponseDto {
+  @Expose()
+  id: string;
+
+  @Expose()
+  createdAt: Date;
+
+  @Expose()
+  updatedAt: Date;
+
+  @Expose()
+  title: string;
+
+  @Expose()
+  text: string;
+
+  @Expose()
+  sourceUrl: string;
+
+  @Expose()
+  categoryType: $Enums.FactCategories;
 }
