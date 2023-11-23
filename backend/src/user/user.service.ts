@@ -6,7 +6,9 @@ import { User } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 import { DatabaseService } from 'src/database/database.service';
-import { PatchUserDto, UserResponseDto } from './dto/user.dto';
+
+import { PatchUserDto, UserResponseDto } from './dto';
+import { AddFactForReviewDto, DeleteFactForReviewDto } from 'src/fact/dto';
 
 @Injectable()
 export class UserService {
@@ -18,6 +20,41 @@ export class UserService {
     return plainToInstance(UserResponseDto, updatedUser, {
       excludeExtraneousValues: true,
     });
+  }
+
+  async addFactForReview(dto: AddFactForReviewDto, user: User) {
+    try {
+      await this.db.factReview.create({
+        data: {
+          userId: user.id,
+          factId: dto.factId,
+        },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+      }
+
+      throw error;
+    }
+  }
+
+  async deleteFactForReview(dto: DeleteFactForReviewDto, user: User) {
+    try {
+      const factReviewToDelete = await this.db.factReview.findFirstOrThrow({
+        where: { userId: user.id, factId: dto.factId },
+      });
+
+      await this.db.factReview.delete({
+        where: { id: factReviewToDelete.id },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+      }
+
+      throw error;
+    }
   }
 
   private async updateUserByPatchDto(user: User, dto: PatchUserDto) {
