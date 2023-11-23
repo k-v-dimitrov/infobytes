@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { FeedService } from './feed.service';
 import { UserFeedDto } from './dto';
-import { CurrentUser, InjectUserInBody } from 'src/interceptors';
+import { CurrentUser, InjectUser } from 'src/interceptors';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from '@prisma/client';
 
@@ -17,11 +17,12 @@ export class FeedController {
 
   @Get('user')
   @UseGuards(AuthGuard('jwt'))
-  @UseInterceptors(InjectUserInBody)
+  @UseInterceptors(InjectUser)
   subscribeUserToFeed(@CurrentUser() user: User) {
     return this.feedService.subscribeUserToFeed(user);
   }
 
+  // TODO: POTENTIAL SECURITY PROBLEM, userId should not be taken from QueryParams
   @Get()
   @UseGuards(AuthGuard('jwt'))
   getFeedForUser(@Query() userIdDto: UserFeedDto) {

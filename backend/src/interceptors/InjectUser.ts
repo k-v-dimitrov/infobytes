@@ -11,7 +11,7 @@ import { JwtPayload } from 'src/auth/type';
 import { DatabaseService } from 'src/database/database.service';
 
 @Injectable()
-export class InjectUserInBody implements NestInterceptor {
+export class InjectUser implements NestInterceptor {
   constructor(
     private jwtService: JwtService,
     private db: DatabaseService,
