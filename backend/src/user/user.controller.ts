@@ -8,9 +8,10 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
-import { InjectUserInBody, UserInjected } from 'src/interceptors';
-import { PatchUserDto } from './dto/user.dto';
+import { CurrentUser, InjectUserInBody } from 'src/interceptors';
+import { PatchUserDto, UserResponseDto } from './dto/user.dto';
 import { UserService } from './user.service';
+import { plainToInstance } from 'class-transformer';
 
 @Controller('user')
 export class UserController {
@@ -19,16 +20,16 @@ export class UserController {
   @Get()
   @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(InjectUserInBody)
-  getCurrentUser(@Body() dto: UserInjected<void>) {
-    const { user } = dto;
-    delete user.password;
-    return user;
+  getCurrentUser(@CurrentUser() user) {
+    return plainToInstance(UserResponseDto, user, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(InjectUserInBody)
   @Patch()
-  patch(@Body() dto: PatchUserDto) {
-    return this.userService.patch(dto);
+  patch(@Body() dto: PatchUserDto, @CurrentUser() user) {
+    return this.userService.patch(dto, user);
   }
 }

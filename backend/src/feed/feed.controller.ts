@@ -1,5 +1,4 @@
 import {
-  Body,
   Controller,
   Get,
   Query,
@@ -8,8 +7,9 @@ import {
 } from '@nestjs/common';
 import { FeedService } from './feed.service';
 import { UserFeedDto } from './dto';
-import { InjectUserInBody, UserInjected } from 'src/interceptors';
+import { CurrentUser, InjectUserInBody } from 'src/interceptors';
 import { AuthGuard } from '@nestjs/passport';
+import { User } from '@prisma/client';
 
 @Controller('feed')
 export class FeedController {
@@ -18,8 +18,8 @@ export class FeedController {
   @Get('user')
   @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(InjectUserInBody)
-  subscribeUserToFeed(@Body() dto: UserInjected<void>) {
-    return this.feedService.subscribeUserToFeed(dto);
+  subscribeUserToFeed(@CurrentUser() user: User) {
+    return this.feedService.subscribeUserToFeed(user);
   }
 
   @Get()

@@ -1,14 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { UserFeedDto } from './dto';
-import { Fact } from '@prisma/client';
-import { UserInjected } from 'src/interceptors';
+import { Fact, User } from '@prisma/client';
 
 @Injectable()
 export class FeedService {
   constructor(private db: DatabaseService) {}
 
-  async subscribeUserToFeed({ user }: UserInjected<void>) {
+  async subscribeUserToFeed(user: User) {
     const feedUser = await this.db.feedUser.create({
       data: { user_id: user.id },
     });

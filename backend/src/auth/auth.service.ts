@@ -12,6 +12,7 @@ import { DatabaseService } from 'src/database/database.service';
 import { JwtPayload } from './type';
 import {
   LoginDto,
+  LoginResponseDto,
   RegisterDto,
   ResetPasswordCheckDto,
   ResetPasswordDto,
@@ -27,6 +28,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { SendGridService } from 'src/sendgrid/sendgrid.service';
 import { UserNotFoundError } from 'src/database/exceptions';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class AuthService {
@@ -104,8 +106,6 @@ export class AuthService {
     if (!hasPasswordRequest || passwordRequest.id !== requestPasswordChangeId) {
       throw new InvalidPasswordRequestLink();
     }
-
-    return;
   }
 
   async resetPassword({
@@ -126,9 +126,6 @@ export class AuthService {
     if (user.id !== id) {
       throw new ForgedUserPayloadError();
     }
-
-    // Omit user password
-    delete user.password;
 
     return user;
   }
@@ -195,14 +192,16 @@ export class AuthService {
   }
 
   private signJwtForUser(user: User) {
-    delete user.password;
     const jwtPayloadToSign: JwtPayload = { ...user };
     return this.jwtService.sign(jwtPayloadToSign);
   }
 
   private buildLoginResponse({ token, user }: { token: string; user: User }) {
-    delete user.password;
-    return { user, token };
+    return plainToInstance(
+      LoginResponseDto,
+      { user, token },
+      { excludeExtraneousValues: true },
+    );
   }
 
   private async checkAndThrowOnEmailAlreadyInUse(email: string) {

@@ -1,29 +1,28 @@
-import {
-  BadRequestException,
-  HttpException,
-  HttpStatus,
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-} from '@nestjs/common';
-import { UserInjected } from 'src/interceptors';
-import { DatabaseService } from 'src/database/database.service';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
-import { PatchUserDto } from './dto/user.dto';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { isArray } from 'class-validator';
+import { plainToInstance } from 'class-transformer';
+import { User } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+
+import { DatabaseService } from 'src/database/database.service';
+import { PatchUserDto, UserResponseDto } from './dto/user.dto';
 
 @Injectable()
 export class UserService {
-  private readonly logger = new Logger(UserService.name);
   constructor(private db: DatabaseService) {}
 
-  async patch(dto: PatchUserDto) {
-    try {
-      const { user } = dto as UserInjected<PatchUserDto>;
-      await this.db.userFactCategory.deleteMany({ where: { userId: user.id } });
+  async patch(dto: PatchUserDto, user: User) {
+    await this.deleteAllUserFactCategories(user);
+    const updatedUser = await this.updateUserByPatchDto(user, dto);
+    return plainToInstance(UserResponseDto, updatedUser, {
+      excludeExtraneousValues: true,
+    });
+  }
 
-      const patchedUser = await this.db.user.update({
+  private async updateUserByPatchDto(user: User, dto: PatchUserDto) {
+    try {
+      return await this.db.user.update({
         where: {
           id: user.id,
         },
@@ -41,21 +40,30 @@ export class UserService {
         },
         include: { UserFactCategory: true },
       });
-
-      delete patchedUser.password;
-
-      return { patchedUser };
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
       }
 
-      if (error instanceof HttpException) {
-        throw error;
+      throw error;
+    }
+  }
+
+  private async deleteAllUserFactCategories(user: {
+    id: string;
+    email: string;
+    password: string;
+    displayName: string;
+    isOnboarded: boolean;
+  }) {
+    try {
+      await this.db.userFactCategory.deleteMany({ where: { userId: user.id } });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
       }
 
-      this.logger.error(error);
-      throw new InternalServerErrorException();
+      throw error;
     }
   }
 }
