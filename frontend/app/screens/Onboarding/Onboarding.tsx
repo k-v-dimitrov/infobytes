@@ -9,7 +9,9 @@ export const Onboarding = ({ navigation }) => {
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([])
 
   const handleFinish = () => {
-    navigation.navigate("Feed")
+    // navigation.navigate("Feed")
+
+    console.log({ nickname, selectedCategories })
   }
 
   return (

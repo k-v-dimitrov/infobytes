@@ -1,5 +1,5 @@
 import React, { Dispatch, SetStateAction, useState } from "react"
-import { View, FlatList, Button, ButtonText, Heading, Pressable, Text, Spinner } from "@gluestack-ui/themed"
+import { View, FlatList, Button, ButtonText, Heading, Pressable, Text } from "@gluestack-ui/themed"
 import { Category } from "../types"
 
 interface Props {
@@ -25,12 +25,6 @@ export const Categories = ({ selectedCategories, setSelectedCategories, handleFi
     setLoading(true)
 
     try {
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve("")
-        }, 1000)
-      })
-
       handleFinish()
     } catch (error) {
     } finally {
@@ -72,7 +66,7 @@ export const Categories = ({ selectedCategories, setSelectedCategories, handleFi
       />
 
       <Button onPress={handleSubmit} isDisabled={!hasRequiredCategories || loading}>
-        {loading ? <Spinner /> : <ButtonText>Begin your journey</ButtonText>}
+        <ButtonText>Begin your journey</ButtonText>
       </Button>
     </View>
   )

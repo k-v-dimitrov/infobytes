@@ -8,7 +8,7 @@ import { NavigationContainer } from "@react-navigation/native"
 import {
   createBottomTabNavigator,
   BottomTabNavigationProp,
-  BottomTabNavigationOptions,
+  // BottomTabNavigationOptions,
 } from "@react-navigation/bottom-tabs"
 import { observer } from "mobx-react-lite"
 import React from "react"
@@ -43,11 +43,11 @@ export type AppStackParamList = {
  * is pressed while in that screen. Only affects Android.
  */
 const exitRoutes = Config.exitRoutes
-const hideTabBar: BottomTabNavigationOptions = {
-  tabBarStyle: {
-    display: "none",
-  },
-}
+// const hideTabBar: BottomTabNavigationOptions = {
+//   tabBarStyle: {
+//     display: "none",
+//   },
+// }
 
 export type AppStackScreenProps<T extends keyof AppStackParamList> = BottomTabNavigationProp<
   AppStackParamList,
@@ -79,8 +79,16 @@ const AppStack = observer(function AppStack() {
         </>
       ) : (
         <>
-          <Tab.Screen options={hideTabBar} name="Auth" component={Auth} />
-          <Tab.Screen options={hideTabBar} name="Onboarding" component={Onboarding} />
+          <Tab.Screen
+            //  options={hideTabBar}
+            name="Auth"
+            component={Auth}
+          />
+          <Tab.Screen
+            //  options={hideTabBar}
+            name="Onboarding"
+            component={Onboarding}
+          />
         </>
       )}
     </Tab.Navigator>

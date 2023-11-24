@@ -1,7 +1,5 @@
-import React, { useState } from "react"
-import { Screen } from "app/components"
+import React from "react"
 import { Button, ButtonText, Input, InputField, Text, VStack, View } from "@gluestack-ui/themed"
-import messages from "app/utils/messages"
 import { Step } from "../types"
 
 interface Props {
@@ -11,15 +9,9 @@ interface Props {
 }
 
 export const Nickname = ({ nickname, setNickname, setStep }: Props) => {
-  const [error, setError] = useState("")
+  const isValid = Boolean(nickname)
 
   const handleSubmit = () => {
-    if (!nickname) {
-      setError(messages.required)
-
-      return
-    }
-
     setStep(Step.GREET)
   }
 
@@ -29,17 +21,17 @@ export const Nickname = ({ nickname, setNickname, setStep }: Props) => {
 
       <VStack>
         <Text>Nickname</Text>
-        <Input isInvalid={!!error} variant="outline" size="md">
-          <InputField value={nickname} onChangeText={setNickname} placeholder="ThugPug_99" />
+        <Input variant="outline" size="md">
+          <InputField
+            onSubmitEditing={handleSubmit}
+            value={nickname}
+            onChangeText={setNickname}
+            placeholder="ThugPug_99"
+          />
         </Input>
-        {!!error && (
-          <Text size="xs" color="$red500">
-            {error}
-          </Text>
-        )}
       </VStack>
 
-      <Button onPress={handleSubmit}>
+      <Button isDisabled={!isValid} onPress={handleSubmit}>
         <ButtonText>Continue</ButtonText>
       </Button>
     </View>
