@@ -33,8 +33,37 @@ model Fact {
 
   categoryType FactCategories?
   FactReview   FactReview[]
+  Question     Question[]
 
   @@map("facts")
+}
+
+model Question {
+  id        String   @id @unique @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  questionText String
+  answers      Answer[]
+
+  fact   Fact   @relation(fields: [factId], references: [id], onDelete: Cascade)
+  factId String
+
+  @@map("questions")
+}
+
+model Answer {
+  id        String   @id @unique @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  answerText String
+  isCorrect  Boolean
+
+  question   Question @relation(fields: [questionId], references: [id])
+  questionId String
+
+  @@map("answers")
 }
 
 model User {
