@@ -11,23 +11,25 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { SendGridModule } from './sendgrid/sendgrid.module';
 import { UserModule } from './user/user.module';
+import { QuestionModule } from './question/question.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    DatabaseModule,
-    FactModule,
-    CategoryModule,
-    FeedModule,
-    AuthModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..'),
       serveStaticOptions: {
         index: '/index.html',
       },
     }),
-    SendGridModule,
+    DatabaseModule,
+    AuthModule,
     UserModule,
+    FactModule,
+    CategoryModule,
+    QuestionModule,
+    SendGridModule,
+    FeedModule,
   ],
 })
 export class AppModule {}
