@@ -24,6 +24,9 @@ export class CreateQuestionDto {
 
 export class CreateQuestionResponseDto {
   @Expose()
+  id: string;
+
+  @Expose()
   questionText: string;
 
   @Expose()
