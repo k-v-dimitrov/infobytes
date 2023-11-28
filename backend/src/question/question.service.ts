@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import {
   CreateQuestionDto,
   CreateQuestionResponseDto,
@@ -22,31 +27,40 @@ export class QuestionService {
   async create(dto: CreateQuestionDto) {
     this.validateAnswers(dto);
 
-    console.log('what?');
-
-    const createdQuestion = await this.db.question.create({
-      data: {
-        questionText: dto.questionText,
-        answers: {
-          createMany: {
-            data: dto.answers,
+    try {
+      const createdQuestion = await this.db.question.create({
+        data: {
+          questionText: dto.questionText,
+          answers: {
+            createMany: {
+              data: dto.answers,
+            },
           },
+          factId: dto.factId,
         },
-        factId: dto.factId,
-      },
-      select: {
-        answers: true,
-        createdAt: true,
-        factId: true,
-        id: true,
-        questionText: true,
-        updatedAt: true,
-      },
-    });
+        select: {
+          answers: true,
+          createdAt: true,
+          factId: true,
+          id: true,
+          questionText: true,
+          updatedAt: true,
+        },
+      });
 
-    return plainToInstance(CreateQuestionResponseDto, createdQuestion, {
-      excludeExtraneousValues: true,
-    });
+      return plainToInstance(CreateQuestionResponseDto, createdQuestion, {
+        excludeExtraneousValues: true,
+      });
+    } catch (err) {
+      if (err instanceof PrismaClientKnownRequestError) {
+        if (err.code === PrismaError.ForeignConstraintViolation) {
+          throw new HttpException(
+            `Encountered error creating new question for fact with id ${dto.factId}. Does this fact exist?`,
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+      }
+    }
   }
 
   async delete(dto: DeleteQuestionDto) {
