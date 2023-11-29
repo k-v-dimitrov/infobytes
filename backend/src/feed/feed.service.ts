@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
-import { UserFeedDto } from './dto';
-import { Fact, User } from '@prisma/client';
+import { UserFeedDto, UserFeedResponseDto } from './dto';
+import { Fact, Prisma, Question, User, ViewedFact } from '@prisma/client';
+import { plainToInstance } from 'class-transformer';
+
+// Enrich user feed on every 5 viewed facts
+const ENRICH_WITH_QUESTION_INTERVAL = 5;
 
 @Injectable()
 export class FeedService {
@@ -18,18 +22,149 @@ export class FeedService {
     const viewedFactIdsByUser =
       await this.getFactsIdsViewedByCurrentUser(userFeedId);
 
-    const currentUserFeed = await this.generateFeedForUser({
+    const factsFeed = await this.generateFactsFeedForUser({
       excludeFactIds: viewedFactIdsByUser,
       size,
       shouldRandomize: true,
     });
 
-    await this.markFactsAsViewed(currentUserFeed, userFeedId);
+    const { beforeUpdateViewedCount, afterUpdateViewedCount } =
+      await this.markFactsAsViewedAndGetUpdatedCounts(userFeedId, factsFeed);
 
-    return currentUserFeed;
+    const numberOfQuestionsToGenerate =
+      this.calculateNumberOfQuestionsToGenerate({
+        beforeUpdateViewedCount,
+        afterUpdateViewedCount,
+      });
+
+    const questionsFeed = await this.generateQuestionsFeed(
+      numberOfQuestionsToGenerate,
+      userFeedId,
+    );
+
+    const feedResponse = plainToInstance(
+      UserFeedResponseDto,
+      {
+        facts: factsFeed,
+        questions: questionsFeed,
+      },
+      { excludeExtraneousValues: true },
+    );
+
+    return feedResponse;
   }
 
-  private async generateFeedForUser({
+  private async generateQuestionsFeed(
+    numberOfQuestionsToInject: number,
+    userFeedId: string,
+  ) {
+    const randomAlreadyViewedFacts = await this.getRandomViewedFacts({
+      count: numberOfQuestionsToInject,
+    });
+
+    const questionsByAlreadyViewedFacts =
+      await this.getQuestionsOfAlreadyViewedFacts(randomAlreadyViewedFacts);
+
+    const { user } = await this.getUserByUserFeedId(userFeedId);
+
+    const feedQuestions = await this.db.$transaction(
+      questionsByAlreadyViewedFacts.map(
+        ({ Question: questionAssocidatedWithViewedFact }) => {
+          const randomQuestionFromViewedFact =
+            questionAssocidatedWithViewedFact[
+              Math.floor(
+                Math.random() * questionAssocidatedWithViewedFact.length,
+              )
+            ];
+
+          return this.createNewUserQuestion(randomQuestionFromViewedFact, user);
+        },
+      ),
+    );
+
+    const enrichedFeedQuestions =
+      this.attachAnswerURIToQuestions(feedQuestions);
+
+    return enrichedFeedQuestions;
+  }
+
+  private createNewUserQuestion(question: Question, user: User) {
+    return this.db.userQuestion.create({
+      data: {
+        user: { connect: { id: user.id } },
+        question: {
+          connect: {
+            id: question.id,
+          },
+        },
+        givenAnswerId: null,
+        isCorrect: null,
+      },
+      include: {
+        question: { include: { answers: true } },
+      },
+    });
+  }
+
+  private attachAnswerURIToQuestions(
+    feedQuestions: Prisma.UserQuestionGetPayload<{
+      include: { question: { include: { answers: true } } };
+    }>[],
+  ) {
+    return feedQuestions.map((fq) => ({
+      ...fq,
+      question: {
+        ...fq.question,
+        answerURI: `/feed/q/${fq.question.id}`,
+      },
+    }));
+  }
+
+  private async getRandomViewedFacts({ count }: { count: number }) {
+    return await this.db.$queryRawUnsafe<ViewedFact[]>(
+      `
+        select * from viewed_facts vf 
+        where vf.user_feed_id = 'a80a4e27-f19a-48eb-b482-c43d983718be'
+        order by random()
+        limit $1
+      `,
+      count,
+    );
+  }
+
+  private async getQuestionsOfAlreadyViewedFacts(
+    alreadyViewedFacts: ViewedFact[],
+  ) {
+    return await this.db.fact.findMany({
+      select: {
+        Question: true,
+      },
+      where: {
+        id: { in: alreadyViewedFacts.map(({ fact_id }) => fact_id) },
+      },
+    });
+  }
+
+  private async getUserByUserFeedId(userFeedId: string) {
+    return await this.db.feedUser.findFirstOrThrow({
+      where: { id: userFeedId },
+      include: { user: true },
+    });
+  }
+
+  private async markFactsAsViewedAndGetUpdatedCounts(
+    userFeedId: string,
+    currentUserFeed: Fact[],
+  ) {
+    const beforeUpdateViewedCount = await this.getViewedFactsCount(userFeedId);
+
+    await this.markFactsAsViewed(currentUserFeed, userFeedId);
+
+    const afterUpdateViewedCount = await this.getViewedFactsCount(userFeedId);
+    return { beforeUpdateViewedCount, afterUpdateViewedCount };
+  }
+
+  private async generateFactsFeedForUser({
     excludeFactIds,
     size,
     shouldRandomize = false,
@@ -69,6 +204,22 @@ export class FeedService {
     });
   }
 
+  private async getViewedFactsCount(userFeedId: string) {
+    return this.db.viewedFact.count({ where: { user_feed_id: userFeedId } });
+  }
+
+  private calculateNumberOfQuestionsToGenerate({
+    beforeUpdateViewedCount,
+    afterUpdateViewedCount,
+  }: {
+    beforeUpdateViewedCount: number;
+    afterUpdateViewedCount: number;
+  }) {
+    const interval = ENRICH_WITH_QUESTION_INTERVAL;
+    return Math.floor(
+      (afterUpdateViewedCount - beforeUpdateViewedCount) / interval,
+    );
+  }
   private async getFactsIdsViewedByCurrentUser(userFeedId: string) {
     const alreadySeenFactsByUser = await this.db.viewedFact.findMany({
       where: { user_feed_id: userFeedId },
@@ -82,9 +233,7 @@ export class FeedService {
     const hasSeenAll = alreadySeenFactsByUser.length === allFactsCount;
 
     if (hasSeenAll) {
-      await this.db.viewedFact.deleteMany({
-        where: { user_feed_id: userFeedId },
-      });
+      await this.resetUserViewedFacts(userFeedId);
       return [];
     }
 
@@ -93,5 +242,11 @@ export class FeedService {
     );
 
     return alreadySeenFactsByUserIds;
+  }
+
+  private async resetUserViewedFacts(userFeedId: string) {
+    await this.db.viewedFact.deleteMany({
+      where: { user_feed_id: userFeedId },
+    });
   }
 }
