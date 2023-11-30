@@ -1,7 +1,6 @@
 import { useState } from "react"
 import { useStores } from "app/models"
 import { Credentials, authApi } from "app/services/api"
-import { saveString } from "app/utils/storage"
 import { navigate } from "app/navigators"
 
 export const useLogin = () => {
@@ -12,17 +11,15 @@ export const useLogin = () => {
   const login = async (credentials: Credentials) => {
     setLoading(true)
 
-    const { error, data } = await authApi.login(credentials)
-
-    if (error) {
-      setError(error)
-
-      return
-    }
-
     try {
-      await saveString("userAuthToken", data.token)
-      authenticationStore.authenticate(data.user)
+      const { error, data } = await authApi.login(credentials)
+
+      if (error) {
+        throw new Error(error)
+      }
+
+      await authenticationStore.authenticate(data.token)
+      
       navigate({ name: "Feed", params: undefined })
     } catch (err) {
       setError("Something went wrong!")

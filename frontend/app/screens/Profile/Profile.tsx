@@ -1,35 +1,34 @@
-import React, { useEffect, useState } from "react"
-import { Button, ButtonText, Text } from "@gluestack-ui/themed"
+import { Button, ButtonText, Divider, Text } from "@gluestack-ui/themed"
+import { observer } from "mobx-react-lite"
 import { Screen } from "app/components"
 import { useStores } from "app/models"
-import { loadString, remove } from "app/utils/storage"
+import React from "react"
 
-export const Profile = ({ navigation }) => {
-  const [authToken, setAuthToken] = useState("")
+export const Profile = observer<any>(({ navigation }) => {
   const { authenticationStore } = useStores()
 
   const logout = async () => {
-    await remove("userAuthToken")
-    authenticationStore.logout()
+    await authenticationStore.logout()
     navigation.navigate("Auth")
   }
 
-  useEffect(() => {
-    const getAuthToken = async () => {
-      const token = await loadString("userAuthToken")
-
-      setAuthToken(token)
-    }
-
-    getAuthToken()
-  }, [])
-
   return (
     <Screen>
-      <Text selectable>{authToken}</Text>
+      <Text selectable>{authenticationStore.token}</Text>
+      <Divider my="$2" />
+      <Text>ID: {authenticationStore?.user?.id}</Text>
+      <Divider my="$2" />
+      <Text>EMAIL: {authenticationStore?.user?.email}</Text>
+      <Divider my="$2" />
+      <Text>DISPLAY_NAME: {authenticationStore?.user?.displayName}</Text>
+      <Divider my="$2" />
+      <Text>CATEGORIES: {authenticationStore?.user?.categories.join(", ")}</Text>
+      <Divider my="$2" />
+      <Text>IS_ONBOARDED: {authenticationStore?.user?.isOnboarded.toString()}</Text>
+      <Divider my="$2" />
       <Button onPress={logout}>
         <ButtonText>Logout</ButtonText>
       </Button>
     </Screen>
   )
-}
+})

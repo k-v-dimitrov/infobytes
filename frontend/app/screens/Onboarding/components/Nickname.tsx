@@ -1,7 +1,7 @@
 import React from "react"
 import { Button, ButtonText, Input, InputField, Text, VStack, View } from "@gluestack-ui/themed"
 import { Step } from "../types"
-import { actions, useOnboardingContext } from "../context"
+import { createAction, useOnboardingContext } from "../context"
 
 export const Nickname = () => {
   const { onboardingState, dispatch } = useOnboardingContext()
@@ -9,11 +9,11 @@ export const Nickname = () => {
   const isValid = Boolean(displayName)
 
   const handleSubmit = () => {
-    dispatch(actions.setStep(Step.GREET))
+    dispatch(createAction("SET_STEP", Step.GREET))
   }
 
   const handleOnChange = (value: string) => {
-    dispatch(actions.setDisplayName(value))
+    dispatch(createAction("SET_DISPLAY_NAME", value))
   }
 
   return (

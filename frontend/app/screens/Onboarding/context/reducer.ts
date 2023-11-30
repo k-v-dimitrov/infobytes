@@ -1,35 +1,31 @@
-import { Category, OnboardingState } from "../types"
-import { ACTION_TYPES, Action } from "./actions"
+import { OnboardingState } from "../types"
+import { OnboardingAction } from "./actions"
 
-export const onboardingReducer = (state: OnboardingState, action: Action) => {
+export const onboardingReducer = (state: OnboardingState, action: OnboardingAction) => {
   switch (action.type) {
-    case ACTION_TYPES.SET_STEP: {
+    case "SET_STEP": {
       return {
         ...state,
         step: action.payload,
       }
     }
-    case ACTION_TYPES.SET_DISPLAY_NAME: {
+    case "SET_DISPLAY_NAME": {
       return {
         ...state,
         displayName: action.payload,
       }
     }
-    case ACTION_TYPES.ADD_CATEGORY: {
+    case "ADD_CATEGORY": {
       return {
         ...state,
         categories: [...state.categories, action.payload],
       }
     }
-    case ACTION_TYPES.REMOVE_CATEGORY: {
+    case "REMOVE_CATEGORY": {
       return {
         ...state,
         categories: state.categories.filter((current) => current !== action.payload),
       }
-    }
-
-    default: {
-      throw "Unknown action type"
     }
   }
 }

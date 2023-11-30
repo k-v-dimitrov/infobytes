@@ -1,12 +1,12 @@
 import React from "react"
 import { Button, ButtonText, FlatList, Heading, Pressable, Text, View } from "@gluestack-ui/themed"
 import { useCompleteOnboarding } from "../hooks/useCompleteOnboarding"
-import { actions, useOnboardingContext } from "../context"
+import { createAction, useOnboardingContext } from "../context"
 import { Category } from "../types"
 
 export const Categories = () => {
   const { onboardingState, dispatch } = useOnboardingContext()
-  const { completeOnboarding, error, loading } = useCompleteOnboarding()
+  const { completeOnboarding, error: _error, loading } = useCompleteOnboarding()
 
   const { categories } = onboardingState
   const hasRequiredCategories = categories.length >= 3
@@ -14,14 +14,14 @@ export const Categories = () => {
 
   const createOnPressHandler = (category: Category) => () => {
     const action = categories.includes(category)
-      ? actions.removeCategory(category)
-      : actions.addCategory(category)
+      ? createAction("REMOVE_CATEGORY", category)
+      : createAction("ADD_CATEGORY", category)
 
     dispatch(action)
   }
 
   const handleSubmit = async () => {
-    const { step, ...onboardingData } = onboardingState
+    const { step: _step, ...onboardingData } = onboardingState
 
     completeOnboarding(onboardingData)
   }

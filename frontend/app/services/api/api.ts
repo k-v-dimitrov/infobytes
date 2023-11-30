@@ -41,7 +41,7 @@ export class Api {
   }
 
   async getAuthToken() {
-    const authToken = await loadString("userAuthToken")
+    const authToken = await loadString("USER_AUTH_TOKEN")
 
     return authToken
   }

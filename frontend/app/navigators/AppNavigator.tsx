@@ -8,7 +8,7 @@ import { NavigationContainer } from "@react-navigation/native"
 import {
   createBottomTabNavigator,
   BottomTabNavigationProp,
-  // BottomTabNavigationOptions,
+  BottomTabNavigationOptions,
 } from "@react-navigation/bottom-tabs"
 import { observer } from "mobx-react-lite"
 import React from "react"
@@ -43,11 +43,11 @@ export type AppStackParamList = {
  * is pressed while in that screen. Only affects Android.
  */
 const exitRoutes = Config.exitRoutes
-// const hideTabBar: BottomTabNavigationOptions = {
-//   tabBarStyle: {
-//     display: "none",
-//   },
-// }
+const hideTabBar: BottomTabNavigationOptions = {
+  tabBarStyle: {
+    display: "none",
+  },
+}
 
 export type AppStackScreenProps<T extends keyof AppStackParamList> = BottomTabNavigationProp<
   AppStackParamList,
@@ -59,7 +59,7 @@ const Tab = createBottomTabNavigator<AppStackParamList>()
 
 const AppStack = observer(function AppStack() {
   const { authenticationStore } = useStores()
-  const { isAuthenticated } = authenticationStore
+  const { isAuthenticated, isOnboarded } = authenticationStore
 
   return (
     <Tab.Navigator
@@ -72,23 +72,22 @@ const AppStack = observer(function AppStack() {
         },
       }}
     >
-      {isAuthenticated ? (
+      {isAuthenticated && !isOnboarded && (
+        <>
+          <Tab.Screen options={hideTabBar} name="Onboarding" component={Onboarding} />
+        </>
+      )}
+
+      {isAuthenticated && isOnboarded && (
         <>
           <Tab.Screen name="Feed" component={Feed} />
           <Tab.Screen name="Profile" component={Profile} />
-          <Tab.Screen
-            //  options={hideTabBar}
-            name="Onboarding"
-            component={Onboarding}
-          />
         </>
-      ) : (
+      )}
+
+      {!isAuthenticated && (
         <>
-          <Tab.Screen
-            //  options={hideTabBar}
-            name="Auth"
-            component={Auth}
-          />
+          <Tab.Screen options={hideTabBar} name="Auth" component={Auth} />
         </>
       )}
     </Tab.Navigator>

@@ -1,8 +1,8 @@
 import { useState } from "react"
 import { authApi } from "app/services/api"
 import { navigate } from "app/navigators"
-import { useStores } from "app/models"
 import { OnboardingState } from "../types"
+import { useStores } from "app/models"
 
 export const useCompleteOnboarding = () => {
   const [loading, setLoading] = useState(false)
@@ -13,22 +13,15 @@ export const useCompleteOnboarding = () => {
     setLoading(true)
 
     try {
-      const { data, error } = await authApi.completeOnboarding(onboardingData)
+      const { error } = await authApi.completeOnboarding(onboardingData)
 
       if (error) {
-        throw new Error()
+        throw new Error(error)
       }
 
-      const transformData = {
-        ...data,
-        // @ts-ignore
-        categories: data.categories.map(({ category }) => category),
-      }
-
-      authenticationStore.authenticate(transformData)
+      await authenticationStore.sync() 
       navigate({ name: "Feed", params: undefined })
     } catch (error) {
-      console.log(error)
       setError("Something went wrong!")
     } finally {
       setLoading(false)

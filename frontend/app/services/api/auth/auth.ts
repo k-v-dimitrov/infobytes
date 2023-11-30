@@ -26,11 +26,15 @@ class AuthApi extends Api {
   async completeOnboarding(onboardingData) {
     const authToken = await this.getAuthToken()
 
-    const { data, ok } = await this.apisauce.patch<User>("/user", onboardingData, {
-      headers: {
-        Authorization: `Bearer ${authToken}`,
+    const { data, ok } = await this.apisauce.patch<User>(
+      "/user",
+      { ...onboardingData, isOnboarded: true },
+      {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
       },
-    })
+    )
 
     return {
       data,

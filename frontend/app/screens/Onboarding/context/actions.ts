@@ -1,57 +1,27 @@
 import { Category, Step } from "../types"
 
-export enum ACTION_TYPES {
-  SET_STEP = "SET_STEP",
-  SET_DISPLAY_NAME = "SET_DISPLAY_NAME",
-  ADD_CATEGORY = "ADD_CATEGORY",
-  REMOVE_CATEGORY = "REMOVE_CATEGORY",
+type GenericAction<TActionsMap> = {
+  [Key in keyof TActionsMap]: {
+    type: Key
+    payload: TActionsMap[Key]
+  }
+}[keyof TActionsMap]
+
+type OnboardingActionsMap = {
+  SET_STEP: Step
+  SET_DISPLAY_NAME: string
+  ADD_CATEGORY: Category
+  REMOVE_CATEGORY: Category
 }
 
-type SetStepAction = {
-  type: ACTION_TYPES.SET_STEP
-  payload: Step
-}
+export type OnboardingAction = GenericAction<OnboardingActionsMap>
 
-type SetDisplayNameAction = {
-  type: ACTION_TYPES.SET_DISPLAY_NAME
-  payload: string
-}
-
-type AddCategoryAction = {
-  type: ACTION_TYPES.ADD_CATEGORY
-  payload: Category
-}
-
-type RemoveCategoryAction = {
-  type: ACTION_TYPES.REMOVE_CATEGORY
-  payload: Category
-}
-
-export type Action = SetStepAction | SetDisplayNameAction | AddCategoryAction | RemoveCategoryAction
-
-const setStep = (step: Step): SetStepAction => ({
-  type: ACTION_TYPES.SET_STEP,
-  payload: step,
-})
-
-const setDisplayName = (displayName: string): SetDisplayNameAction => ({
-  type: ACTION_TYPES.SET_DISPLAY_NAME,
-  payload: displayName,
-})
-
-const addCategory = (category: Category): AddCategoryAction => ({
-  type: ACTION_TYPES.ADD_CATEGORY,
-  payload: category,
-})
-
-const removeCategory = (category: Category): RemoveCategoryAction => ({
-  type: ACTION_TYPES.REMOVE_CATEGORY,
-  payload: category,
-})
-
-export const actions = {
-  setStep,
-  setDisplayName,
-  addCategory,
-  removeCategory,
+export function createAction<T extends keyof OnboardingActionsMap>(
+  type: T,
+  payload: OnboardingActionsMap[T],
+) {
+  return {
+    type,
+    payload,
+  }
 }

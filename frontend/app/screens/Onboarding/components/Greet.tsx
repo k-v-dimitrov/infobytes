@@ -1,14 +1,14 @@
 import React from "react"
 import { Button, ButtonText, Text, View } from "@gluestack-ui/themed"
 import { Step } from "../types"
-import { actions, useOnboardingContext } from "../context"
+import { createAction, useOnboardingContext } from "../context"
 
 export const Greet = () => {
   const { onboardingState, dispatch } = useOnboardingContext()
   const { displayName } = onboardingState
 
   const handleSubmit = () => {
-    dispatch(actions.setStep(Step.CATEGORIES))
+    dispatch(createAction("SET_STEP", Step.CATEGORIES))
   }
 
   return (

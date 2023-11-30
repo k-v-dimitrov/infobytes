@@ -21,10 +21,11 @@ import { config } from "@gluestack-ui/config"
 import "./i18n"
 import "./utils/ignoreWarnings"
 import { useFonts } from "expo-font"
-import React from "react"
+import React, { useEffect } from "react"
 import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context"
 import * as Linking from "expo-linking"
-import { useInitialRootStore } from "./models"
+import { observer } from "mobx-react-lite"
+import { useInitialRootStore, useStores } from "./models"
 import { AppNavigator, useNavigationPersistence } from "./navigators"
 import { ErrorBoundary } from "./screens/ErrorScreen/ErrorBoundary"
 import * as storage from "./utils/storage"
@@ -53,8 +54,8 @@ function App(props: AppProps) {
     onNavigationStateChange,
     isRestored: isNavigationStateRestored,
   } = useNavigationPersistence(storage, NAVIGATION_PERSISTENCE_KEY)
-
   const [areFontsLoaded] = useFonts(customFontsToLoad)
+  const { authenticationStore } = useStores()
 
   const { rehydrated } = useInitialRootStore(() => {
     // This runs after the root store has been initialized and rehydrated.
@@ -65,6 +66,14 @@ function App(props: AppProps) {
     // Note: (vanilla iOS) You might notice the splash-screen logo change size. This happens in debug/development mode. Try building the app for release.
     setTimeout(hideSplashScreen, 500)
   })
+
+  useEffect(() => {
+    const sync = async () => {
+      await authenticationStore.sync()
+    }
+
+    sync()
+  }, [authenticationStore.token])
 
   // Before we show the app, we have to wait for our state to be ready.
   // In the meantime, don't render anything. This will be the background
@@ -95,4 +104,4 @@ function App(props: AppProps) {
   )
 }
 
-export default App
+export default observer(App)
