@@ -1,4 +1,4 @@
-import { Exclude, Expose, Type } from 'class-transformer';
+import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import { IsNumber, IsOptional, IsUUID, Max, Min } from 'class-validator';
 
 export class UserFeedDto {
@@ -24,6 +24,10 @@ export class AnswerFeedQuestionDto {
 }
 
 export class UserFeedFactResponseDto {
+  @Expose()
+  @Transform(() => 'FEED_FACT')
+  type: string;
+
   @Expose()
   id: string;
 
@@ -64,6 +68,10 @@ export class QuestionDataReponseDto {
 }
 
 export class UserFeedQuestionResponseDto {
+  @Expose()
+  @Transform(() => 'FEED_QUESTION')
+  type: string;
+
   @Exclude()
   id: string;
 
