@@ -10,16 +10,21 @@ import {
   ButtonText,
   LinkText,
   Spinner,
+  Alert,
+  AlertIcon,
+  InfoIcon,
+  AlertText,
 } from "@gluestack-ui/themed"
 import { RegisterState, initialState, validateRegister } from "../utils/register"
+import { useRegister } from "../hooks/useRegister"
 
 interface Props {
   toggleIsLogin: () => void
-  onSubmitSuccess: () => void
 }
 
-export const RegisterForm = ({ toggleIsLogin, onSubmitSuccess }: Props) => {
-  const [loading, setLoading] = useState(false)
+export const RegisterForm = ({ toggleIsLogin }: Props) => {
+  const { register, loading, error } = useRegister()
+
   const [formState, setFormState] = useState<RegisterState>(initialState)
   const [formErrors, setFormErrors] = useState<Partial<RegisterState>>({})
 
@@ -55,20 +60,7 @@ export const RegisterForm = ({ toggleIsLogin, onSubmitSuccess }: Props) => {
       return
     }
 
-    setLoading(true)
-
-    try {
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve("")
-        }, 1000)
-      })
-
-      onSubmitSuccess()
-    } catch (error) {
-    } finally {
-      setLoading(false)
-    }
+    register({ email: formState.email, password: formState.password })
   }
 
   return (
@@ -76,6 +68,13 @@ export const RegisterForm = ({ toggleIsLogin, onSubmitSuccess }: Props) => {
       <Heading textAlign="center" size="2xl">
         Create New Account
       </Heading>
+
+      {error && (
+        <Alert action="error" variant="accent">
+          <AlertIcon as={InfoIcon} mr="$3" />
+          <AlertText>{error}</AlertText>
+        </Alert>
+      )}
 
       <VStack>
         <Text>Email</Text>

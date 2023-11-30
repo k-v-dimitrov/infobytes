@@ -1,41 +1,29 @@
-import React, { Dispatch, SetStateAction, useState } from "react"
-import { View, FlatList, Button, ButtonText, Heading, Pressable, Text, Spinner } from "@gluestack-ui/themed"
+import React from "react"
+import { Button, ButtonText, FlatList, Heading, Pressable, Text, View } from "@gluestack-ui/themed"
+import { useCompleteOnboarding } from "../hooks/useCompleteOnboarding"
+import { createAction, useOnboardingContext } from "../context"
 import { Category } from "../types"
 
-interface Props {
-  selectedCategories: Category[]
-  setSelectedCategories: Dispatch<SetStateAction<Category[]>>
-  handleFinish: () => void
-}
+export const Categories = () => {
+  const { onboardingState, dispatch } = useOnboardingContext()
+  const { completeOnboarding, error: _error, loading } = useCompleteOnboarding()
 
-export const Categories = ({ selectedCategories, setSelectedCategories, handleFinish }: Props) => {
-  const [loading, setLoading] = useState(false)
-  const data = Object.keys(Category)
-  const hasRequiredCategories = selectedCategories.length >= 3
+  const { categories } = onboardingState
+  const hasRequiredCategories = categories.length >= 3
+  const data = Object.values(Category)
 
   const createOnPressHandler = (category: Category) => () => {
-    if (selectedCategories.includes(category)) {
-      setSelectedCategories((prev) => prev.filter((current) => current !== category))
-    } else {
-      setSelectedCategories((prev) => [...prev, category])
-    }
+    const action = categories.includes(category)
+      ? createAction("REMOVE_CATEGORY", category)
+      : createAction("ADD_CATEGORY", category)
+
+    dispatch(action)
   }
 
   const handleSubmit = async () => {
-    setLoading(true)
+    const { step: _step, ...onboardingData } = onboardingState
 
-    try {
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve("")
-        }, 1000)
-      })
-
-      handleFinish()
-    } catch (error) {
-    } finally {
-      setLoading(false)
-    }
+    completeOnboarding(onboardingData)
   }
 
   return (
@@ -45,7 +33,7 @@ export const Categories = ({ selectedCategories, setSelectedCategories, handleFi
       </Heading>
 
       <Text textAlign="center" size="lg" letterSpacing="$2xl">
-        {!hasRequiredCategories && `${selectedCategories.length}/3`}
+        {!hasRequiredCategories && `${categories.length}/3`}
       </Text>
 
       <FlatList
@@ -61,7 +49,7 @@ export const Categories = ({ selectedCategories, setSelectedCategories, handleFi
             py="$10"
             m="$1"
             borderRadius="$md"
-            borderColor={selectedCategories.includes(item as Category) ? "$green500" : "$blue500"}
+            borderColor={categories.includes(item as Category) ? "$green500" : "$blue500"}
             onPress={createOnPressHandler(item as Category)}
           >
             <Heading size="sm" textTransform="uppercase">
@@ -72,7 +60,7 @@ export const Categories = ({ selectedCategories, setSelectedCategories, handleFi
       />
 
       <Button onPress={handleSubmit} isDisabled={!hasRequiredCategories || loading}>
-        {loading ? <Spinner /> : <ButtonText>Begin your journey</ButtonText>}
+        <ButtonText>Begin your journey</ButtonText>
       </Button>
     </View>
   )

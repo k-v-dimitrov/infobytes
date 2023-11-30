@@ -5,12 +5,18 @@ export enum Step {
 }
 
 export enum Category {
-  History = "History",
-  Cinema = "Cinema",
-  Technology = "Technology",
-  Art = "Art",
-  Sport = "Sport",
-  Fashion = "Fashion",
-  Science = "Science",
-  Geography = "Geography",
+  History = "history",
+  Cinema = "cinema",
+  Technology = "technology",
+  Art = "art",
+  Sport = "sport",
+  Fashion = "fashion",
+  Science = "science",
+  Geography = "geography",
+}
+
+export interface OnboardingState {
+  step: Step
+  displayName: string
+  categories: Category[]
 }

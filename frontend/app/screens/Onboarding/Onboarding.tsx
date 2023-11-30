@@ -1,32 +1,32 @@
-import React, { useState } from "react"
 import { Screen } from "app/components"
-import { Nickname, Greet, Categories } from "./components"
-import { Category, Step } from "./types"
+import React from "react"
+import { Categories, Greet, Nickname } from "./components"
+import { Step } from "./types"
+import { OnboardingContextProvider, useOnboardingContext } from "./context"
 
-export const Onboarding = ({ navigation }) => {
-  const [step, setStep] = useState<Step>(Step.NICKNAME)
-  const [nickname, setNickname] = useState("")
-  const [selectedCategories, setSelectedCategories] = useState<Category[]>([])
+const Steps = () => {
+  const { onboardingState } = useOnboardingContext()
+  const { step } = onboardingState
 
-  const handleFinish = () => {
-    navigation.navigate("Feed")
+  switch (step) {
+    case Step.NICKNAME: {
+      return <Nickname />
+    }
+    case Step.GREET: {
+      return <Greet />
+    }
+    case Step.CATEGORIES: {
+      return <Categories />
+    }
   }
+}
 
+export const Onboarding = () => {
   return (
     <Screen justifyContent="space-between">
-      {step === Step.NICKNAME && (
-        <Nickname nickname={nickname} setNickname={setNickname} setStep={setStep} />
-      )}
-
-      {step === Step.GREET && <Greet nickname={nickname} setStep={setStep} />}
-
-      {step === Step.CATEGORIES && (
-        <Categories
-          selectedCategories={selectedCategories}
-          setSelectedCategories={setSelectedCategories}
-          handleFinish={handleFinish}
-        />
-      )}
+      <OnboardingContextProvider>
+        <Steps />
+      </OnboardingContextProvider>
     </Screen>
   )
 }
