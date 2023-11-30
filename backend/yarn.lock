@@ -698,6 +698,11 @@
     semver "^7.3.5"
     tar "^6.1.11"
 
+"@nest-lab/or-guard@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@nest-lab/or-guard/-/or-guard-2.2.0.tgz#5ccebd9d27a99b689533d8f87a4eec3a34e4e4a0"
+  integrity sha512-ebV9zpNosOgGdMZoGAwGYVCRISbIW4kdWeBbMzT87gc9/bwtDIecJNWVAYJ+BSW1j79Wi5QSgdYX14mvmGvAaA==
+
 "@nestjs/cli@^10.0.0":
   version "10.1.18"
   resolved "https://registry.yarnpkg.com/@nestjs/cli/-/cli-10.1.18.tgz#7aa0099eea5fe60787eb822f9a8a6d47e22d0123"

@@ -1,12 +1,21 @@
 import {
+  Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
   Query,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FeedService } from './feed.service';
-import { UserFeedDto } from './dto';
+import {
+  AnswerFeedQuestionDto,
+  AnswerFeedQuestionRouteParams,
+  UserFeedDto,
+} from './dto';
 import { CurrentUser, InjectUser } from 'src/interceptors';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from '@prisma/client';
@@ -25,7 +34,20 @@ export class FeedController {
   // TODO: POTENTIAL SECURITY PROBLEM, userId should not be taken from QueryParams
   @Get()
   @UseGuards(AuthGuard('jwt'))
-  getFeedForUser(@Query() userIdDto: UserFeedDto) {
-    return this.feedService.getFeedForUser(userIdDto);
+  getFeedForUser(@Query() userFeedDto: UserFeedDto) {
+    return this.feedService.getFeedForUser(userFeedDto);
+  }
+
+  @Post('/q/:userQuestionId')
+  @UseGuards(AuthGuard('jwt'))
+  @HttpCode(HttpStatus.OK)
+  answerFeedQuestion(
+    @Param() asnwerFeedQuestionRouteParams: AnswerFeedQuestionRouteParams,
+    @Body() answerFeedQuestionDto: AnswerFeedQuestionDto,
+  ) {
+    return this.feedService.answerFeedQuestion(
+      asnwerFeedQuestionRouteParams,
+      answerFeedQuestionDto,
+    );
   }
 }

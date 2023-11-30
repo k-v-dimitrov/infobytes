@@ -1,7 +1,23 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
-import { UserFeedDto } from './dto';
-import { Fact, User } from '@prisma/client';
+import {
+  AnswerFeedQuestionDto,
+  AnswerFeedQuestionRouteParams,
+  UserFeedDto,
+  UserFeedResponseDto,
+} from './dto';
+import { Fact, Prisma, Question, User, ViewedFact } from '@prisma/client';
+import { plainToInstance } from 'class-transformer';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { PrismaError } from 'prisma-error-enum';
+import {
+  InvalidAnswerIdException,
+  UserFeedQuestionAlreadyAnsweredException,
+} from './exceptions';
+import { mergeAndShuffleArrays } from 'src/utils/mergeAndShuffleArrays';
+
+// Enrich user feed on every 5 viewed facts
+const ENRICH_WITH_QUESTION_INTERVAL = 5;
 
 @Injectable()
 export class FeedService {
@@ -18,18 +34,242 @@ export class FeedService {
     const viewedFactIdsByUser =
       await this.getFactsIdsViewedByCurrentUser(userFeedId);
 
-    const currentUserFeed = await this.generateFeedForUser({
+    const factsFeed = await this.generateFactsFeedForUser({
       excludeFactIds: viewedFactIdsByUser,
       size,
       shouldRandomize: true,
     });
 
-    await this.markFactsAsViewed(currentUserFeed, userFeedId);
+    const { beforeUpdateViewedCount, afterUpdateViewedCount } =
+      await this.markFactsAsViewedAndGetUpdatedCounts(userFeedId, factsFeed);
 
-    return currentUserFeed;
+    const numberOfQuestionsToGenerate =
+      this.calculateNumberOfQuestionsToGenerate({
+        beforeUpdateViewedCount,
+        afterUpdateViewedCount,
+      });
+
+    const questionsFeed = await this.generateQuestionsFeed(
+      numberOfQuestionsToGenerate,
+      userFeedId,
+    );
+
+    const feedResponse = plainToInstance(
+      UserFeedResponseDto,
+      {
+        facts: factsFeed,
+        questions: questionsFeed,
+      },
+      { excludeExtraneousValues: true },
+    );
+
+    return mergeAndShuffleArrays(feedResponse.facts, feedResponse.questions);
   }
 
-  private async generateFeedForUser({
+  async answerFeedQuestion(
+    { userQuestionId }: AnswerFeedQuestionRouteParams,
+    { answerId }: AnswerFeedQuestionDto,
+  ) {
+    const userQuestion = await this.getUserQuestionById(userQuestionId);
+
+    this.throwOnQuestionAlreadyAnswered(userQuestion);
+    this.throwOnProvidedAnswerNotInQuestion(userQuestion, answerId);
+
+    const userAnswerToQuestion = userQuestion.question.answers.find(
+      ({ id }) => answerId === id,
+    );
+
+    const correctAnswerToQuestion = userQuestion.question.answers.find(
+      ({ isCorrect }) => isCorrect,
+    );
+
+    const isUserCorrect =
+      userAnswerToQuestion.id === correctAnswerToQuestion.id;
+
+    await this.db.userQuestion.update({
+      data: {
+        givenAnswerId: userAnswerToQuestion.id,
+        isCorrect: isUserCorrect,
+      },
+      where: { id: userQuestion.id },
+    });
+
+    return {
+      isCorrect: isUserCorrect,
+      ...(!isUserCorrect
+        ? { correctAnswerId: correctAnswerToQuestion.id }
+        : {}),
+    };
+  }
+
+  private throwOnQuestionAlreadyAnswered(
+    userQuestion: Prisma.UserQuestionGetPayload<{
+      include: { question: { include: { answers: true } } };
+    }>,
+  ) {
+    if (userQuestion.givenAnswerId) {
+      throw new UserFeedQuestionAlreadyAnsweredException();
+    }
+  }
+
+  private throwOnProvidedAnswerNotInQuestion(
+    userQuestion: Prisma.UserQuestionGetPayload<{
+      include: { question: { include: { answers: true } } };
+    }>,
+    answerId: string,
+  ) {
+    const questionHasSuchAnswer = !!userQuestion.question.answers.find(
+      ({ id }) => answerId === id,
+    );
+
+    if (!questionHasSuchAnswer) {
+      throw new InvalidAnswerIdException();
+    }
+  }
+
+  private async getUserQuestionById(userQuestionId: string) {
+    try {
+      return await this.db.userQuestion.findFirstOrThrow({
+        where: { id: userQuestionId },
+        include: { question: { include: { answers: true } } },
+      });
+    } catch (err) {
+      if (err instanceof PrismaClientKnownRequestError) {
+        if (err.code === PrismaError.RecordsNotFound) {
+          throw new NotFoundException();
+        }
+      }
+
+      throw err;
+    }
+  }
+
+  private async generateQuestionsFeed(
+    numberOfQuestionsToInject: number,
+    userFeedId: string,
+  ) {
+    const randomAlreadyViewedFacts =
+      await this.getRandomViewedFactsForFeedUserWithQuestions({
+        count: numberOfQuestionsToInject,
+        userFeedId,
+      });
+
+    const questionsByAlreadyViewedFacts =
+      await this.getQuestionsOfAlreadyViewedFacts(randomAlreadyViewedFacts);
+
+    const { user } = await this.getUserByUserFeedId(userFeedId);
+
+    const feedQuestions = await this.db.$transaction(
+      questionsByAlreadyViewedFacts.map(
+        ({ Question: questionsAssocidatedWithViewedFact }) => {
+          const randomQuestionFromViewedFact =
+            questionsAssocidatedWithViewedFact[
+              Math.floor(
+                Math.random() * questionsAssocidatedWithViewedFact.length,
+              )
+            ];
+
+          return this.createNewUserQuestion(randomQuestionFromViewedFact, user);
+        },
+      ),
+    );
+
+    const enrichedFeedQuestions =
+      this.attachAnswerURIToQuestions(feedQuestions);
+
+    return enrichedFeedQuestions;
+  }
+
+  private createNewUserQuestion(question: Question, user: User) {
+    return this.db.userQuestion.create({
+      data: {
+        user: { connect: { id: user.id } },
+        question: {
+          connect: {
+            id: question.id,
+          },
+        },
+        givenAnswerId: null,
+        isCorrect: null,
+      },
+      include: {
+        question: { include: { answers: true } },
+      },
+    });
+  }
+
+  private attachAnswerURIToQuestions(
+    feedQuestions: Prisma.UserQuestionGetPayload<{
+      include: { question: { include: { answers: true } } };
+    }>[],
+  ) {
+    return feedQuestions.map((fq) => ({
+      ...fq,
+      question: {
+        ...fq.question,
+        answerURI: `/feed/q/${fq.id}`,
+      },
+    }));
+  }
+
+  private async getRandomViewedFactsForFeedUserWithQuestions({
+    count,
+    userFeedId,
+  }: {
+    count: number;
+    userFeedId: string;
+  }) {
+    try {
+      return await this.db.$queryRawUnsafe<ViewedFact[]>(
+        `
+            select vf."createdAt", vf."updatedAt", vf.fact_id, vf.id, vf.user_feed_id  from viewed_facts vf 
+            join facts f on f.id  = vf.fact_id 
+            join questions q on q."factId" = f.id 
+            where vf.user_feed_id = $1
+            order by random()
+            limit $2
+        `,
+        userFeedId,
+        count,
+      );
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  private async getQuestionsOfAlreadyViewedFacts(
+    alreadyViewedFacts: ViewedFact[],
+  ) {
+    return await this.db.fact.findMany({
+      select: {
+        Question: true,
+      },
+      where: {
+        id: { in: alreadyViewedFacts.map(({ fact_id }) => fact_id) },
+      },
+    });
+  }
+
+  private async getUserByUserFeedId(userFeedId: string) {
+    return await this.db.feedUser.findFirstOrThrow({
+      where: { id: userFeedId },
+      include: { user: true },
+    });
+  }
+
+  private async markFactsAsViewedAndGetUpdatedCounts(
+    userFeedId: string,
+    currentUserFeed: Fact[],
+  ) {
+    const beforeUpdateViewedCount = await this.getViewedFactsCount(userFeedId);
+
+    await this.markFactsAsViewed(currentUserFeed, userFeedId);
+
+    const afterUpdateViewedCount = await this.getViewedFactsCount(userFeedId);
+    return { beforeUpdateViewedCount, afterUpdateViewedCount };
+  }
+
+  private async generateFactsFeedForUser({
     excludeFactIds,
     size,
     shouldRandomize = false,
@@ -69,6 +309,26 @@ export class FeedService {
     });
   }
 
+  private async getViewedFactsCount(userFeedId: string) {
+    return this.db.viewedFact.count({ where: { user_feed_id: userFeedId } });
+  }
+
+  private calculateNumberOfQuestionsToGenerate({
+    beforeUpdateViewedCount,
+    afterUpdateViewedCount,
+  }: {
+    beforeUpdateViewedCount: number;
+    afterUpdateViewedCount: number;
+  }) {
+    return new Array(afterUpdateViewedCount - beforeUpdateViewedCount)
+      .fill(0)
+      .map((_, i) => beforeUpdateViewedCount + i)
+      .filter(
+        (viewedFactIndex) =>
+          viewedFactIndex % ENRICH_WITH_QUESTION_INTERVAL === 0,
+      ).length;
+  }
+
   private async getFactsIdsViewedByCurrentUser(userFeedId: string) {
     const alreadySeenFactsByUser = await this.db.viewedFact.findMany({
       where: { user_feed_id: userFeedId },
@@ -82,9 +342,7 @@ export class FeedService {
     const hasSeenAll = alreadySeenFactsByUser.length === allFactsCount;
 
     if (hasSeenAll) {
-      await this.db.viewedFact.deleteMany({
-        where: { user_feed_id: userFeedId },
-      });
+      await this.resetUserViewedFacts(userFeedId);
       return [];
     }
 
@@ -93,5 +351,11 @@ export class FeedService {
     );
 
     return alreadySeenFactsByUserIds;
+  }
+
+  private async resetUserViewedFacts(userFeedId: string) {
+    await this.db.viewedFact.deleteMany({
+      where: { user_feed_id: userFeedId },
+    });
   }
 }

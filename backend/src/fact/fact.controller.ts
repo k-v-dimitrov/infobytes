@@ -26,6 +26,7 @@ import { UserService } from 'src/user/user.service';
 import { FactService } from './fact.service';
 import { PageableParamsDto } from 'src/utils/pageable';
 import { User } from '@prisma/client';
+import { UseAllAuthGuards } from 'src/utils/UseAllAuthGuards';
 
 @Controller('fact')
 export class FactController {
@@ -34,14 +35,14 @@ export class FactController {
     private userService: UserService,
   ) {}
 
-  @UseGuards(AuthGuard('jwt'))
   @Get()
+  @UseAllAuthGuards()
   get(@Query() factId: FactIdDto) {
     return this.factService.get(factId);
   }
 
-  @UseGuards(AuthGuard('jwt'))
   @Get()
+  @UseAllAuthGuards()
   search(@Query() searchDto: SearchFactDto) {
     return this.factService.search(searchDto.search);
   }
