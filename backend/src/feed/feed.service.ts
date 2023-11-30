@@ -136,9 +136,11 @@ export class FeedService {
     numberOfQuestionsToInject: number,
     userFeedId: string,
   ) {
-    const randomAlreadyViewedFacts = await this.getRandomViewedFacts({
-      count: numberOfQuestionsToInject,
-    });
+    const randomAlreadyViewedFacts =
+      await this.getRandomViewedFactsForFeedUserWithQuestions({
+        count: numberOfQuestionsToInject,
+        userFeedId,
+      });
 
     const questionsByAlreadyViewedFacts =
       await this.getQuestionsOfAlreadyViewedFacts(randomAlreadyViewedFacts);
@@ -147,11 +149,11 @@ export class FeedService {
 
     const feedQuestions = await this.db.$transaction(
       questionsByAlreadyViewedFacts.map(
-        ({ Question: questionAssocidatedWithViewedFact }) => {
+        ({ Question: questionsAssocidatedWithViewedFact }) => {
           const randomQuestionFromViewedFact =
-            questionAssocidatedWithViewedFact[
+            questionsAssocidatedWithViewedFact[
               Math.floor(
-                Math.random() * questionAssocidatedWithViewedFact.length,
+                Math.random() * questionsAssocidatedWithViewedFact.length,
               )
             ];
 
@@ -198,16 +200,29 @@ export class FeedService {
     }));
   }
 
-  private async getRandomViewedFacts({ count }: { count: number }) {
-    return await this.db.$queryRawUnsafe<ViewedFact[]>(
-      `
-        select * from viewed_facts vf 
-        where vf.user_feed_id = 'a80a4e27-f19a-48eb-b482-c43d983718be'
-        order by random()
-        limit $1
-      `,
-      count,
-    );
+  private async getRandomViewedFactsForFeedUserWithQuestions({
+    count,
+    userFeedId,
+  }: {
+    count: number;
+    userFeedId: string;
+  }) {
+    try {
+      return await this.db.$queryRawUnsafe<ViewedFact[]>(
+        `
+            select vf."createdAt", vf."updatedAt", vf.fact_id, vf.id, vf.user_feed_id  from viewed_facts vf 
+            join facts f on f.id  = vf.fact_id 
+            join questions q on q."factId" = f.id 
+            where vf.user_feed_id = $1
+            order by random()
+            limit $2
+        `,
+        userFeedId,
+        count,
+      );
+    } catch (err) {
+      throw err;
+    }
   }
 
   private async getQuestionsOfAlreadyViewedFacts(
