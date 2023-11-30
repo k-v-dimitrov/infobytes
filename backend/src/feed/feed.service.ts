@@ -1,8 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
-import { UserFeedDto, UserFeedResponseDto } from './dto';
+import {
+  AnswerFeedQuestionDto,
+  AnswerFeedQuestionRouteParams,
+  UserFeedDto,
+  UserFeedResponseDto,
+} from './dto';
 import { Fact, Prisma, Question, User, ViewedFact } from '@prisma/client';
 import { plainToInstance } from 'class-transformer';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { PrismaError } from 'prisma-error-enum';
+import {
+  InvalidAnswerIdException,
+  UserFeedQuestionAlreadyAnsweredException,
+} from './exceptions';
 
 // Enrich user feed on every 5 viewed facts
 const ENRICH_WITH_QUESTION_INTERVAL = 5;
@@ -52,6 +63,72 @@ export class FeedService {
     );
 
     return feedResponse;
+  }
+
+  async answerFeedQuestion(
+    { userQuestionId }: AnswerFeedQuestionRouteParams,
+    { answerId }: AnswerFeedQuestionDto,
+  ) {
+    const userQuestion = await this.getUserQuestionById(userQuestionId);
+
+    this.validateQuestionNotAnswered(userQuestion);
+    this.validateProvidedAnswerToQuestion(userQuestion, answerId);
+
+    const answerToQuestion = userQuestion.question.answers.find(
+      ({ id }) => answerId === id,
+    );
+
+    await this.db.userQuestion.update({
+      data: {
+        givenAnswerId: answerToQuestion.id,
+        isCorrect: answerToQuestion.isCorrect,
+      },
+      where: { id: userQuestion.id },
+    });
+
+    return { isCorrect: answerToQuestion.isCorrect };
+  }
+
+  private validateQuestionNotAnswered(
+    userQuestion: Prisma.UserQuestionGetPayload<{
+      include: { question: { include: { answers: true } } };
+    }>,
+  ) {
+    if (userQuestion.givenAnswerId) {
+      throw new UserFeedQuestionAlreadyAnsweredException();
+    }
+  }
+
+  private validateProvidedAnswerToQuestion(
+    userQuestion: Prisma.UserQuestionGetPayload<{
+      include: { question: { include: { answers: true } } };
+    }>,
+    answerId: string,
+  ) {
+    const questionHasSuchAnswer = !!userQuestion.question.answers.find(
+      ({ id }) => answerId === id,
+    );
+
+    if (!questionHasSuchAnswer) {
+      throw new InvalidAnswerIdException();
+    }
+  }
+
+  private async getUserQuestionById(userQuestionId: string) {
+    try {
+      return await this.db.userQuestion.findFirstOrThrow({
+        where: { id: userQuestionId },
+        include: { question: { include: { answers: true } } },
+      });
+    } catch (err) {
+      if (err instanceof PrismaClientKnownRequestError) {
+        if (err.code === PrismaError.RecordsNotFound) {
+          throw new NotFoundException();
+        }
+      }
+
+      throw err;
+    }
   }
 
   private async generateQuestionsFeed(
@@ -115,7 +192,7 @@ export class FeedService {
       ...fq,
       question: {
         ...fq.question,
-        answerURI: `/feed/q/${fq.question.id}`,
+        answerURI: `/feed/q/${fq.id}`,
       },
     }));
   }
@@ -215,11 +292,15 @@ export class FeedService {
     beforeUpdateViewedCount: number;
     afterUpdateViewedCount: number;
   }) {
-    const interval = ENRICH_WITH_QUESTION_INTERVAL;
-    return Math.floor(
-      (afterUpdateViewedCount - beforeUpdateViewedCount) / interval,
-    );
+    return new Array(afterUpdateViewedCount - beforeUpdateViewedCount)
+      .fill(0)
+      .map((_, i) => beforeUpdateViewedCount + i)
+      .filter(
+        (viewedFactIndex) =>
+          viewedFactIndex % ENRICH_WITH_QUESTION_INTERVAL === 0,
+      ).length;
   }
+
   private async getFactsIdsViewedByCurrentUser(userFeedId: string) {
     const alreadySeenFactsByUser = await this.db.viewedFact.findMany({
       where: { user_feed_id: userFeedId },

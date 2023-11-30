@@ -13,6 +13,16 @@ export class UserFeedDto {
   size: number;
 }
 
+export class AnswerFeedQuestionRouteParams {
+  @IsUUID()
+  userQuestionId: string;
+}
+
+export class AnswerFeedQuestionDto {
+  @IsUUID()
+  answerId: string;
+}
+
 export class UserFeedFactResponseDto {
   @Expose()
   id: string;
