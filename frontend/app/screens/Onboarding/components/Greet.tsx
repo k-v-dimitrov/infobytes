@@ -1,15 +1,14 @@
-import { Button, ButtonText, Text, View } from "@gluestack-ui/themed"
 import React from "react"
+import { Button, ButtonText, Text, View } from "@gluestack-ui/themed"
 import { Step } from "../types"
+import { actions, useOnboardingContext } from "../context"
 
-interface Props {
-  nickname: string
-  setStep: (step: Step) => void
-}
+export const Greet = () => {
+  const { onboardingState, dispatch } = useOnboardingContext()
+  const { displayName } = onboardingState
 
-export const Greet = ({ nickname, setStep }: Props) => {
   const handleSubmit = () => {
-    setStep(Step.CATEGORIES)
+    dispatch(actions.setStep(Step.CATEGORIES))
   }
 
   return (
@@ -20,7 +19,7 @@ export const Greet = ({ nickname, setStep }: Props) => {
         <Text size="xl">
           Welcome{" "}
           <Text size="2xl" fontWeight="$bold">
-            {nickname}
+            {displayName}
           </Text>
           .
         </Text>

@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useStores } from "app/models"
-import { Credentials, api } from "app/services/api"
+import { Credentials, authApi } from "app/services/api"
 import { saveString } from "app/utils/storage"
 import { navigate } from "app/navigators"
 
@@ -12,7 +12,7 @@ export const useLogin = () => {
   const login = async (credentials: Credentials) => {
     setLoading(true)
 
-    const { error, data } = await api.login(credentials)
+    const { error, data } = await authApi.login(credentials)
 
     if (error) {
       setError(error)

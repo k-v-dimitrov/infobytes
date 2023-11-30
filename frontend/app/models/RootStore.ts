@@ -8,6 +8,9 @@ export const RootStoreModel = types.model("RootStore").props({
   authenticationStore: types.optional(AuthenticationStoreModel, () => ({
     id: "",
     email: "",
+    displayName: "",
+    categories: [],
+    isOnboarded: false,
   })),
 })
 

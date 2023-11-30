@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Credentials, api } from "app/services/api"
+import { Credentials, authApi } from "app/services/api"
 import { saveString } from "app/utils/storage"
 import { useStores } from "app/models"
 import { navigate } from "app/navigators"
@@ -12,7 +12,7 @@ export const useRegister = () => {
   const register = async (credentials: Credentials) => {
     setLoading(true)
 
-    const { error, data } = await api.register(credentials)
+    const { error, data } = await authApi.register(credentials)
 
     if (error) {
       setError(error)
@@ -23,7 +23,7 @@ export const useRegister = () => {
     try {
       await saveString("userAuthToken", data.token)
       authenticationStore.authenticate(data.user)
-      navigate({ name: "Feed", params: undefined })
+      navigate({ name: "Onboarding", params: undefined })
     } catch (err) {
       setError("Something went wrong!")
     }

@@ -7,7 +7,8 @@
  */
 import { ApisauceInstance, create } from "apisauce"
 import Config from "../../config"
-import type { ApiAuthResponseData, ApiConfig, Credentials } from "./api.types"
+import type { ApiConfig } from "./api.types"
+import { loadString } from "app/utils/storage"
 
 /**
  * Configuring the apisauce instance.
@@ -39,25 +40,10 @@ export class Api {
     })
   }
 
-  async login(credentials: Credentials) {
-    const { data, ok } = await this.apisauce.post<ApiAuthResponseData>("/auth/login", credentials)
+  async getAuthToken() {
+    const authToken = await loadString("userAuthToken")
 
-    return {
-      data,
-      error: ok ? null : "Invalid email or password!",
-    }
-  }
-
-  async register(credentials: Credentials) {
-    const { data, ok } = await this.apisauce.post<ApiAuthResponseData>(
-      "/auth/register",
-      credentials,
-    )
-
-    return {
-      data,
-      error: ok ? null : data.message,
-    }
+    return authToken
   }
 }
 

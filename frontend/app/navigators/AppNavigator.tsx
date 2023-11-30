@@ -76,6 +76,11 @@ const AppStack = observer(function AppStack() {
         <>
           <Tab.Screen name="Feed" component={Feed} />
           <Tab.Screen name="Profile" component={Profile} />
+          <Tab.Screen
+            //  options={hideTabBar}
+            name="Onboarding"
+            component={Onboarding}
+          />
         </>
       ) : (
         <>
@@ -83,11 +88,6 @@ const AppStack = observer(function AppStack() {
             //  options={hideTabBar}
             name="Auth"
             component={Auth}
-          />
-          <Tab.Screen
-            //  options={hideTabBar}
-            name="Onboarding"
-            component={Onboarding}
           />
         </>
       )}

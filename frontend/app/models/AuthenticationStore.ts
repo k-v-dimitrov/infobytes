@@ -5,6 +5,9 @@ export const AuthenticationStoreModel = types
   .props({
     id: types.string,
     email: types.string,
+    displayName: types.string,
+    categories: types.array(types.string),
+    isOnboarded: types.boolean,
   })
   .views((store) => ({
     get isAuthenticated() {
@@ -12,10 +15,14 @@ export const AuthenticationStoreModel = types
     },
   }))
   .actions((store) => ({
-    authenticate({ id, email }) {
+    authenticate({ id, email, displayName, categories, isOnboarded }) {
       store.id = id
       store.email = email
+      store.displayName = displayName
+      store.categories = categories
+      store.isOnboarded = isOnboarded
     },
+
     logout() {
       store.id = ""
       store.email = ""

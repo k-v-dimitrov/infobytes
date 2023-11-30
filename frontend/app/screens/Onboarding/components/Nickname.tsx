@@ -1,18 +1,19 @@
 import React from "react"
 import { Button, ButtonText, Input, InputField, Text, VStack, View } from "@gluestack-ui/themed"
 import { Step } from "../types"
+import { actions, useOnboardingContext } from "../context"
 
-interface Props {
-  nickname: string
-  setNickname: (nickname: string) => void
-  setStep: (step: Step) => void
-}
-
-export const Nickname = ({ nickname, setNickname, setStep }: Props) => {
-  const isValid = Boolean(nickname)
+export const Nickname = () => {
+  const { onboardingState, dispatch } = useOnboardingContext()
+  const { displayName } = onboardingState
+  const isValid = Boolean(displayName)
 
   const handleSubmit = () => {
-    setStep(Step.GREET)
+    dispatch(actions.setStep(Step.GREET))
+  }
+
+  const handleOnChange = (value: string) => {
+    dispatch(actions.setDisplayName(value))
   }
 
   return (
@@ -24,8 +25,8 @@ export const Nickname = ({ nickname, setNickname, setStep }: Props) => {
         <Input variant="outline" size="md">
           <InputField
             onSubmitEditing={handleSubmit}
-            value={nickname}
-            onChangeText={setNickname}
+            value={displayName}
+            onChangeText={handleOnChange}
             placeholder="ThugPug_99"
           />
         </Input>

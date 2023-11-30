@@ -1,10 +1,11 @@
-import React from "react"
-import { Button, ButtonText } from "@gluestack-ui/themed"
+import React, { useEffect, useState } from "react"
+import { Button, ButtonText, Text } from "@gluestack-ui/themed"
 import { Screen } from "app/components"
 import { useStores } from "app/models"
-import { remove } from "app/utils/storage"
+import { loadString, remove } from "app/utils/storage"
 
 export const Profile = ({ navigation }) => {
+  const [authToken, setAuthToken] = useState("")
   const { authenticationStore } = useStores()
 
   const logout = async () => {
@@ -13,8 +14,19 @@ export const Profile = ({ navigation }) => {
     navigation.navigate("Auth")
   }
 
+  useEffect(() => {
+    const getAuthToken = async () => {
+      const token = await loadString("userAuthToken")
+
+      setAuthToken(token)
+    }
+
+    getAuthToken()
+  }, [])
+
   return (
     <Screen>
+      <Text selectable>{authToken}</Text>
       <Button onPress={logout}>
         <ButtonText>Logout</ButtonText>
       </Button>
