@@ -34,8 +34,8 @@ export class FeedController {
   // TODO: POTENTIAL SECURITY PROBLEM, userId should not be taken from QueryParams
   @Get()
   @UseGuards(AuthGuard('jwt'))
-  getFeedForUser(@Query() UserFeedDto: UserFeedDto) {
-    return this.feedService.getFeedForUser(UserFeedDto);
+  getFeedForUser(@Query() userFeedDto: UserFeedDto) {
+    return this.feedService.getFeedForUser(userFeedDto);
   }
 
   @Post('/q/:userQuestionId')
