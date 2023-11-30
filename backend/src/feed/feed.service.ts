@@ -72,25 +72,37 @@ export class FeedService {
   ) {
     const userQuestion = await this.getUserQuestionById(userQuestionId);
 
-    this.validateQuestionNotAnswered(userQuestion);
-    this.validateProvidedAnswerToQuestion(userQuestion, answerId);
+    this.throwOnQuestionAlreadyAnswered(userQuestion);
+    this.throwOnProvidedAnswerNotInQuestion(userQuestion, answerId);
 
-    const answerToQuestion = userQuestion.question.answers.find(
+    const userAnswerToQuestion = userQuestion.question.answers.find(
       ({ id }) => answerId === id,
     );
 
+    const correctAnswerToQuestion = userQuestion.question.answers.find(
+      ({ isCorrect }) => isCorrect,
+    );
+
+    const isUserCorrect =
+      userAnswerToQuestion.id === correctAnswerToQuestion.id;
+
     await this.db.userQuestion.update({
       data: {
-        givenAnswerId: answerToQuestion.id,
-        isCorrect: answerToQuestion.isCorrect,
+        givenAnswerId: userAnswerToQuestion.id,
+        isCorrect: isUserCorrect,
       },
       where: { id: userQuestion.id },
     });
 
-    return { isCorrect: answerToQuestion.isCorrect };
+    return {
+      isCorrect: isUserCorrect,
+      ...(!isUserCorrect
+        ? { correctAnswerId: correctAnswerToQuestion.id }
+        : {}),
+    };
   }
 
-  private validateQuestionNotAnswered(
+  private throwOnQuestionAlreadyAnswered(
     userQuestion: Prisma.UserQuestionGetPayload<{
       include: { question: { include: { answers: true } } };
     }>,
@@ -100,7 +112,7 @@ export class FeedService {
     }
   }
 
-  private validateProvidedAnswerToQuestion(
+  private throwOnProvidedAnswerNotInQuestion(
     userQuestion: Prisma.UserQuestionGetPayload<{
       include: { question: { include: { answers: true } } };
     }>,
