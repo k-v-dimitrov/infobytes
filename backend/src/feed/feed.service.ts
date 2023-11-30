@@ -14,6 +14,7 @@ import {
   InvalidAnswerIdException,
   UserFeedQuestionAlreadyAnsweredException,
 } from './exceptions';
+import { mergeAndShuffleArrays } from 'src/utils/mergeAndShuffleArrays';
 
 // Enrich user feed on every 5 viewed facts
 const ENRICH_WITH_QUESTION_INTERVAL = 5;
@@ -62,7 +63,7 @@ export class FeedService {
       { excludeExtraneousValues: true },
     );
 
-    return feedResponse;
+    return mergeAndShuffleArrays(feedResponse.facts, feedResponse.questions);
   }
 
   async answerFeedQuestion(
