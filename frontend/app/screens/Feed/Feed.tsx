@@ -7,20 +7,24 @@ import { TikTokList } from "./TiktokList"
 export const Feed = () => {
   const listRef = useRef<ComponentRef<typeof TikTokList>>(null)
 
+  // Example of TikTok built-in animations
   useEffect(() => {
     const tId = setTimeout(() => {
       if (listRef) {
-        listRef.current.playInviteToNextItemAnimation()
+        listRef.current.advanceItem()
       }
-    }, 1000)
+    }, 2000)
 
-    setTimeout(() => {
+    const t2Id = setTimeout(() => {
       if (listRef) {
         listRef.current.playInviteToNextItemAnimation()
       }
-    }, 3000)
+    }, 3500)
 
-    return () => clearTimeout(tId)
+    return () => {
+      clearTimeout(tId)
+      clearTimeout(t2Id)
+    }
   }, [])
 
   return (

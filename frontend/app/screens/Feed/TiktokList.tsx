@@ -7,6 +7,7 @@ import React, {
   forwardRef,
   useImperativeHandle,
 } from "react"
+
 import { PanResponder } from "react-native"
 import Animated, {
   WithSpringConfig,
@@ -35,9 +36,11 @@ type TiktokListProps<T> = {
 
 type TikTokListRef = ForwardedRef<{
   playInviteToNextItemAnimation: () => void
+  scrollToIndex: (index: number) => void
+  advanceItem: () => void
+  retreatItem: () => void
 }>
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function TikTokListInner<T>(props: TiktokListProps<T>, ref: TikTokListRef) {
   const { data, keyExtractor, renderItem, itemContainerProps = {} } = props
 
@@ -105,8 +108,9 @@ export function TikTokListInner<T>(props: TiktokListProps<T>, ref: TikTokListRef
 
   const playAnimation = async (anim: () => Promise<void>) => {
     if (isAnimationPlaying.current) {
-      console.warn("Tried playing playing animation while another has not finished.")
-      return
+      throw new Error(
+        "(TikTok List)Tried playing playing animation while another has not finished.",
+      )
     }
 
     isAnimationPlaying.current = true
@@ -139,8 +143,33 @@ export function TikTokListInner<T>(props: TiktokListProps<T>, ref: TikTokListRef
     })
   }
 
+  const scrollToIndexAnim = async (itemIndex: number) => {
+    return new Promise<void>((resolve, reject) => {
+      const absIndex = Math.abs(itemIndex)
+      const isNewIndexInBounds = absIndex >= 0 && absIndex <= data.length - 1
+
+      if (isNewIndexInBounds) {
+        yOffset.value = withSpring(-(elementHeight * absIndex), SPRING_ANIM_CONFIG, () => {
+          runOnJS(handleScrollAnimationEnd)()
+          runOnJS(resolve)()
+        })
+      } else {
+        reject(
+          new Error(
+            `(TikTok List) Item index: (${itemIndex}) is out of bounds in array with length ${data.length}!`,
+          ),
+        )
+      }
+    })
+  }
+
   useImperativeHandle(ref, () => ({
     playInviteToNextItemAnimation: () => playAnimation(inviteToNextAnim),
+    scrollToIndex: (index: number) => playAnimation(async () => await scrollToIndexAnim(index)),
+    advanceItem: () =>
+      playAnimation(async () => await scrollToIndexAnim(currentItemIndexInView + 1)),
+    retreatItem: () =>
+      playAnimation(async () => await scrollToIndexAnim(currentItemIndexInView - 1)),
   }))
 
   return (
