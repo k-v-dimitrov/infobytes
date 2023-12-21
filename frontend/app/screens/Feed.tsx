@@ -1,9 +1,10 @@
-import React, { Key, useRef, useState } from "react"
+import React, { Key, useRef, useState, useMemo } from "react"
+import { PanResponder } from "react-native"
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated"
 import { View, Text } from "@gluestack-ui/themed"
 import { Screen } from "app/components"
-import { PanResponder } from "react-native"
-import { TranslateYTransform } from "react-native"
-import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated"
+
+const NEXT_ELEMENT_SCROLL_THRESHOLD_PERCENTAGE = 35
 
 function CustomVirtualizedList<T>({
   data,
@@ -16,7 +17,7 @@ function CustomVirtualizedList<T>({
   renderItem: (item: T) => React.ReactNode
   itemContainerProps?: React.ComponentProps<typeof View>
 }) {
-  const [height, setHeight] = useState(0)
+  const [elementHeight, setElementHeight] = useState(0)
   const [bottomBoundary, setBottomBoundary] = useState(0)
 
   const yOffset = useSharedValue(0)
@@ -26,28 +27,53 @@ function CustomVirtualizedList<T>({
   }))
 
   const lastDy = useRef(0)
-  const panResponder = useRef(
-    PanResponder.create({
+  const onPanStartIndex = useRef(0)
+  const panResponder = useMemo(() => {
+    const handleGrant = () => {
+      onPanStartIndex.current = Math.round(yOffset.value / elementHeight)
+    }
+
+    const handleMove = (_, { dy }) => {
+      yOffset.value -= lastDy.current - dy
+      lastDy.current = dy
+    }
+
+    const handleEnd = () => {
+      lastDy.current = 0
+
+      const normalizedOffsetPercentage =
+        ((yOffset.value - elementHeight * onPanStartIndex.current) / elementHeight) * 100
+
+      const isBackwardScroll = normalizedOffsetPercentage > 0
+
+      if (Math.abs(normalizedOffsetPercentage) >= NEXT_ELEMENT_SCROLL_THRESHOLD_PERCENTAGE) {
+        const newIndex = isBackwardScroll
+          ? onPanStartIndex.current + 1
+          : onPanStartIndex.current - 1
+
+        yOffset.value = withSpring(elementHeight * newIndex)
+      } else {
+        yOffset.value = withSpring(elementHeight * onPanStartIndex.current)
+      }
+    }
+
+    return PanResponder.create({
       onMoveShouldSetPanResponder: () => true,
-      onPanResponderMove: (_, { dy }) => {
-        yOffset.value -= lastDy.current - dy
-        lastDy.current = dy
-      },
-      onPanResponderEnd: (_, { dy }) => {
-        lastDy.current = 0
-      },
-    }),
-  ).current
+      onPanResponderGrant: handleGrant,
+      onPanResponderMove: handleMove,
+      onPanResponderEnd: handleEnd,
+    })
+  }, [elementHeight])
 
   return (
     <View flex={1} {...panResponder.panHandlers}>
       {data.map((item) => (
-        <View key={keyExtractor(item)} borderWidth={4} borderColor="red">
+        <View key={keyExtractor(item)}>
           <Animated.View style={[animatedStyles, { height: "100%" }]}>
             <View
               onLayout={(e) => {
                 const viewHeight = e.nativeEvent.layout.height
-                setHeight(viewHeight)
+                setElementHeight(viewHeight)
                 setBottomBoundary(viewHeight * data.length)
               }}
               height="$full"
@@ -70,10 +96,14 @@ export const Feed = () => {
   return (
     <Screen p="$0">
       <CustomVirtualizedList
-        data={["test", "test 2"]}
+        data={["test", "test 2", "test 3", "test 4", "test 5"]}
         keyExtractor={(item) => item}
         renderItem={(item) => {
-          return <View borderColor="$green100" borderWidth={3}></View>
+          return (
+            <View borderColor="$green100" borderWidth={3}>
+              <Text>{item}</Text>
+            </View>
+          )
         }}
         itemContainerProps={{ bgColor: "$blueGray800" }}
       />
