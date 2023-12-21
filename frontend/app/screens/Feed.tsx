@@ -17,7 +17,7 @@ const SPRING_ANIM_CONFIG: WithSpringConfig = {
   mass: 0.025,
 }
 
-function CustomVirtualizedList<T>({
+function TikTokList<T>({
   data,
   keyExtractor,
   renderItem,
@@ -34,14 +34,14 @@ function CustomVirtualizedList<T>({
     transform: [{ translateY: yOffset.value }],
   }))
 
-  const calcItemIndexInView = () => Math.abs(Math.round(yOffset.value / elementHeight))
   const [currentItemIndexInView, setCurrentItemIndexInView] = useState(0)
 
+  const calcItemIndexInView = () => Math.abs(Math.round(yOffset.value / elementHeight))
   const handleScrollAnimationEnd = () => {
     setCurrentItemIndexInView(calcItemIndexInView())
   }
 
-  const lastDy = useRef(0)
+  const lastDeltaY = useRef(0)
   const onPanStartItemIndex = useRef(0)
   const panResponder = useMemo(() => {
     const handleGrant = () => {
@@ -50,12 +50,12 @@ function CustomVirtualizedList<T>({
     }
 
     const handleMove = (_, { dy }) => {
-      yOffset.value -= lastDy.current - dy
-      lastDy.current = dy
+      yOffset.value -= lastDeltaY.current - dy
+      lastDeltaY.current = dy
     }
 
     const handleEnd = () => {
-      lastDy.current = 0
+      lastDeltaY.current = 0
 
       const normalizedOffsetPercentage =
         ((yOffset.value - elementHeight * onPanStartItemIndex.current) / elementHeight) * 100
@@ -113,7 +113,7 @@ function CustomVirtualizedList<T>({
 export const Feed = () => {
   return (
     <Screen p="$0">
-      <CustomVirtualizedList
+      <TikTokList
         data={["test", "test 2", "test 3", "test 4", "test 5"]}
         keyExtractor={(item) => item}
         renderItem={({ item, isFullyInView }) => {
