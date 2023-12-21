@@ -1,4 +1,4 @@
-import React, { Key, useRef, useState, useMemo } from "react"
+import React, { Key, useRef, useState, useMemo, useEffect } from "react"
 import { PanResponder } from "react-native"
 import Animated, {
   WithSpringConfig,
@@ -6,7 +6,9 @@ import Animated, {
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
+  withSequence,
   withSpring,
+  withTiming,
 } from "react-native-reanimated"
 import { View, Text, Spinner, CheckIcon } from "@gluestack-ui/themed"
 import { Screen } from "app/components"
@@ -22,11 +24,13 @@ function TikTokList<T>({
   keyExtractor,
   renderItem,
   itemContainerProps = {},
+  playInviteToNextItemAnimation = false, // TODO: figure out how to invoke animations from parent component in a better manner. forwardRef and useImperativeHandle cannot be used because they break generics
 }: {
   data: Array<T>
   keyExtractor: (item: T) => Key
   renderItem: ({ item, isFullyInView }: { item: T; isFullyInView: boolean }) => React.ReactNode
   itemContainerProps?: React.ComponentProps<typeof View>
+  playInviteToNextItemAnimation?: boolean
 }) {
   const [elementHeight, setElementHeight] = useState(0)
   const yOffset = useSharedValue(0)
@@ -88,6 +92,26 @@ function TikTokList<T>({
     })
   }, [elementHeight, handleScrollAnimationEnd])
 
+  const inviteToNextItemAnimationPlayed = useRef(false)
+  if (playInviteToNextItemAnimation && !inviteToNextItemAnimationPlayed.current) {
+    yOffset.value = withSequence(
+      withTiming(yOffset.value - 50, {
+        duration: 300,
+      }),
+      withTiming(yOffset.value, {
+        duration: 300,
+      }),
+      withTiming(yOffset.value - 50, {
+        duration: 300,
+      }),
+      withTiming(yOffset.value, {
+        duration: 300,
+      }),
+    )
+
+    inviteToNextItemAnimationPlayed.current = true
+  }
+
   return (
     <View flex={1} {...panResponder.panHandlers}>
       {data.map((item, index) => (
@@ -111,10 +135,21 @@ function TikTokList<T>({
 }
 
 export const Feed = () => {
+  const [playNextItemAnimation, setPlayNextItemAnimation] = useState(false)
+
+  useEffect(() => {
+    const tId = setTimeout(() => {
+      setPlayNextItemAnimation(true)
+    }, 5000)
+
+    return () => clearTimeout(tId)
+  }, [])
+
   return (
     <Screen p="$0">
       <TikTokList
         data={["test", "test 2", "test 3", "test 4", "test 5"]}
+        playInviteToNextItemAnimation={playNextItemAnimation}
         keyExtractor={(item) => item}
         renderItem={({ item, isFullyInView }) => {
           return (
