@@ -51,10 +51,15 @@ function CustomVirtualizedList<T>({
           ? onPanStartIndex.current + 1
           : onPanStartIndex.current - 1
 
-        yOffset.value = withSpring(elementHeight * newIndex)
-      } else {
-        yOffset.value = withSpring(elementHeight * onPanStartIndex.current)
+        const isNewIndexInBounds = -newIndex >= 0 && -newIndex <= data.length - 1
+
+        if (isNewIndexInBounds) {
+          yOffset.value = withSpring(elementHeight * newIndex)
+          return
+        }
       }
+
+      yOffset.value = withSpring(elementHeight * onPanStartIndex.current)
     }
 
     return PanResponder.create({
