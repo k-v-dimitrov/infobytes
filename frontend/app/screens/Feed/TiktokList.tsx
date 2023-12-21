@@ -1,4 +1,12 @@
-import React, { Key, useRef, useState, useMemo, useEffect } from "react"
+import React, {
+  ForwardedRef,
+  Key,
+  useRef,
+  useState,
+  useMemo,
+  forwardRef,
+  useImperativeHandle,
+} from "react"
 import { PanResponder } from "react-native"
 import Animated, {
   WithSpringConfig,
@@ -10,8 +18,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated"
-import { View, Text, Spinner, CheckIcon } from "@gluestack-ui/themed"
-import { Screen } from "app/components"
+import { View } from "@gluestack-ui/themed"
 
 const NEXT_ELEMENT_SCROLL_THRESHOLD_PERCENTAGE = 10
 const SPRING_ANIM_CONFIG: WithSpringConfig = {
@@ -19,19 +26,21 @@ const SPRING_ANIM_CONFIG: WithSpringConfig = {
   mass: 0.025,
 }
 
-function TikTokList<T>({
-  data,
-  keyExtractor,
-  renderItem,
-  itemContainerProps = {},
-  playInviteToNextItemAnimation = false, // TODO: figure out how to invoke animations from parent component in a better manner. forwardRef and useImperativeHandle cannot be used because they break generics
-}: {
+type TiktokListProps<T> = {
   data: Array<T>
   keyExtractor: (item: T) => Key
   renderItem: ({ item, isFullyInView }: { item: T; isFullyInView: boolean }) => React.ReactNode
   itemContainerProps?: React.ComponentProps<typeof View>
-  playInviteToNextItemAnimation?: boolean
-}) {
+}
+
+type TikTokListRef = ForwardedRef<{
+  playInviteToNextItemAnimation: () => void
+}>
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function TikTokListInner<T>(props: TiktokListProps<T>, ref: TikTokListRef) {
+  const { data, keyExtractor, renderItem, itemContainerProps = {} } = props
+
   const [elementHeight, setElementHeight] = useState(0)
   const yOffset = useSharedValue(0)
   const animatedStyles = useAnimatedStyle(() => ({
@@ -92,25 +101,47 @@ function TikTokList<T>({
     })
   }, [elementHeight, handleScrollAnimationEnd])
 
-  const inviteToNextItemAnimationPlayed = useRef(false)
-  if (playInviteToNextItemAnimation && !inviteToNextItemAnimationPlayed.current) {
-    yOffset.value = withSequence(
-      withTiming(yOffset.value - 50, {
-        duration: 300,
-      }),
-      withTiming(yOffset.value, {
-        duration: 300,
-      }),
-      withTiming(yOffset.value - 50, {
-        duration: 300,
-      }),
-      withTiming(yOffset.value, {
-        duration: 300,
-      }),
-    )
+  const isAnimationPlaying = useRef(false)
 
-    inviteToNextItemAnimationPlayed.current = true
+  const playAnimation = async (anim: () => Promise<void>) => {
+    if (isAnimationPlaying.current) {
+      console.warn("Tried playing playing animation while another has not finished.")
+      return
+    }
+
+    isAnimationPlaying.current = true
+    await anim()
+    isAnimationPlaying.current = false
   }
+
+  const inviteToNextAnim = async () => {
+    return new Promise<void>((resolve) => {
+      yOffset.value = withSequence(
+        withTiming(yOffset.value - 50, {
+          duration: 300,
+        }),
+        withTiming(yOffset.value, {
+          duration: 300,
+        }),
+        withTiming(yOffset.value - 50, {
+          duration: 300,
+        }),
+        withTiming(
+          yOffset.value,
+          {
+            duration: 300,
+          },
+          () => {
+            runOnJS(resolve)()
+          },
+        ),
+      )
+    })
+  }
+
+  useImperativeHandle(ref, () => ({
+    playInviteToNextItemAnimation: () => playAnimation(inviteToNextAnim),
+  }))
 
   return (
     <View flex={1} {...panResponder.panHandlers}>
@@ -134,47 +165,6 @@ function TikTokList<T>({
   )
 }
 
-export const Feed = () => {
-  const [playNextItemAnimation, setPlayNextItemAnimation] = useState(false)
-
-  useEffect(() => {
-    const tId = setTimeout(() => {
-      setPlayNextItemAnimation(true)
-    }, 5000)
-
-    return () => clearTimeout(tId)
-  }, [])
-
-  return (
-    <Screen p="$0">
-      <TikTokList
-        data={["test", "test 2", "test 3", "test 4", "test 5"]}
-        playInviteToNextItemAnimation={playNextItemAnimation}
-        keyExtractor={(item) => item}
-        renderItem={({ item, isFullyInView }) => {
-          return (
-            // This item can have flex={1} and it will be height 100%
-            <View flex={1} borderColor="$green100" borderWidth={1}>
-              <Text>{item}</Text>
-              <View
-                flex={1}
-                borderColor="$amber400"
-                borderWidth={1}
-                alignContent="center"
-                justifyContent="center"
-                alignItems="center"
-              >
-                {isFullyInView ? (
-                  <CheckIcon size="xl" color="$green400" />
-                ) : (
-                  <Spinner size={"large"} />
-                )}
-              </View>
-            </View>
-          )
-        }}
-        itemContainerProps={{ bgColor: "$blueGray800" }}
-      />
-    </Screen>
-  )
-}
+export const TikTokList = forwardRef(TikTokListInner) as <T>(
+  props: TiktokListProps<T> & { ref?: TikTokListRef },
+) => ReturnType<typeof TikTokListInner>
