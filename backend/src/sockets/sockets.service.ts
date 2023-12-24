@@ -37,7 +37,6 @@ export default class SocketsService implements OnGatewayDisconnect {
     @MessageBody('jwt') jwt: string,
   ) {
     const asd = jwtDecode<User>(jwt);
-    console.log({ asd });
     this.connectionsPool.registerConnection(client.id, asd.id);
   }
 
@@ -52,8 +51,22 @@ export default class SocketsService implements OnGatewayDisconnect {
       excludeExtraneousValues: true,
     });
 
-    this.server
-      .to(clientId)
-      .emit(Events.INTERNAL.userAnsweredCorrectly, response);
+    this.server.to(clientId).emit(Events.APP.userLevelUp, response);
+  }
+
+  @OnEvent(Events.APP.userChangeInXP)
+  handleUserChangeInXp(
+    event: InstanceType<
+      typeof Events.PAYLOADS.UserAnsweredCorrectlyEventPayload
+    >,
+  ) {
+    const { id: userId } = event.user;
+    const clientId = this.connectionsPool.getSocketIdBy({ userId });
+
+    const response = plainToInstance(UserLeveledUpResponseDto, event.user, {
+      excludeExtraneousValues: true,
+    });
+
+    this.server.to(clientId).emit(Events.APP.userChangeInXP, response);
   }
 }

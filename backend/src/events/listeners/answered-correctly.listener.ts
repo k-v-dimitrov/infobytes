@@ -18,8 +18,6 @@ export class UserAnsweredCorrectlyListener {
       typeof Events.PAYLOADS.UserAnsweredCorrectlyEventPayload
     >,
   ) {
-    console.log('here');
-
     const { user } = event;
 
     const { id, level_points: levelPoints, level } = user;
@@ -27,15 +25,18 @@ export class UserAnsweredCorrectlyListener {
     const newLevelPoints = levelPoints + BASE_EXP * 1000;
 
     if (!shouldLevelUp(level, levelPoints + newLevelPoints)) {
-      await this.db.user.update({
+      const updatedUser = await this.db.user.update({
         where: { id: id },
         data: { level_points: newLevelPoints },
       });
 
+      this.eventEmitter.emit(
+        Events.APP.userChangeInXP,
+        new Events.PAYLOADS.UserAnsweredCorrectlyEventPayload(updatedUser),
+      );
+
       return;
     }
-
-    console.log('here 2');
 
     const updatedUser = await this.db.user.update({
       where: { id: id },

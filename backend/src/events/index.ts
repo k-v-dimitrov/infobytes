@@ -8,6 +8,7 @@ enum INTERNAL {
 
 enum APP {
   userLevelUp = 'USER_LEVEL_UP',
+  userChangeInXP = 'USER_CHANGE_IN_XP',
 }
 
 export const Events = {
