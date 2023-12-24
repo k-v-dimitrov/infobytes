@@ -44,10 +44,12 @@ export class FeedController {
   answerFeedQuestion(
     @Param() asnwerFeedQuestionRouteParams: AnswerFeedQuestionRouteParams,
     @Body() answerFeedQuestionDto: AnswerFeedQuestionDto,
+    @CurrentUser() user: User,
   ) {
     return this.feedService.answerFeedQuestion(
       asnwerFeedQuestionRouteParams,
       answerFeedQuestionDto,
+      user,
     );
   }
 }

@@ -15,13 +15,18 @@ import {
   UserFeedQuestionAlreadyAnsweredException,
 } from './exceptions';
 import { mergeAndShuffleArrays } from 'src/utils/mergeAndShuffleArrays';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { UserAnsweredCorrectlyEvent } from 'src/user/events/asnwered-correctly.event';
 
 // Enrich user feed on every 5 viewed facts
 const ENRICH_WITH_QUESTION_INTERVAL = 5;
 
 @Injectable()
 export class FeedService {
-  constructor(private db: DatabaseService) {}
+  constructor(
+    private db: DatabaseService,
+    private eventEmitter: EventEmitter2,
+  ) {}
 
   async subscribeUserToFeed(user: User) {
     const feedUser = await this.db.feedUser.create({
@@ -69,6 +74,7 @@ export class FeedService {
   async answerFeedQuestion(
     { userQuestionId }: AnswerFeedQuestionRouteParams,
     { answerId }: AnswerFeedQuestionDto,
+    user: User,
   ) {
     const userQuestion = await this.getUserQuestionById(userQuestionId);
 
@@ -93,6 +99,13 @@ export class FeedService {
       },
       where: { id: userQuestion.id },
     });
+
+    if (isUserCorrect) {
+      this.eventEmitter.emit(
+        'user.answer.correct',
+        new UserAnsweredCorrectlyEvent(user),
+      );
+    }
 
     return {
       isCorrect: isUserCorrect,
