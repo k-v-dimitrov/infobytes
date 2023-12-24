@@ -29,6 +29,7 @@ import { ConfigService } from '@nestjs/config';
 import { SendGridService } from 'src/sendgrid/sendgrid.service';
 import { UserNotFoundError } from 'src/database/exceptions';
 import { plainToInstance } from 'class-transformer';
+import { calculateExperienceForNextLevel } from 'src/utils/levels';
 
 @Injectable()
 export class AuthService {
@@ -199,7 +200,15 @@ export class AuthService {
   private buildLoginResponse({ token, user }: { token: string; user: User }) {
     return plainToInstance(
       LoginResponseDto,
-      { user, token },
+      {
+        ...{
+          ...user,
+          requiredPointsForNextLevel: calculateExperienceForNextLevel(
+            user.level,
+          ),
+        },
+        token,
+      },
       { excludeExtraneousValues: true },
     );
   }

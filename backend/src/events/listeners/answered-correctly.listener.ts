@@ -20,14 +20,14 @@ export class UserAnsweredCorrectlyListener {
   ) {
     const { user } = event;
 
-    const { id, level_points: levelPoints, level } = user;
+    const { id, levelPoints: levelPoints, level } = user;
 
     const newLevelPoints = levelPoints + BASE_EXP * 1000;
 
     if (!shouldLevelUp(level, levelPoints + newLevelPoints)) {
       const updatedUser = await this.db.user.update({
         where: { id: id },
-        data: { level_points: newLevelPoints },
+        data: { levelPoints: newLevelPoints },
       });
 
       this.eventEmitter.emit(
@@ -40,7 +40,7 @@ export class UserAnsweredCorrectlyListener {
 
     const updatedUser = await this.db.user.update({
       where: { id: id },
-      data: { level: level + 1, level_points: 0 },
+      data: { level: level + 1, levelPoints: 0 },
     });
 
     this.eventEmitter.emit(

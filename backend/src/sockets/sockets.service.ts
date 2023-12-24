@@ -15,6 +15,7 @@ import { ConnectionsPool } from './ConnectionsPool';
 import { Events } from 'src/events';
 import { plainToInstance } from 'class-transformer';
 import { UserLeveledUpResponseDto } from './dto';
+import { calculateExperienceForNextLevel } from 'src/utils/levels';
 
 @WebSocketGateway({
   cors: {
@@ -47,9 +48,18 @@ export default class SocketsService implements OnGatewayDisconnect {
     const { id: userId } = event.user;
     const clientId = this.connectionsPool.getSocketIdBy({ userId });
 
-    const response = plainToInstance(UserLeveledUpResponseDto, event.user, {
-      excludeExtraneousValues: true,
-    });
+    const response = plainToInstance(
+      UserLeveledUpResponseDto,
+      {
+        ...event.user,
+        requiredPointsForNextLevel: calculateExperienceForNextLevel(
+          event.user.level,
+        ),
+      },
+      {
+        excludeExtraneousValues: true,
+      },
+    );
 
     this.server.to(clientId).emit(Events.APP.userLevelUp, response);
   }
@@ -63,9 +73,18 @@ export default class SocketsService implements OnGatewayDisconnect {
     const { id: userId } = event.user;
     const clientId = this.connectionsPool.getSocketIdBy({ userId });
 
-    const response = plainToInstance(UserLeveledUpResponseDto, event.user, {
-      excludeExtraneousValues: true,
-    });
+    const response = plainToInstance(
+      UserLeveledUpResponseDto,
+      {
+        ...event.user,
+        requiredPointsForNextLevel: calculateExperienceForNextLevel(
+          event.user.level,
+        ),
+      },
+      {
+        excludeExtraneousValues: true,
+      },
+    );
 
     this.server.to(clientId).emit(Events.APP.userChangeInXP, response);
   }
