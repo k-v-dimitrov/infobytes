@@ -12,6 +12,7 @@ import { join } from 'path';
 import { SendGridModule } from './sendgrid/sendgrid.module';
 import { UserModule } from './user/user.module';
 import { QuestionModule } from './question/question.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { QuestionModule } from './question/question.module';
         index: '/index.html',
       },
     }),
+    EventEmitterModule.forRoot(),
     DatabaseModule,
     AuthModule,
     UserModule,
