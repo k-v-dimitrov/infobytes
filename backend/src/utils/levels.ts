@@ -30,10 +30,6 @@ export function calculateExperienceForNextLevel(currentLevel: number): number {
 
 export function shouldLevelUp(currentLevel: number, currentExperience: number) {
   const experienceForNextLevel = calculateExperienceForNextLevel(currentLevel);
-  console.log(
-    'User progress:',
-    (currentExperience / experienceForNextLevel) * 100,
-  );
 
   if (currentExperience >= experienceForNextLevel) {
     return true;

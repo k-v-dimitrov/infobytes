@@ -28,8 +28,6 @@ export class UserAnsweredCorrectlyListener {
       return;
     }
 
-    console.log('here');
-
     await this.db.user.update({
       where: { id: id },
       data: { level: level + 1, level_points: 0 },
