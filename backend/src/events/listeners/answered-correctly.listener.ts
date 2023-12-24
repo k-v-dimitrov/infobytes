@@ -22,7 +22,7 @@ export class UserAnsweredCorrectlyListener {
 
     const { id, levelPoints: levelPoints, level } = user;
 
-    const newLevelPoints = levelPoints + BASE_EXP * 1000;
+    const newLevelPoints = levelPoints + BASE_EXP;
 
     if (!shouldLevelUp(level, levelPoints + newLevelPoints)) {
       const updatedUser = await this.db.user.update({
