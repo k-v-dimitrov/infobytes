@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { DatabaseService } from 'src/database/database.service';
-import { UserAnsweredCorrectlyEvent } from '../events/asnwered-correctly.event';
+
 import { BASE_EXP, shouldLevelUp } from 'src/utils/levels';
+import { Events } from 'src/events';
 
 @Injectable()
 export class UserAnsweredCorrectlyListener {
@@ -11,11 +12,17 @@ export class UserAnsweredCorrectlyListener {
     private eventEmitter: EventEmitter2,
   ) {}
 
-  @OnEvent('user.answer.correct')
-  async handleUserAnsweredCorrectlyEvent(event: UserAnsweredCorrectlyEvent) {
-    const {
-      user: { id, level_points: levelPoints, level },
-    } = event;
+  @OnEvent(Events.INTERNAL.userAnsweredCorrectly)
+  async handleUserAnsweredCorrectlyEvent(
+    event: InstanceType<
+      typeof Events.PAYLOADS.UserAnsweredCorrectlyEventPayload
+    >,
+  ) {
+    console.log('here');
+
+    const { user } = event;
+
+    const { id, level_points: levelPoints, level } = user;
 
     const newLevelPoints = levelPoints + BASE_EXP * 1000;
 
@@ -28,11 +35,16 @@ export class UserAnsweredCorrectlyListener {
       return;
     }
 
-    await this.db.user.update({
+    console.log('here 2');
+
+    const updatedUser = await this.db.user.update({
       where: { id: id },
       data: { level: level + 1, level_points: 0 },
     });
 
-    this.eventEmitter.emit('user.levelup');
+    this.eventEmitter.emit(
+      Events.APP.userLevelUp,
+      new Events.PAYLOADS.UserLevelUpEventPayload(updatedUser),
+    );
   }
 }

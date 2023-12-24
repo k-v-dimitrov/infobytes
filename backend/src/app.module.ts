@@ -13,6 +13,8 @@ import { SendGridModule } from './sendgrid/sendgrid.module';
 import { UserModule } from './user/user.module';
 import { QuestionModule } from './question/question.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { SocketsModule } from './sockets/sockets.module';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
       },
     }),
     EventEmitterModule.forRoot(),
+    EventsModule,
+    SocketsModule,
     DatabaseModule,
     AuthModule,
     UserModule,

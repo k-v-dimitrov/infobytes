@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
-import { UserAnsweredCorrectlyListener } from './listeners/answered-correctly.listener';
 
 @Module({
-  providers: [UserService, UserAnsweredCorrectlyListener],
+  providers: [UserService],
   controllers: [UserController],
   exports: [UserService],
 })

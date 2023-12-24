@@ -1,6 +1,6 @@
 import { User } from '@prisma/client';
 
-export class UserLevelUpEvent {
+export class UserAnsweredCorrectlyEventPayload {
   public user: User;
 
   constructor(user: User) {

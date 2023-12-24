@@ -1,22 +1,26 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
+import { Fact, Prisma, Question, User, ViewedFact } from '@prisma/client';
+import { plainToInstance } from 'class-transformer';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { PrismaError } from 'prisma-error-enum';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+
 import {
   AnswerFeedQuestionDto,
   AnswerFeedQuestionRouteParams,
   UserFeedDto,
   UserFeedResponseDto,
 } from './dto';
-import { Fact, Prisma, Question, User, ViewedFact } from '@prisma/client';
-import { plainToInstance } from 'class-transformer';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { PrismaError } from 'prisma-error-enum';
+
 import {
   InvalidAnswerIdException,
   UserFeedQuestionAlreadyAnsweredException,
 } from './exceptions';
+
+import { Events } from 'src/events';
+
 import { mergeAndShuffleArrays } from 'src/utils/mergeAndShuffleArrays';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { UserAnsweredCorrectlyEvent } from 'src/user/events/asnwered-correctly.event';
 
 // Enrich user feed on every 5 viewed facts
 const ENRICH_WITH_QUESTION_INTERVAL = 5;
@@ -102,8 +106,8 @@ export class FeedService {
 
     if (isUserCorrect) {
       this.eventEmitter.emit(
-        'user.answer.correct',
-        new UserAnsweredCorrectlyEvent(user),
+        Events.INTERNAL.userAnsweredCorrectly,
+        new Events.PAYLOADS.UserAnsweredCorrectlyEventPayload(user),
       );
     }
 

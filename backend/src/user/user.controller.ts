@@ -14,8 +14,8 @@ import { PatchUserDto, UserResponseDto } from './dto';
 import { UserService } from './user.service';
 import { plainToInstance } from 'class-transformer';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { UserAnsweredCorrectlyEvent } from './events/asnwered-correctly.event';
 import { User } from '@prisma/client';
+import { Events } from 'src/events';
 
 @Controller('user')
 export class UserController {
@@ -45,8 +45,8 @@ export class UserController {
   @UseInterceptors(InjectUser)
   test(@CurrentUser() user: User) {
     this.eventEmitter.emit(
-      'user.answer.correct',
-      new UserAnsweredCorrectlyEvent(user),
+      Events.INTERNAL.userAnsweredCorrectly,
+      new Events.PAYLOADS.UserAnsweredCorrectlyEventPayload(user),
     );
   }
 }
