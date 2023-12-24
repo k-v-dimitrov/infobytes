@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { Fact, Prisma, Question, User, ViewedFact } from '@prisma/client';
 import { plainToInstance } from 'class-transformer';
@@ -268,10 +273,21 @@ export class FeedService {
   }
 
   private async getUserByUserFeedId(userFeedId: string) {
-    return await this.db.feedUser.findFirstOrThrow({
-      where: { id: userFeedId },
-      include: { user: true },
-    });
+    try {
+      return await this.db.feedUser.findFirstOrThrow({
+        where: { id: userFeedId },
+        include: { user: true },
+      });
+    } catch (err) {
+      if (err instanceof PrismaClientKnownRequestError) {
+        if (err.code === PrismaError.RecordsNotFound) {
+          throw new HttpException(
+            'Such feed user does not exist!',
+            HttpStatus.NOT_FOUND,
+          );
+        }
+      }
+    }
   }
 
   private async markFactsAsViewedAndGetUpdatedCounts(
