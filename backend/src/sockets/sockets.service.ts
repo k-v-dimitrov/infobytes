@@ -37,8 +37,8 @@ export default class SocketsService implements OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody('jwt') jwt: string,
   ) {
-    const asd = jwtDecode<User>(jwt);
-    this.connectionsPool.registerConnection(client.id, asd.id);
+    const user = jwtDecode<User>(jwt);
+    this.connectionsPool.registerConnection(client.id, user.id);
   }
 
   @OnEvent(Events.APP.userLevelUp)
