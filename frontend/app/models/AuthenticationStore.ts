@@ -11,6 +11,8 @@ const UserModel = types.maybeNull(
     displayName: types.string,
     categories: types.array(types.string),
     isOnboarded: types.boolean,
+    level: types.number,
+    levelPoints: types.number,
   }),
 )
 
@@ -63,7 +65,7 @@ export const AuthenticationStoreModel = types
           throw new Error()
         }
 
-        const { id, email, displayName, categories, isOnboarded } = data
+        const { id, email, displayName, categories, isOnboarded, level, levelPoints } = data
 
         const user = UserModel.create({
           id,
@@ -71,6 +73,8 @@ export const AuthenticationStoreModel = types
           displayName,
           isOnboarded,
           categories: categories.map(({ category }) => category),
+          level,
+          levelPoints,
         })
 
         store.user = user
