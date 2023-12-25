@@ -1,19 +1,30 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
+import { Fact, Prisma, Question, User, ViewedFact } from '@prisma/client';
+import { plainToInstance } from 'class-transformer';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { PrismaError } from 'prisma-error-enum';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+
 import {
   AnswerFeedQuestionDto,
   AnswerFeedQuestionRouteParams,
   UserFeedDto,
   UserFeedResponseDto,
 } from './dto';
-import { Fact, Prisma, Question, User, ViewedFact } from '@prisma/client';
-import { plainToInstance } from 'class-transformer';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { PrismaError } from 'prisma-error-enum';
+
 import {
   InvalidAnswerIdException,
   UserFeedQuestionAlreadyAnsweredException,
 } from './exceptions';
+
+import { Events } from 'src/events';
+
 import { mergeAndShuffleArrays } from 'src/utils/mergeAndShuffleArrays';
 
 // Enrich user feed on every 5 viewed facts
@@ -21,7 +32,10 @@ const ENRICH_WITH_QUESTION_INTERVAL = 5;
 
 @Injectable()
 export class FeedService {
-  constructor(private db: DatabaseService) {}
+  constructor(
+    private db: DatabaseService,
+    private eventEmitter: EventEmitter2,
+  ) {}
 
   async subscribeUserToFeed(user: User) {
     const feedUser = await this.db.feedUser.create({
@@ -69,6 +83,7 @@ export class FeedService {
   async answerFeedQuestion(
     { userQuestionId }: AnswerFeedQuestionRouteParams,
     { answerId }: AnswerFeedQuestionDto,
+    user: User,
   ) {
     const userQuestion = await this.getUserQuestionById(userQuestionId);
 
@@ -93,6 +108,13 @@ export class FeedService {
       },
       where: { id: userQuestion.id },
     });
+
+    if (isUserCorrect) {
+      this.eventEmitter.emit(
+        Events.INTERNAL.userAnsweredCorrectly,
+        new Events.PAYLOADS.UserAnsweredCorrectlyEventPayload(user),
+      );
+    }
 
     return {
       isCorrect: isUserCorrect,
@@ -251,10 +273,21 @@ export class FeedService {
   }
 
   private async getUserByUserFeedId(userFeedId: string) {
-    return await this.db.feedUser.findFirstOrThrow({
-      where: { id: userFeedId },
-      include: { user: true },
-    });
+    try {
+      return await this.db.feedUser.findFirstOrThrow({
+        where: { id: userFeedId },
+        include: { user: true },
+      });
+    } catch (err) {
+      if (err instanceof PrismaClientKnownRequestError) {
+        if (err.code === PrismaError.RecordsNotFound) {
+          throw new HttpException(
+            'Such feed user does not exist!',
+            HttpStatus.NOT_FOUND,
+          );
+        }
+      }
+    }
   }
 
   private async markFactsAsViewedAndGetUpdatedCounts(

@@ -66,6 +66,15 @@ export class UserLoginResponseDto {
 
   @Expose()
   isOnboarded: boolean;
+
+  @Expose()
+  level: number;
+
+  @Expose()
+  levelPoints: number;
+
+  @Expose()
+  requiredPointsForNextLevel: number;
 }
 
 export class LoginResponseDto {

@@ -13,15 +13,21 @@ import { PatchUserDto, UserResponseDto } from './dto';
 
 import { UserService } from './user.service';
 import { plainToInstance } from 'class-transformer';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { User } from '@prisma/client';
+import { Events } from 'src/events';
 
 @Controller('user')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private eventEmitter: EventEmitter2,
+  ) {}
 
   @Get()
   @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(InjectUser)
-  getCurrentUser(@CurrentUser() user) {
+  getCurrentUser(@CurrentUser() user: User) {
     return plainToInstance(UserResponseDto, user, {
       excludeExtraneousValues: true,
     });
@@ -30,7 +36,17 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(InjectUser)
   @Patch()
-  patch(@Body() dto: PatchUserDto, @CurrentUser() user) {
+  patch(@Body() dto: PatchUserDto, @CurrentUser() user: User) {
     return this.userService.patch(dto, user);
+  }
+
+  @Get('/test')
+  @UseGuards(AuthGuard('jwt'))
+  @UseInterceptors(InjectUser)
+  test(@CurrentUser() user: User) {
+    this.eventEmitter.emit(
+      Events.INTERNAL.userAnsweredCorrectly,
+      new Events.PAYLOADS.UserAnsweredCorrectlyEventPayload(user),
+    );
   }
 }

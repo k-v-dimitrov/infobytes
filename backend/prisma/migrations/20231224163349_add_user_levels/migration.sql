@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "users" ADD COLUMN     "level" INTEGER NOT NULL DEFAULT 1,
+ADD COLUMN     "levelPoints" INTEGER NOT NULL DEFAULT 0;
