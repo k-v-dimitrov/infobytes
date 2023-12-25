@@ -16,6 +16,7 @@ import { plainToInstance } from 'class-transformer';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { User } from '@prisma/client';
 import { Events } from 'src/events';
+import { calculateExperienceForNextLevel } from 'src/utils/levels';
 
 @Controller('user')
 export class UserController {
@@ -28,9 +29,16 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(InjectUser)
   getCurrentUser(@CurrentUser() user: User) {
-    return plainToInstance(UserResponseDto, user, {
-      excludeExtraneousValues: true,
-    });
+    return plainToInstance(
+      UserResponseDto,
+      {
+        ...user,
+        requiredPointsForNextLevel: calculateExperienceForNextLevel(user.level),
+      },
+      {
+        excludeExtraneousValues: true,
+      },
+    );
   }
 
   @UseGuards(AuthGuard('jwt'))

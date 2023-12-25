@@ -44,6 +44,12 @@ export class UserResponseDto {
   @Expose()
   isOnboarded: boolean;
 
+  @Expose()
+  level: number;
+
+  @Expose()
+  levelPoints: number;
+
   @Expose({ name: 'UserFactCategory' })
   @Type(() => UserFactCategoriesResponseDto)
   categories: UserFactCategoriesResponseDto[];
