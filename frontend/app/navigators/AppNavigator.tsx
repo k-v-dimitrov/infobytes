@@ -11,12 +11,14 @@ import {
   BottomTabNavigationOptions,
 } from "@react-navigation/bottom-tabs"
 import { observer } from "mobx-react-lite"
-import React from "react"
+import React, { useEffect } from "react"
 import Config from "../config"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { Auth, Feed, Onboarding, Profile } from "app/screens"
-import { config } from "@gluestack-ui/themed"
+import { Toast, ToastDescription, ToastTitle, VStack, config, useToast } from "@gluestack-ui/themed"
 import { useStores } from "app/models"
+import { useRealtimeManagerContext } from "app/services/realtime-manager"
+import { Events } from "app/services/realtime-manager/events"
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -60,6 +62,28 @@ const Tab = createBottomTabNavigator<AppStackParamList>()
 const AppStack = observer(function AppStack() {
   const { authenticationStore } = useStores()
   const { isAuthenticated, isOnboarded } = authenticationStore
+  const toast = useToast()
+
+  const { addRealtimeListener } = useRealtimeManagerContext()
+
+  useEffect(() => {
+    addRealtimeListener(Events.connect, () => {
+      toast.show({
+        placement: "top",
+        render: ({ id }) => {
+          const toastId = "toast-" + id
+          return (
+            <Toast nativeID={toastId} action="attention" variant="solid">
+              <VStack space="xs">
+                <ToastTitle>Connected</ToastTitle>
+                <ToastDescription>Connected to socket server successfully!</ToastDescription>
+              </VStack>
+            </Toast>
+          )
+        },
+      })
+    })
+  })
 
   return (
     <Tab.Navigator
