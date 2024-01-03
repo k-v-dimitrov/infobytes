@@ -1,8 +1,8 @@
+import React from "react"
 import { Button, ButtonText, Divider, Text } from "@gluestack-ui/themed"
 import { observer } from "mobx-react-lite"
 import { Screen } from "app/components"
 import { useStores } from "app/models"
-import React from "react"
 import { ScrollView } from "react-native-gesture-handler"
 
 export const Profile = observer<any>(({ navigation }) => {
