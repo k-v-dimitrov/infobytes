@@ -66,7 +66,7 @@ const AppStack = observer(function AppStack() {
   const { isAuthenticated, isOnboarded } = authenticationStore
   const toast = useToast()
 
-  const { addRealtimeListener } = useRealtimeManagerContext()
+  const { addRealtimeListener, removeRealtimeListener } = useRealtimeManagerContext()
 
   useEffect(() => {
     const handleConnect = () => {
@@ -122,6 +122,12 @@ const AppStack = observer(function AppStack() {
     addRealtimeListener(Events.connect, handleConnect)
     addRealtimeListener(Events.userChangeInXP, handleUserChangeInXp)
     addRealtimeListener(Events.userLevelUp, handleUserLevelUp)
+
+    return () => {
+      removeRealtimeListener(Events.connect, handleConnect)
+      removeRealtimeListener(Events.userChangeInXP, handleUserChangeInXp)
+      removeRealtimeListener(Events.userLevelUp, handleUserLevelUp)
+    }
   }, [])
 
   return (
