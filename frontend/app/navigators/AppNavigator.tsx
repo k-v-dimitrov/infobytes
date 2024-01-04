@@ -15,7 +15,9 @@ import React, { useEffect } from "react"
 import Config from "../config"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { Auth, Feed, Onboarding, Profile } from "app/screens"
-import { Toast, ToastDescription, ToastTitle, VStack, config, useToast } from "@gluestack-ui/themed"
+
+import { config } from "@gluestack-ui/config"
+import { Toast, ToastDescription, ToastTitle, VStack, useToast } from "@gluestack-ui/themed"
 import { useStores } from "app/models"
 import { useRealtimeManagerContext } from "app/services/realtime-manager"
 import { Events } from "app/services/realtime-manager/events"
@@ -67,7 +69,7 @@ const AppStack = observer(function AppStack() {
   const { addRealtimeListener } = useRealtimeManagerContext()
 
   useEffect(() => {
-    addRealtimeListener(Events.connect, () => {
+    const handleConnect = () => {
       toast.show({
         placement: "top",
         render: ({ id }) => {
@@ -82,17 +84,54 @@ const AppStack = observer(function AppStack() {
           )
         },
       })
-    })
-  })
+    }
+
+    const handleUserChangeInXp = () => {
+      toast.show({
+        placement: "top",
+        render: ({ id }) => {
+          const toastId = "toast" + id
+          return (
+            <Toast nativeID={toastId} action="attention" variant="solid">
+              <VStack space="xs">
+                <ToastTitle>Tasty XP</ToastTitle>
+                <ToastDescription>You answered correctly and got level points!!</ToastDescription>
+              </VStack>
+            </Toast>
+          )
+        },
+      })
+    }
+
+    const handleUserLevelUp = () => {
+      toast.show({
+        placement: "top",
+        render: ({ id }) => {
+          const toastId = "toast" + id
+          return (
+            <Toast nativeID={toastId} action="attention" variant="solid">
+              <VStack space="xs">
+                <ToastTitle>Level Up!</ToastTitle>
+              </VStack>
+            </Toast>
+          )
+        },
+      })
+    }
+
+    addRealtimeListener(Events.connect, handleConnect)
+    addRealtimeListener(Events.userChangeInXP, handleUserChangeInXp)
+    addRealtimeListener(Events.userLevelUp, handleUserLevelUp)
+  }, [])
 
   return (
     <Tab.Navigator
       initialRouteName={isAuthenticated ? "Feed" : "Auth"}
       screenOptions={{
         headerShown: false,
-        tabBarItemStyle: { backgroundColor: config.theme.tokens.colors.backgroundDark700 },
+        tabBarItemStyle: { backgroundColor: config.tokens.colors.backgroundDark700 },
         tabBarLabelStyle: {
-          fontSize: config.theme.tokens.fontSizes.sm,
+          fontSize: config.tokens.fontSizes.sm,
         },
       }}
     >
