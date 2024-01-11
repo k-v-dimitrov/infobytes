@@ -1,7 +1,6 @@
 import React, { ComponentRef, useRef, useEffect } from "react"
 import { View, Text, Spinner, CheckIcon } from "@gluestack-ui/themed"
 import { Screen } from "app/components"
-
 import { TikTokList } from "./TiktokList"
 
 export const Feed = () => {

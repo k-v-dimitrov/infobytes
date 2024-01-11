@@ -3,6 +3,7 @@ export interface ConfigBaseProps {
   catchErrors: "always" | "dev" | "prod" | "never"
   exitRoutes: string[]
   API_URL: string
+  SOCKET_URL: string
 }
 
 export type PersistNavigationConfig = ConfigBaseProps["persistNavigation"]
@@ -23,6 +24,7 @@ const BaseConfig: ConfigBaseProps = {
    */
   exitRoutes: ["Welcome"],
   API_URL: "https://infobytes.app",
+  SOCKET_URL: "ws://infobytes.app",
 }
 
 export default BaseConfig

@@ -38,7 +38,7 @@
     "@expo/webpack-config": "18.1.2",
     "@gluestack-style/react": "^1.0.12",
     "@gluestack-ui/config": "^1.0.3",
-    "@gluestack-ui/themed": "^1.0.11",
+    "@gluestack-ui/themed": "^1.0.32",
     "@react-native-async-storage/async-storage": "1.17.11",
     "@react-navigation/bottom-tabs": "^6.5.11",
     "@react-navigation/native": "^6.0.2",
@@ -70,7 +70,8 @@
     "react-native-svg": "13.4.0",
     "reactotron-mst": "3.1.4",
     "reactotron-react-js": "^3.3.7",
-    "reactotron-react-native": "5.0.3"
+    "reactotron-react-native": "5.0.3",
+    "socket.io-client": "^4.7.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
