@@ -50,6 +50,9 @@ export class UserResponseDto {
   @Expose()
   levelPoints: number;
 
+  @Expose()
+  requiredPointsForNextLevel: number;
+
   @Expose({ name: 'UserFactCategory' })
   @Type(() => UserFactCategoriesResponseDto)
   categories: UserFactCategoriesResponseDto[];
