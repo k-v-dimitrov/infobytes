@@ -1,5 +1,6 @@
-import { createIcon } from "@gluestack-ui/themed"
+import React from "react"
 import { Path } from "react-native-svg"
+import { createIcon } from "@gluestack-ui/themed"
 
 export const GoogleLogo = createIcon({
   viewBox: "0 0 24 24",
