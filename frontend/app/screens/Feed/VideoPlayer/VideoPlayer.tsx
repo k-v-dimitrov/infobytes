@@ -20,7 +20,7 @@ export const VideoPlayer = ({ source = SOURCE }) => {
   }, [repeatVideoBtnAnimRef])
 
   return (
-    <View flex={1} position="relative">
+    <View flex={1} position="relative" justifyContent="flex-end">
       <Video
         style={{
           position: "absolute",
