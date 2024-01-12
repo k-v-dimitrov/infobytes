@@ -63,6 +63,17 @@ export const VideoPlayer = ({ source = SOURCE }) => {
           </View>
         </Button>
       </View>
+
+      <View position="relative" height={4} bgColor="$trueGray500" width="$full" zIndex={1}>
+        <View
+          position="relative"
+          height={4}
+          bgColor="$green800"
+          zIndex={1}
+          alignItems="flex-end"
+          width={100}
+        />
+      </View>
     </View>
   )
 }
