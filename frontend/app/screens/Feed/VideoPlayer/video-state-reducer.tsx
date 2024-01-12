@@ -8,6 +8,7 @@ enum VideoActionKind {
   LOADING_STARTED,
   LOADING_FINISHED,
   ERROR,
+  REPLAY,
 }
 type VideoPayloads = {
   [VideoActionKind.PROGRESS]: OnProgressData
@@ -17,6 +18,7 @@ type VideoPayloads = {
   [VideoActionKind.LOADING_STARTED]: void
   [VideoActionKind.LOADING_FINISHED]: void
   [VideoActionKind.ERROR]: LoadError
+  [VideoActionKind.REPLAY]: void
 }
 interface VideoAction<T extends VideoActionKind> {
   type: T
@@ -87,6 +89,13 @@ const videoStateReducer = (state: VideoState, action: VideoAction<VideoActionKin
       return {
         ...state,
         error: { ...state.error, ...action.payload },
+      }
+
+    case VideoActionKind.REPLAY:
+      return {
+        ...state,
+        hasFinished: false,
+        isPlaying: true,
       }
 
     default:

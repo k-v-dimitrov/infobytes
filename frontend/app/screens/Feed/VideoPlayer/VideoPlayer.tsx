@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useEffect, useReducer, useState } from "react"
+import React, { useEffect, useReducer, useRef, useState } from "react"
 import { View, Button } from "@gluestack-ui/themed"
 import Video from "react-native-video"
 import LottieView from "lottie-react-native"
@@ -12,6 +12,7 @@ const SOURCE =
 
 export const VideoPlayer = ({ source = SOURCE }) => {
   const [repeatVideoBtnAnimRef, setRepeatVideoBtnAnimRef] = useState<LottieView>(null)
+  const videoRef = useRef<Video>(null)
   const [videoState, dispatch] = useReducer(videoStateReducer, initialVideoState)
   const [progressContainerWidth, setProgressContainerWidth] = useState(0)
 
@@ -21,24 +22,34 @@ export const VideoPlayer = ({ source = SOURCE }) => {
     }
   }, [repeatVideoBtnAnimRef])
 
-  const videoProgressPercentages =
-    videoState.currentProgress.currentTime / videoState.currentProgress.playableDuration
-
-  const getProjectedVideoProgressWidth = () => {
+  const getProgressIndicatorWidth = () => {
     if (videoState.hasFinished) {
       return progressContainerWidth
     }
 
-    const projectedVideoProgressWidth = isNaN(videoProgressPercentages)
+    const videoProgressPercentages =
+      videoState.currentProgress.currentTime / videoState.currentProgress.playableDuration
+
+    const progressIndicatorWidth = isNaN(videoProgressPercentages)
       ? 0
       : Math.floor(progressContainerWidth * videoProgressPercentages)
 
-    return projectedVideoProgressWidth
+    return progressIndicatorWidth
+  }
+
+  const handleReplay = () => {
+    if (videoRef.current) {
+      videoRef.current.seek(0)
+      dispatch({ type: VideoActionKind.REPLAY })
+    }
   }
 
   return (
     <View flex={1} position="relative" justifyContent="flex-end">
       <Video
+        ref={(ref) => {
+          if (ref) videoRef.current = ref
+        }}
         style={{
           position: "absolute",
           top: 0,
@@ -74,7 +85,7 @@ export const VideoPlayer = ({ source = SOURCE }) => {
           justifyContent="center"
           alignItems="center"
         >
-          <Button w="$32" height="$32" borderWidth={10} borderRadius={1000}>
+          <Button onPress={handleReplay} w="$32" height="$32" borderWidth={10} borderRadius={100}>
             <View flex={1}>
               <LottieView
                 ref={(ref) => ref && setRepeatVideoBtnAnimRef(ref)}
@@ -104,7 +115,7 @@ export const VideoPlayer = ({ source = SOURCE }) => {
           bgColor="$green800"
           zIndex={1}
           alignItems="flex-end"
-          width={getProjectedVideoProgressWidth()}
+          width={getProgressIndicatorWidth()}
         />
       </View>
     </View>
