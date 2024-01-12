@@ -41,7 +41,6 @@ const initialVideoState: VideoState = {
 }
 
 const videoStateReducer = (state: VideoState, action: VideoAction<VideoActionKind>): VideoState => {
-  console.log("dispached")
   switch (action.type) {
     case VideoActionKind.PAUSE:
       return {
