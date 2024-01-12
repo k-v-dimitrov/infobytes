@@ -1,17 +1,18 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useReducer, useState } from "react"
 import { View, Button } from "@gluestack-ui/themed"
 import Video from "react-native-video"
 import LottieView from "lottie-react-native"
+
 import RepeatVideoLottie from "../../../../assets/lottie/repeat-video.json"
+import { VideoActionKind, initialVideoState, videoStateReducer } from "./video-state-reducer"
 
 const SOURCE =
   "https://s3.eu-central-1.amazonaws.com/infobytes.app-storage/fact-video/0e3fd411-07e4-4305-8d61-f15b2dc8217d.mp4"
 
 export const VideoPlayer = ({ source = SOURCE }) => {
   const [repeatVideoBtnAnimRef, setRepeatVideoBtnAnimRef] = useState<LottieView>(null)
-  const [hasVideoEnded, setHasVideoEnded] = useState(true)
-  const [isVideoLoading, setIsVideoLoading] = useState(false)
+  const [videoState, dispatch] = useReducer(videoStateReducer, initialVideoState)
 
   useEffect(() => {
     if (repeatVideoBtnAnimRef) {
@@ -29,14 +30,21 @@ export const VideoPlayer = ({ source = SOURCE }) => {
           bottom: 0,
           right: 0,
           zIndex: 1,
-          ...(hasVideoEnded ? { opacity: 0.25 } : {}),
+          ...(videoState.hasFinished ? { opacity: 0.25 } : {}),
         }}
         useTextureView={true}
         source={{
           uri: source,
+          type: "mp4",
         }}
         resizeMode="stretch"
-        repeat
+        paused={!videoState.isPlaying}
+        onLoad={() => dispatch({ type: VideoActionKind.LOADING_FINISHED })}
+        onLoadStart={() => dispatch({ type: VideoActionKind.LOADING_STARTED })}
+        onProgress={(p) => dispatch({ type: VideoActionKind.PROGRESS, payload: p })}
+        onEnd={() => dispatch({ type: VideoActionKind.FINISHED })}
+        onError={(e) => dispatch({ type: VideoActionKind.ERROR, payload: e })}
+        onAudioBecomingNoisy={() => dispatch({ type: VideoActionKind.PAUSE })}
       />
 
       <View

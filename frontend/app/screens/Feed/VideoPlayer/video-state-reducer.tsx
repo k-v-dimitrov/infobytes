@@ -2,6 +2,7 @@ import { OnProgressData, LoadError } from "react-native-video"
 
 enum VideoActionKind {
   PROGRESS,
+  FINISHED,
   PLAY,
   PAUSE,
   LOADING_STARTED,
@@ -10,6 +11,7 @@ enum VideoActionKind {
 }
 type VideoPayloads = {
   [VideoActionKind.PROGRESS]: OnProgressData
+  [VideoActionKind.FINISHED]: void
   [VideoActionKind.PLAY]: void
   [VideoActionKind.PAUSE]: void
   [VideoActionKind.LOADING_STARTED]: void
@@ -19,7 +21,7 @@ type VideoPayloads = {
 interface VideoAction<T extends VideoActionKind> {
   type: T
 
-  payload: VideoPayloads[T]
+  payload?: VideoPayloads[T]
 }
 interface VideoState {
   isPlaying: boolean
@@ -39,6 +41,7 @@ const initialVideoState: VideoState = {
 }
 
 const videoStateReducer = (state: VideoState, action: VideoAction<VideoActionKind>): VideoState => {
+  console.log("dispached")
   switch (action.type) {
     case VideoActionKind.PAUSE:
       return {
@@ -50,6 +53,13 @@ const videoStateReducer = (state: VideoState, action: VideoAction<VideoActionKin
       return {
         ...state,
         isPlaying: true,
+      }
+
+    case VideoActionKind.FINISHED:
+      return {
+        ...state,
+        hasFinished: true,
+        isPlaying: false,
       }
 
     case VideoActionKind.LOADING_STARTED:
@@ -64,11 +74,13 @@ const videoStateReducer = (state: VideoState, action: VideoAction<VideoActionKin
         ...state,
         isLoading: false,
         hasFinishedLoading: true,
+        isPlaying: true,
       }
 
     case VideoActionKind.PROGRESS:
       return {
         ...state,
+        isPlaying: true,
         currentProgress: { ...state.currentProgress, ...action.payload },
       }
 
@@ -83,4 +95,4 @@ const videoStateReducer = (state: VideoState, action: VideoAction<VideoActionKin
   }
 }
 
-export { initialVideoState, videoStateReducer }
+export { initialVideoState, videoStateReducer, VideoActionKind }
