@@ -54,6 +54,7 @@ export const AuthenticationStoreModel = types
       yield remove(AUTH_TOKEN_KEY)
       store.token = authInitialState.token
       store.user = authInitialState.user
+      store.feedUserId = authInitialState.feedUserId
     }),
 
     sync: flow(function* sync() {
