@@ -3,12 +3,12 @@ import React, { useEffect, useState } from "react"
 import { View, Button } from "@gluestack-ui/themed"
 import Video from "react-native-video"
 import LottieView from "lottie-react-native"
-import RepeatVideoLottie from "../../../assets/lottie/repeat-video.json"
+import RepeatVideoLottie from "../../../../assets/lottie/repeat-video.json"
 
 const SOURCE =
   "https://s3.eu-central-1.amazonaws.com/infobytes.app-storage/fact-video/0e3fd411-07e4-4305-8d61-f15b2dc8217d.mp4"
 
-const Test = ({ source = SOURCE }) => {
+export const VideoPlayer = ({ source = SOURCE }) => {
   const [repeatVideoBtnAnimRef, setRepeatVideoBtnAnimRef] = useState<LottieView>(null)
   const [hasVideoEnded, setHasVideoEnded] = useState(true)
   const [isVideoLoading, setIsVideoLoading] = useState(false)
@@ -66,5 +66,3 @@ const Test = ({ source = SOURCE }) => {
     </View>
   )
 }
-
-export default Test

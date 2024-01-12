@@ -2,7 +2,7 @@ import React, { ComponentRef, useRef, useEffect } from "react"
 import { View, Text, Spinner, CheckIcon } from "@gluestack-ui/themed"
 import { Screen } from "app/components"
 import { TikTokList } from "./TiktokList"
-import Test from "./test"
+import { VideoPlayer } from "./VideoPlayer"
 
 export const Feed = () => {
   // const listRef = useRef<ComponentRef<typeof TikTokList>>(null)
@@ -59,7 +59,7 @@ export const Feed = () => {
         }}
         itemContainerProps={{ bgColor: "$blueGray800" }}
       /> */}
-      <Test />
+      <VideoPlayer />
     </Screen>
   )
 }
