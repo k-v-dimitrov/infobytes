@@ -2,33 +2,34 @@ import React, { ComponentRef, useRef, useEffect } from "react"
 import { View, Text, Spinner, CheckIcon } from "@gluestack-ui/themed"
 import { Screen } from "app/components"
 import { TikTokList } from "./TiktokList"
+import Test from "./test"
 
 export const Feed = () => {
-  const listRef = useRef<ComponentRef<typeof TikTokList>>(null)
+  // const listRef = useRef<ComponentRef<typeof TikTokList>>(null)
 
-  // Example of TikTok built-in animations
-  useEffect(() => {
-    const tId = setTimeout(() => {
-      if (listRef) {
-        listRef.current.advanceItem()
-      }
-    }, 2000)
+  // // Example of TikTok built-in animations
+  // useEffect(() => {
+  //   const tId = setTimeout(() => {
+  //     if (listRef) {
+  //       listRef.current.advanceItem()
+  //     }
+  //   }, 2000)
 
-    const t2Id = setTimeout(() => {
-      if (listRef) {
-        listRef.current.playInviteToNextItemAnimation()
-      }
-    }, 3500)
+  //   const t2Id = setTimeout(() => {
+  //     if (listRef) {
+  //       listRef.current.playInviteToNextItemAnimation()
+  //     }
+  //   }, 3500)
 
-    return () => {
-      clearTimeout(tId)
-      clearTimeout(t2Id)
-    }
-  }, [])
+  //   return () => {
+  //     clearTimeout(tId)
+  //     clearTimeout(t2Id)
+  //   }
+  // }, [])
 
   return (
     <Screen p="$0">
-      <TikTokList
+      {/* <TikTokList
         ref={(ref) => {
           listRef.current = ref
         }}
@@ -57,7 +58,8 @@ export const Feed = () => {
           )
         }}
         itemContainerProps={{ bgColor: "$blueGray800" }}
-      />
+      /> */}
+      <Test />
     </Screen>
   )
 }
