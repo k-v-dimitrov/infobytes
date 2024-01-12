@@ -13,12 +13,28 @@ const SOURCE =
 export const VideoPlayer = ({ source = SOURCE }) => {
   const [repeatVideoBtnAnimRef, setRepeatVideoBtnAnimRef] = useState<LottieView>(null)
   const [videoState, dispatch] = useReducer(videoStateReducer, initialVideoState)
+  const [progressContainerWidth, setProgressContainerWidth] = useState(0)
 
   useEffect(() => {
     if (repeatVideoBtnAnimRef) {
       repeatVideoBtnAnimRef.play(30, 99)
     }
   }, [repeatVideoBtnAnimRef])
+
+  const videoProgressPercentages =
+    videoState.currentProgress.currentTime / videoState.currentProgress.playableDuration
+
+  const getProjectedVideoProgressWidth = () => {
+    if (videoState.hasFinished) {
+      return progressContainerWidth
+    }
+
+    const projectedVideoProgressWidth = isNaN(videoProgressPercentages)
+      ? 0
+      : Math.floor(progressContainerWidth * videoProgressPercentages)
+
+    return projectedVideoProgressWidth
+  }
 
   return (
     <View flex={1} position="relative" justifyContent="flex-end">
@@ -47,39 +63,48 @@ export const VideoPlayer = ({ source = SOURCE }) => {
         onAudioBecomingNoisy={() => dispatch({ type: VideoActionKind.PAUSE })}
       />
 
-      <View
-        position="absolute"
-        zIndex={2}
-        top={0}
-        left={0}
-        right={0}
-        bottom={0}
-        justifyContent="center"
-        alignItems="center"
-      >
-        <Button w="$32" height="$32" borderWidth={10} borderRadius={1000}>
-          <View flex={1}>
-            <LottieView
-              ref={(ref) => ref && setRepeatVideoBtnAnimRef(ref)}
-              speed={1.25}
-              resizeMode="contain"
-              source={RepeatVideoLottie}
-              loop={false}
-              autoPlay={false}
-              style={{ flex: 1 }}
-            />
-          </View>
-        </Button>
-      </View>
+      {videoState.hasFinished && (
+        <View
+          position="absolute"
+          zIndex={2}
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Button w="$32" height="$32" borderWidth={10} borderRadius={1000}>
+            <View flex={1}>
+              <LottieView
+                ref={(ref) => ref && setRepeatVideoBtnAnimRef(ref)}
+                speed={1.25}
+                resizeMode="contain"
+                source={RepeatVideoLottie}
+                loop={false}
+                autoPlay={false}
+                style={{ flex: 1 }}
+              />
+            </View>
+          </Button>
+        </View>
+      )}
 
-      <View position="relative" height={4} bgColor="$trueGray500" width="$full" zIndex={1}>
+      <View
+        onLayout={(e) => setProgressContainerWidth(e.nativeEvent.layout.width || 0)}
+        position="relative"
+        height={4}
+        bgColor="$trueGray500"
+        width="$full"
+        zIndex={1}
+      >
         <View
           position="relative"
           height={4}
           bgColor="$green800"
           zIndex={1}
           alignItems="flex-end"
-          width={100}
+          width={getProjectedVideoProgressWidth()}
         />
       </View>
     </View>
