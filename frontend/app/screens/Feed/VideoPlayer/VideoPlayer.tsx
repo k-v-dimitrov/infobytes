@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useReducer, useRef, useState } from "react"
-import { View, Button } from "@gluestack-ui/themed"
+import { View, Button, Spinner, Text } from "@gluestack-ui/themed"
 import Video from "react-native-video"
 import LottieView from "lottie-react-native"
 
@@ -98,6 +98,37 @@ export const VideoPlayer = ({ source = SOURCE }) => {
               />
             </View>
           </Button>
+        </View>
+      )}
+
+      {videoState.isLoading && (
+        <View
+          position="absolute"
+          zIndex={2}
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Spinner zIndex={4} size="large" />
+        </View>
+      )}
+
+      {videoState.error && (
+        <View
+          position="absolute"
+          zIndex={2}
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Text color="$red400">There was an error! Please try again later.</Text>
+          <Text color="$red400">{videoState?.error?.error?.errorString}</Text>
         </View>
       )}
 
