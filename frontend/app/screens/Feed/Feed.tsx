@@ -1,10 +1,15 @@
 import React, { ComponentRef, useRef, useEffect } from "react"
 import { View, Text, Spinner, CheckIcon } from "@gluestack-ui/themed"
+import { observer } from "mobx-react-lite"
 import { Screen } from "app/components"
 import { TikTokList } from "./TiktokList"
 import { VideoPlayer } from "./VideoPlayer"
+import { feedApi } from "app/services/api/feed"
+import { useStores } from "app/models"
+import useFeedManager from "./useFeedManager"
 
-export const Feed = () => {
+export const Feed = observer<any>(() => {
+  useFeedManager()
   // const listRef = useRef<ComponentRef<typeof TikTokList>>(null)
 
   // // Example of TikTok built-in animations
@@ -59,7 +64,7 @@ export const Feed = () => {
         }}
         itemContainerProps={{ bgColor: "$blueGray800" }}
       /> */}
-      <VideoPlayer />
+      {/* <VideoPlayer /> */}
     </Screen>
   )
-}
+})
