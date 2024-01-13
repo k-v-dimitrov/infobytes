@@ -20,9 +20,11 @@ const FACT_ID = "0e3fd411-07e4-4305-8d61-f15b2dc8217d"
 export const VideoPlayer = ({
   factId = FACT_ID,
   play = false,
+  onEnd,
 }: {
   factId: string
   play: boolean
+  onEnd?: () => void
 }) => {
   const [repeatVideoBtnAnimRef, setRepeatVideoBtnAnimRef] = useState<LottieView>(null)
   const videoRef = useRef<Video>(null)
@@ -82,7 +84,10 @@ export const VideoPlayer = ({
         onLoad={() => dispatch({ type: VideoActionKind.LOADING_FINISHED })}
         onLoadStart={() => dispatch({ type: VideoActionKind.LOADING_STARTED })}
         onProgress={(p) => dispatch({ type: VideoActionKind.PROGRESS, payload: p })}
-        onEnd={() => dispatch({ type: VideoActionKind.FINISHED })}
+        onEnd={() => {
+          dispatch({ type: VideoActionKind.FINISHED })
+          if (onEnd) onEnd()
+        }}
         onError={(e) => dispatch({ type: VideoActionKind.ERROR, payload: e })}
         onAudioBecomingNoisy={() => dispatch({ type: VideoActionKind.PAUSE })}
       />
