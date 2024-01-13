@@ -11,7 +11,7 @@ import {
   BottomTabNavigationProp,
   BottomTabNavigationOptions,
 } from "@react-navigation/bottom-tabs"
-import { Toast, ToastDescription, ToastTitle, VStack, useToast, config } from "@gluestack-ui/themed"
+import { Toast, ToastDescription, ToastTitle, VStack, useToast } from "@gluestack-ui/themed"
 import React, { useEffect } from "react"
 import Config from "../config"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
@@ -19,6 +19,7 @@ import { Auth, Feed, Onboarding, ProfileNavigator } from "app/screens"
 import { useStores } from "app/models"
 import { useRealtimeManagerContext } from "app/services/realtime-manager"
 import { Events } from "app/services/realtime-manager/events"
+import { config } from "@gluestack-ui/config"
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
