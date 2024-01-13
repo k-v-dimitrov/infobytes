@@ -6,6 +6,7 @@ import React, {
   useMemo,
   forwardRef,
   useImperativeHandle,
+  useEffect,
 } from "react"
 
 import { PanResponder } from "react-native"
@@ -22,6 +23,8 @@ import Animated, {
 import { View } from "@gluestack-ui/themed"
 
 const NEXT_ELEMENT_SCROLL_THRESHOLD_PERCENTAGE = 10
+
+// TODO: Replace spring animation with timed function with bezier curve
 const SPRING_ANIM_CONFIG: WithSpringConfig = {
   stiffness: 5,
   mass: 0.025,
@@ -30,8 +33,17 @@ const SPRING_ANIM_CONFIG: WithSpringConfig = {
 type TiktokListProps<T> = {
   data: Array<T>
   keyExtractor: (item: T) => Key
-  renderItem: ({ item, isFullyInView }: { item: T; isFullyInView: boolean }) => React.ReactNode
+  renderItem: ({
+    item,
+    index,
+    isFullyInView,
+  }: {
+    item: T
+    index: number
+    isFullyInView: boolean
+  }) => React.ReactNode
   itemContainerProps?: React.ComponentProps<typeof View>
+  onCurrentItemInViewChange?: (itemIndex: number) => void
 }
 
 type TikTokListRef = ForwardedRef<{
@@ -42,7 +54,13 @@ type TikTokListRef = ForwardedRef<{
 }>
 
 export function TikTokListInner<T>(props: TiktokListProps<T>, ref: TikTokListRef) {
-  const { data, keyExtractor, renderItem, itemContainerProps = {} } = props
+  const {
+    data,
+    keyExtractor,
+    renderItem,
+    itemContainerProps = {},
+    onCurrentItemInViewChange,
+  } = props
 
   const [elementHeight, setElementHeight] = useState(0)
   const yOffset = useSharedValue(0)
@@ -172,6 +190,12 @@ export function TikTokListInner<T>(props: TiktokListProps<T>, ref: TikTokListRef
       playAnimation(async () => await scrollToIndexAnim(currentItemIndexInView - 1)),
   }))
 
+  useEffect(() => {
+    if (onCurrentItemInViewChange) {
+      onCurrentItemInViewChange(currentItemIndexInView)
+    }
+  }, [currentItemIndexInView])
+
   return (
     <View flex={1} {...panResponder.panHandlers}>
       {data.map((item, index) => (
@@ -185,7 +209,7 @@ export function TikTokListInner<T>(props: TiktokListProps<T>, ref: TikTokListRef
               height="$full"
               {...itemContainerProps}
             >
-              {renderItem({ item, isFullyInView: currentItemIndexInView === index })}
+              {renderItem({ item, index, isFullyInView: currentItemIndexInView === index })}
             </View>
           </Animated.View>
         </View>
