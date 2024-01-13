@@ -15,16 +15,27 @@ import {
 } from "@gluestack-ui/themed"
 import React, { useState } from "react"
 import { LoginState, initialState, validateLogin } from "../utils/login"
-import { useLogin } from "../hooks/useLogin"
+import { useApi } from "app/hooks"
+import { authApi } from "app/services/api"
+import { useStores } from "app/models"
+import { navigate } from "app/navigators"
 
 interface Props {
   toggleIsLogin: () => void
 }
 
 export const LoginForm = ({ toggleIsLogin }: Props) => {
-  const { login, loading, error } = useLogin()
+  const { authenticationStore } = useStores()
   const [formState, setFormState] = useState<LoginState>(initialState)
   const [formErrors, setFormErrors] = useState<Partial<LoginState>>({})
+  const { loading, error, trigger } = useApi(authApi.login, {
+    executeOnMount: false,
+    props: [formState],
+    onSuccess: async (data) => {
+      await authenticationStore.authenticate(data.token)
+      navigate({ name: "Feed", params: undefined })
+    },
+  })
 
   const handleOnChangeEmail = (value: string) => {
     setFormState((prev) => ({
@@ -43,11 +54,13 @@ export const LoginForm = ({ toggleIsLogin }: Props) => {
   const handleSubmit = async () => {
     const errors = validateLogin(formState)
     const hasErrors = Object.keys(errors).length > 0
+
     if (hasErrors) {
       setFormErrors(errors)
       return
     }
-    login(formState)
+
+    trigger()
   }
 
   return (

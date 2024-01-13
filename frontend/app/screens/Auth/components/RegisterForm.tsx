@@ -16,17 +16,27 @@ import {
   AlertText,
 } from "@gluestack-ui/themed"
 import { RegisterState, initialState, validateRegister } from "../utils/register"
-import { useRegister } from "../hooks/useRegister"
+import { authApi } from "app/services/api"
+import { useApi } from "app/hooks"
+import { useStores } from "app/models"
+import { navigate } from "app/navigators"
 
 interface Props {
   toggleIsLogin: () => void
 }
 
 export const RegisterForm = ({ toggleIsLogin }: Props) => {
-  const { register, loading, error } = useRegister()
-
+  const { authenticationStore } = useStores()
   const [formState, setFormState] = useState<RegisterState>(initialState)
   const [formErrors, setFormErrors] = useState<Partial<RegisterState>>({})
+  const { trigger, loading, error } = useApi(authApi.register, {
+    executeOnMount: false,
+    props: [{ email: formState.email, password: formState.password }],
+    onSuccess: async (data) => {
+      await authenticationStore.authenticate(data.token)
+      navigate({ name: "Onboarding", params: undefined })
+    },
+  })
 
   const handleOnChangeEmail = (value: string) => {
     setFormState((prev) => ({
@@ -60,7 +70,7 @@ export const RegisterForm = ({ toggleIsLogin }: Props) => {
       return
     }
 
-    register({ email: formState.email, password: formState.password })
+    trigger()
   }
 
   return (
