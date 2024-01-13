@@ -1,5 +1,5 @@
 import { Api } from "../api"
-import { SubscribeUserToFeed } from "./feed.types"
+import { FeedFact, SubscribeUserToFeed } from "./feed.types"
 
 class FeedApi extends Api {
   async subscribeUserToFeed() {
@@ -8,6 +8,26 @@ class FeedApi extends Api {
     const { data, ok, status } = await this.apisauce.get<SubscribeUserToFeed>(
       "feed/user",
       {},
+      {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      },
+    )
+
+    return {
+      data,
+      error: ok ? null : status,
+    }
+  }
+
+  async getUserFeed(userFeedId: string) {
+    const authToken = await this.getAuthToken()
+
+    // TODO: handle feed questions
+    const { data, ok, status } = await this.apisauce.get<FeedFact[]>(
+      "/feed",
+      { userFeedId, size: 2 },
       {
         headers: {
           Authorization: `Bearer ${authToken}`,
