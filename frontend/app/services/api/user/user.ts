@@ -1,22 +1,28 @@
 import { Api } from "../api"
-import { SyncResponse } from "./user.types"
+import { GetFactsForReviewResponse, SyncResponse } from "./user.types"
 
 class UserApi extends Api {
   async sync() {
-    const authToken = await this.getAuthToken()
+    const { data, ok } = await this.protectedApisauce.get<SyncResponse>("/user")
 
-    const { data, ok } = await this.apisauce.get<SyncResponse>(
-      "/user",
-      {},
+    return {
+      data,
+      error: ok ? null : data?.message,
+    }
+  }
+
+  async getFactsForReview() {
+    const { data, ok } = await this.protectedApisauce.get<GetFactsForReviewResponse>(
+      "/fact/review",
       {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
+        sortBy: ["createdAt"],
+        page: 1,
+        size: 10,
       },
     )
 
     return {
-      data,
+      data: data.results,
       error: ok ? null : data.message,
     }
   }
