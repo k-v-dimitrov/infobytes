@@ -3,7 +3,7 @@ import { Button, ButtonText } from "@gluestack-ui/themed"
 
 interface ProfileButtonProps {
   text: string
-  onClick: () => void
+  onClick?: () => void
 }
 
 export const ProfileButton = ({ text, onClick }: ProfileButtonProps) => (
