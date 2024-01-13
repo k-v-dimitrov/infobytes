@@ -13,7 +13,7 @@ export const Feed = observer<any>(() => {
     useFeedManager()
   const { authenticationStore } = useStores()
 
-  const currentItemIndexInView = useRef<number>(-1)
+  const currentItemIndexInView = useRef<number>(0)
 
   // const listRef = useRef<ComponentRef<typeof TikTokList>>(null)
   // // Example of TikTok built-in animations
@@ -40,7 +40,6 @@ export const Feed = observer<any>(() => {
     if (shouldPullNextFeedChunk(itemIndex)) {
       pullNextFeedChunk(authenticationStore.feedUserId)
     }
-
     currentItemIndexInView.current = itemIndex
   }
 
@@ -53,12 +52,7 @@ export const Feed = observer<any>(() => {
           // if (!shouldRenderFeedItem(index, currentItemIndexInView.current)) {
           //   return null
           // }
-
-          return (
-            <View flex={1}>
-              <VideoPlayer />
-            </View>
-          )
+          if (isFullyInView) return <VideoPlayer factId={item.id} play={isFullyInView} />
         }}
         itemContainerProps={{ bgColor: "$blueGray800" }}
         onCurrentItemInViewChange={handleCurrentItemInViewChange}

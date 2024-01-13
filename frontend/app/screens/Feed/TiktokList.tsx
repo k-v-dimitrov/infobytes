@@ -70,7 +70,7 @@ export function TikTokListInner<T>(props: TiktokListProps<T>, ref: TikTokListRef
 
   const [currentItemIndexInView, setCurrentItemIndexInView] = useState(0)
 
-  const calcItemIndexInView = () => Math.abs(Math.round(yOffset.value / elementHeight))
+  const calcItemIndexInView = () => Math.abs(Math.floor(yOffset.value / elementHeight))
   const handleScrollAnimationEnd = () => {
     setCurrentItemIndexInView(calcItemIndexInView())
   }

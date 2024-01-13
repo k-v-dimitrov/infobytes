@@ -7,10 +7,23 @@ import LottieView from "lottie-react-native"
 import RepeatVideoLottie from "../../../../assets/lottie/repeat-video.json"
 import { VideoActionKind, initialVideoState, videoStateReducer } from "./video-state-reducer"
 
-const SOURCE =
-  "https://s3.eu-central-1.amazonaws.com/infobytes.app-storage/fact-video/0e3fd411-07e4-4305-8d61-f15b2dc8217d.mp4"
+const SOURCE_BASE = "https://s3.eu-central-1.amazonaws.com/infobytes.app-storage/fact-video/"
+const VIDEO_EXTENSION = ".mp4"
 
-export const VideoPlayer = ({ source = SOURCE }) => {
+const getFullUri = (factId) => {
+  return `${SOURCE_BASE}${factId}${VIDEO_EXTENSION}`
+}
+
+// Fallback fact id
+const FACT_ID = "0e3fd411-07e4-4305-8d61-f15b2dc8217d"
+
+export const VideoPlayer = ({
+  factId = FACT_ID,
+  play = false,
+}: {
+  factId: string
+  play: boolean
+}) => {
   const [repeatVideoBtnAnimRef, setRepeatVideoBtnAnimRef] = useState<LottieView>(null)
   const videoRef = useRef<Video>(null)
   const [videoState, dispatch] = useReducer(videoStateReducer, initialVideoState)
@@ -61,11 +74,11 @@ export const VideoPlayer = ({ source = SOURCE }) => {
         }}
         useTextureView={true}
         source={{
-          uri: source,
+          uri: getFullUri(factId),
           type: "mp4",
         }}
         resizeMode="stretch"
-        paused={!videoState.isPlaying}
+        paused={!play && !videoState.isPlaying}
         onLoad={() => dispatch({ type: VideoActionKind.LOADING_FINISHED })}
         onLoadStart={() => dispatch({ type: VideoActionKind.LOADING_STARTED })}
         onProgress={(p) => dispatch({ type: VideoActionKind.PROGRESS, payload: p })}
@@ -85,7 +98,13 @@ export const VideoPlayer = ({ source = SOURCE }) => {
           justifyContent="center"
           alignItems="center"
         >
-          <Button onPress={handleReplay} w="$32" height="$32" borderWidth={10} borderRadius={100}>
+          <Button
+            onPressOut={handleReplay}
+            w="$32"
+            height="$32"
+            borderWidth={10}
+            borderRadius={100}
+          >
             <View flex={1}>
               <LottieView
                 ref={(ref) => ref && setRepeatVideoBtnAnimRef(ref)}
