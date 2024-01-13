@@ -1,5 +1,5 @@
 import { useStores } from "app/models"
-import { feedApi } from "app/services/api/feed"
+import { FeedFact, feedApi } from "app/services/api/feed"
 import { autorun } from "mobx"
 import { useEffect, useState } from "react"
 
@@ -7,7 +7,7 @@ const ITEMS_TO_PRELOAD = 2
 
 const useFeedManager = () => {
   const { authenticationStore } = useStores()
-  const [feedList, setFeedList] = useState([])
+  const [feedList, setFeedList] = useState<FeedFact[]>([])
 
   useEffect(() => {
     autorun(() => {
