@@ -4,20 +4,18 @@
  * Generally speaking, it will contain an auth flow (registration, login, forgot password)
  * and a "main" flow which the user will use once logged in.
  */
+import { observer } from "mobx-react-lite"
 import { NavigationContainer } from "@react-navigation/native"
 import {
   createBottomTabNavigator,
   BottomTabNavigationProp,
   BottomTabNavigationOptions,
 } from "@react-navigation/bottom-tabs"
-import { observer } from "mobx-react-lite"
+import { Toast, ToastDescription, ToastTitle, VStack, useToast, config } from "@gluestack-ui/themed"
 import React, { useEffect } from "react"
 import Config from "../config"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
-import { Auth, Feed, Onboarding, Profile } from "app/screens"
-
-import { config } from "@gluestack-ui/config"
-import { Toast, ToastDescription, ToastTitle, VStack, useToast } from "@gluestack-ui/themed"
+import { Auth, Feed, Onboarding, ProfileNavigator } from "app/screens"
 import { useStores } from "app/models"
 import { useRealtimeManagerContext } from "app/services/realtime-manager"
 import { Events } from "app/services/realtime-manager/events"
@@ -150,7 +148,7 @@ const AppStack = observer(function AppStack() {
       {isAuthenticated && isOnboarded && (
         <>
           <Tab.Screen name="Feed" component={Feed} />
-          <Tab.Screen name="Profile" component={Profile} />
+          <Tab.Screen name="Profile" component={ProfileNavigator} />
         </>
       )}
 

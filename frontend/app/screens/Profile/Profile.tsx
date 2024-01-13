@@ -16,17 +16,20 @@ import { useStores } from "app/models"
 import { getProgressPercentage } from "./utils/progressPercentage"
 import { ProfileButton } from "./components/ProfileButton"
 
-import type { AppStackParamList } from "app/navigators"
-import { type NativeStackScreenProps } from "@react-navigation/native-stack"
+import type { NativeStackScreenProps } from "@react-navigation/native-stack"
+import type { ProfileStackParamList } from "./ProfileNavigator"
 
-export const Profile = observer<NativeStackScreenProps<AppStackParamList, "Profile">>(
+export const Profile = observer<NativeStackScreenProps<ProfileStackParamList, "Root">>(
   ({ navigation }) => {
     const { authenticationStore } = useStores()
     const { displayName, level, levelPoints, requiredPointsForNextLevel } = authenticationStore.user
 
+
     const progressPercentage = getProgressPercentage(levelPoints, requiredPointsForNextLevel)
 
-    const handleOnClick = () => {}
+    const navigateToMyReviewCollection = () => {
+      navigation.navigate("ReviewCollection")
+    }
 
     return (
       <Screen alignItems="center" gap="$16">
@@ -52,9 +55,9 @@ export const Profile = observer<NativeStackScreenProps<AppStackParamList, "Profi
         </VStack>
 
         <VStack space="xl">
-          <ProfileButton text="My Review Collection" onClick={handleOnClick} />
-          <ProfileButton text="Trivia History" onClick={handleOnClick} />
-          <ProfileButton text="My Rewards" onClick={handleOnClick} />
+          <ProfileButton text="My Review Collection" onClick={navigateToMyReviewCollection} />
+          <ProfileButton text="Trivia History" />
+          <ProfileButton text="My Rewards" />
         </VStack>
       </Screen>
     )
