@@ -24,11 +24,14 @@ export const Profile = observer<NativeStackScreenProps<ProfileStackParamList, "R
     const { authenticationStore } = useStores()
     const { displayName, level, levelPoints, requiredPointsForNextLevel } = authenticationStore.user
 
-
     const progressPercentage = getProgressPercentage(levelPoints, requiredPointsForNextLevel)
 
     const navigateToMyReviewCollection = () => {
       navigation.navigate("ReviewCollection")
+    }
+
+    const logout = () => {
+      authenticationStore.logout()
     }
 
     return (
@@ -58,6 +61,7 @@ export const Profile = observer<NativeStackScreenProps<ProfileStackParamList, "R
           <ProfileButton text="My Review Collection" onClick={navigateToMyReviewCollection} />
           <ProfileButton text="Trivia History" />
           <ProfileButton text="My Rewards" />
+          <ProfileButton text="Logout" onClick={logout} />
         </VStack>
       </Screen>
     )
