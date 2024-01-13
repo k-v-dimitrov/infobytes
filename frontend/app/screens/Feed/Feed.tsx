@@ -1,4 +1,4 @@
-import React, { ComponentRef, useRef, useEffect } from "react"
+import React, { ComponentRef, useRef, useEffect, useState } from "react"
 import { View, Text, Spinner, CheckIcon } from "@gluestack-ui/themed"
 import { observer } from "mobx-react-lite"
 import { Screen } from "app/components"
@@ -9,9 +9,13 @@ import { useStores } from "app/models"
 import useFeedManager from "./useFeedManager"
 
 export const Feed = observer<any>(() => {
-  useFeedManager()
-  // const listRef = useRef<ComponentRef<typeof TikTokList>>(null)
+  const { feedList, pullNextFeedChunk, shouldPullNextFeedChunk, shouldRenderFeedItem } =
+    useFeedManager()
+  const { authenticationStore } = useStores()
 
+  const currentItemIndexInView = useRef<number>(-1)
+
+  // const listRef = useRef<ComponentRef<typeof TikTokList>>(null)
   // // Example of TikTok built-in animations
   // useEffect(() => {
   //   const tId = setTimeout(() => {
@@ -32,38 +36,33 @@ export const Feed = observer<any>(() => {
   //   }
   // }, [])
 
+  const handleCurrentItemInViewChange = (itemIndex: number) => {
+    if (shouldPullNextFeedChunk(itemIndex)) {
+      pullNextFeedChunk(authenticationStore.feedUserId)
+    }
+
+    currentItemIndexInView.current = itemIndex
+  }
+
   return (
     <Screen p="$0">
-      {/* <TikTokList
-        ref={(ref) => {
-          listRef.current = ref
-        }}
-        data={["test", "test 2", "test 3", "test 4", "test 5"]}
-        keyExtractor={(item) => item}
-        renderItem={({ item, isFullyInView }) => {
+      <TikTokList
+        data={feedList}
+        keyExtractor={({ id }) => id}
+        renderItem={({ item, index, isFullyInView }) => {
+          // if (!shouldRenderFeedItem(index, currentItemIndexInView.current)) {
+          //   return null
+          // }
+
           return (
-            // This item can have flex={1} and it will be height 100%
-            <View flex={1} borderColor="$green100" borderWidth={1}>
-              <Text>{item}</Text>
-              <View
-                flex={1}
-                borderColor="$amber400"
-                borderWidth={1}
-                alignContent="center"
-                justifyContent="center"
-                alignItems="center"
-              >
-                {isFullyInView ? (
-                  <CheckIcon size="xl" color="$green400" />
-                ) : (
-                  <Spinner size={"large"} />
-                )}
-              </View>
+            <View flex={1}>
+              <VideoPlayer />
             </View>
           )
         }}
         itemContainerProps={{ bgColor: "$blueGray800" }}
-      /> */}
+        onCurrentItemInViewChange={handleCurrentItemInViewChange}
+      />
       {/* <VideoPlayer /> */}
     </Screen>
   )
