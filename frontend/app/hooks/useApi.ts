@@ -7,7 +7,7 @@ interface Config<T extends Request> {
   props?: Parameters<T>
   executeOnMount?: boolean
   onError?: (error: string) => void
-  onSuccess?: () => void
+  onSuccess?: (arg1: Awaited<ReturnType<T>>["data"]) => void
 }
 
 export function useApi<T extends Request>(request: T, config?: Config<T>) {
@@ -28,14 +28,14 @@ export function useApi<T extends Request>(request: T, config?: Config<T>) {
       }
 
       setData(data)
-      onSuccess && onSuccess()
+      onSuccess && onSuccess(data)
     } catch (error) {
-      setError(error)
-      onError && onError(error)
+      setError(error.message)
+      onError && onError(error.message)
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [props])
 
   useEffect(() => {
     if (executeOnMount) {
