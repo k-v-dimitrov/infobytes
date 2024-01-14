@@ -1,41 +1,69 @@
 import React from "react"
-import { Button, ButtonText, Divider, Text } from "@gluestack-ui/themed"
 import { observer } from "mobx-react-lite"
+import {
+  Avatar,
+  Heading,
+  Icon,
+  Progress,
+  ProgressFilledTrack,
+  Text,
+  VStack,
+  View,
+} from "@gluestack-ui/themed"
 import { Screen } from "app/components"
+import { User } from "app/icons"
 import { useStores } from "app/models"
-import { ScrollView } from "react-native-gesture-handler"
+import { getProgressPercentage } from "./utils/progressPercentage"
+import { ProfileButton } from "./components/ProfileButton"
 
-export const Profile = observer<any>(({ navigation }) => {
-  const { authenticationStore } = useStores()
+import type { NativeStackScreenProps } from "@react-navigation/native-stack"
+import type { ProfileStackParamList } from "./ProfileNavigator"
 
-  const logout = async () => {
-    await authenticationStore.logout()
-    navigation.navigate("Auth")
-  }
+export const Profile = observer<NativeStackScreenProps<ProfileStackParamList, "Root">>(
+  ({ navigation }) => {
+    const { authenticationStore } = useStores()
+    const { displayName, level, levelPoints, requiredPointsForNextLevel } = authenticationStore.user
 
-  return (
-    <Screen p="$4">
-      <ScrollView>
-        <Text selectable>{authenticationStore.token}</Text>
-        <Divider my="$2" />
-        <Text>ID: {authenticationStore?.user?.id}</Text>
-        <Divider my="$2" />
-        <Text>EMAIL: {authenticationStore?.user?.email}</Text>
-        <Divider my="$2" />
-        <Text>DISPLAY_NAME: {authenticationStore?.user?.displayName}</Text>
-        <Divider my="$2" />
-        <Text>CATEGORIES: {authenticationStore?.user?.categories.join(", ")}</Text>
-        <Divider my="$2" />
-        <Text>IS_ONBOARDED: {authenticationStore?.user?.isOnboarded.toString()}</Text>
-        <Divider my="$2" />
-        <Text>level: {authenticationStore?.user?.level.toString()}</Text>
-        <Divider my="$2" />
-        <Text>levelPoints: {authenticationStore?.user?.levelPoints.toString()}</Text>
-        <Divider my="$2" />
-        <Button onPress={logout}>
-          <ButtonText>Logout</ButtonText>
-        </Button>
-      </ScrollView>
-    </Screen>
-  )
-})
+    const progressPercentage = getProgressPercentage(levelPoints, requiredPointsForNextLevel)
+
+    const navigateToMyReviewCollection = () => {
+      navigation.navigate("ReviewCollection")
+    }
+
+    const logout = () => {
+      authenticationStore.logout()
+    }
+
+    return (
+      <Screen alignItems="center" gap="$16">
+        <VStack space="md">
+          <VStack alignItems="center">
+            <Avatar height="$40" width="$40" bgColor="$blue500" borderRadius="$full">
+              <Icon as={User} color="white" width="$24" height="$24" />
+            </Avatar>
+            <Heading size="xl">{displayName}</Heading>
+          </VStack>
+
+          <VStack>
+            <View flexDirection="row" justifyContent="space-between">
+              <Text>Level {level}</Text>
+              <Text>
+                {levelPoints}/{requiredPointsForNextLevel}
+              </Text>
+            </View>
+            <Progress width={250} value={progressPercentage} size="md">
+              <ProgressFilledTrack></ProgressFilledTrack>
+            </Progress>
+          </VStack>
+        </VStack>
+
+        <VStack space="xl">
+          <ProfileButton text="My Review Collection" onClick={navigateToMyReviewCollection} />
+          <ProfileButton text="Trivia History" />
+          <ProfileButton text="My Rewards" />
+          <ProfileButton text="Logout" onClick={logout} />
+        </VStack>
+      </Screen>
+    )
+  },
+)

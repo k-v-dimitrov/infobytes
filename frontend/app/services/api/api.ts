@@ -24,6 +24,7 @@ export const DEFAULT_API_CONFIG: ApiConfig = {
  */
 export class Api {
   apisauce: ApisauceInstance
+  protectedApisauce: ApisauceInstance
   config: ApiConfig
 
   /**
@@ -38,12 +39,22 @@ export class Api {
         Accept: "application/json",
       },
     })
-  }
+    this.protectedApisauce = create({
+      baseURL: this.config.url,
+      timeout: this.config.timeout,
+      headers: {
+        Accept: "application/json",
+      },
+    })
 
-  async getAuthToken() {
-    const authToken = await loadString("USER_AUTH_TOKEN")
+    this.protectedApisauce.addAsyncRequestTransform(async (request) => {
+      const authToken = await loadString("USER_AUTH_TOKEN")
 
-    return authToken
+      request.headers = {
+        ...request.headers,
+        Authorization: `Bearer ${authToken}`,
+      }
+    })
   }
 }
 
