@@ -1,7 +1,7 @@
 {
     "client": "Thunder Client",
     "collectionName": "infobytes",
-    "dateExported": "2024-01-11T17:00:07.616Z",
+    "dateExported": "2024-01-14T11:02:58.678Z",
     "version": "1.1",
     "folders": [],
     "requests": [
@@ -188,12 +188,12 @@
             "method": "GET",
             "sortNum": 60000,
             "created": "2023-11-28T12:29:34.725Z",
-            "modified": "2023-12-24T18:19:39.959Z",
+            "modified": "2024-01-14T11:02:38.764Z",
             "headers": [],
             "params": [],
             "auth": {
                 "type": "bearer",
-                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjlhNTdiMjczLWUwMjYtNDk5OS1hMzllLTIxM2Y5ODM5ZWFkNCIsImNyZWF0ZWRBdCI6IjIwMjMtMTItMjRUMTg6MTc6NTAuODgxWiIsInVwZGF0ZWRBdCI6IjIwMjMtMTItMjRUMTg6MTc6NTAuODgxWiIsImVtYWlsIjoidGVzdEBhYmMuY29tIiwicGFzc3dvcmQiOiIkMmIkMDYkSTMwamhwL2NaaTFERlA0R2JpZjQ5ZUl3YkwxM3U5VGFQR0ZWRFR6Vk5idWxkSW1XdlBLT3kiLCJsZXZlbCI6MSwibGV2ZWxQb2ludHMiOjAsImRpc3BsYXlOYW1lIjoiIiwiaXNPbmJvYXJkZWQiOmZhbHNlLCJpYXQiOjE3MDM0NDE4NzB9.MrChQXOnQLp4yOcxHMOZeRMETrj5xTdCckkGf0lM7ZA"
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjlhNTdiMjczLWUwMjYtNDk5OS1hMzllLTIxM2Y5ODM5ZWFkNCIsImNyZWF0ZWRBdCI6IjIwMjMtMTItMjRUMTg6MTc6NTAuODgxWiIsInVwZGF0ZWRBdCI6IjIwMjMtMTItMjRUMTg6MjI6MDYuNjY1WiIsImVtYWlsIjoidGVzdEBhYmMuY29tIiwicGFzc3dvcmQiOiIkMmIkMDYkSTMwamhwL2NaaTFERlA0R2JpZjQ5ZUl3YkwxM3U5VGFQR0ZWRFR6Vk5idWxkSW1XdlBLT3kiLCJsZXZlbCI6MiwibGV2ZWxQb2ludHMiOjE1LCJkaXNwbGF5TmFtZSI6IiIsImlzT25ib2FyZGVkIjpmYWxzZSwiaWF0IjoxNzA1MjMwMTIxfQ.JmARqB5EafcyTXU6R8UUyMHeKKRBaZvjFb_P48DyiIQ"
             },
             "tests": []
         },
@@ -202,23 +202,19 @@
             "colId": "b933d179-c7ed-456e-9c3a-056d8b4bde40",
             "containerId": "",
             "name": "get-user-feed",
-            "url": "{{api_url}}/feed?userFeedId=dbc62e60-db73-457d-978e-d901980e0b2a",
+            "url": "{{api_url}}/feed?userFeedId=2845b0b1-0e56-4fe1-9033-d5bb2b430cf7",
             "method": "GET",
             "sortNum": 62500,
             "created": "2023-11-28T12:29:34.726Z",
-            "modified": "2023-12-24T18:28:50.968Z",
+            "modified": "2024-01-12T22:59:49.472Z",
             "headers": [],
             "params": [
                 {
                     "name": "userFeedId",
-                    "value": "dbc62e60-db73-457d-978e-d901980e0b2a",
+                    "value": "2845b0b1-0e56-4fe1-9033-d5bb2b430cf7",
                     "isPath": false
                 }
             ],
-            "auth": {
-                "type": "bearer",
-                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjlhNTdiMjczLWUwMjYtNDk5OS1hMzllLTIxM2Y5ODM5ZWFkNCIsImNyZWF0ZWRBdCI6IjIwMjMtMTItMjRUMTg6MTc6NTAuODgxWiIsInVwZGF0ZWRBdCI6IjIwMjMtMTItMjRUMTg6MTc6NTAuODgxWiIsImVtYWlsIjoidGVzdEBhYmMuY29tIiwicGFzc3dvcmQiOiIkMmIkMDYkSTMwamhwL2NaaTFERlA0R2JpZjQ5ZUl3YkwxM3U5VGFQR0ZWRFR6Vk5idWxkSW1XdlBLT3kiLCJsZXZlbCI6MSwibGV2ZWxQb2ludHMiOjAsImRpc3BsYXlOYW1lIjoiIiwiaXNPbmJvYXJkZWQiOmZhbHNlLCJpYXQiOjE3MDM0NDE4NzB9.MrChQXOnQLp4yOcxHMOZeRMETrj5xTdCckkGf0lM7ZA"
-            },
             "tests": []
         },
         {
@@ -285,22 +281,17 @@
             "_id": "83a4f44c-ba80-4732-908f-c119ea9f9f42",
             "colId": "b933d179-c7ed-456e-9c3a-056d8b4bde40",
             "containerId": "",
-            "name": "login user",
+            "name": "get user",
             "url": "{{api_url}}/user",
             "method": "GET",
             "sortNum": 71250,
             "created": "2023-11-28T12:29:34.728Z",
-            "modified": "2024-01-11T16:58:56.850Z",
+            "modified": "2024-01-14T11:02:29.754Z",
             "headers": [],
             "params": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"email\": \"kir4agi@gmail.com\",\n  \"password\": \"123456\"\n}",
-                "form": []
-            },
             "auth": {
                 "type": "bearer",
-                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjI2NTA4ZGNhLWJhZTMtNDljZi05MWM1LWEyMzgyNGM4NWE5YSIsImNyZWF0ZWRBdCI6IjIwMjMtMTEtMjNUMjI6MTE6MDMuOTUwWiIsInVwZGF0ZWRBdCI6IjIwMjQtMDEtMDNUMjA6NDc6MTIuOTk5WiIsImVtYWlsIjoia2lyNGFnaUBnbWFpbC5jb20iLCJwYXNzd29yZCI6IiQyYiQwNiRJSkJZOGpaNFhoQ0tVcUlzZTYzanllL3lYUmpMQ0JlMndFUGJaN1hYWklvY2R6MGtJZ01ENiIsImxldmVsIjoxMCwibGV2ZWxQb2ludHMiOjEzNSwiZGlzcGxheU5hbWUiOiJLaXI0YWdpIiwiaXNPbmJvYXJkZWQiOnRydWUsImlhdCI6MTcwNDk5MjI2MH0.fw_qtu1f1R34GBIDC3T21W-wXyu1b47De6oaSF_rT4Q"
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjlhNTdiMjczLWUwMjYtNDk5OS1hMzllLTIxM2Y5ODM5ZWFkNCIsImNyZWF0ZWRBdCI6IjIwMjMtMTItMjRUMTg6MTc6NTAuODgxWiIsInVwZGF0ZWRBdCI6IjIwMjMtMTItMjRUMTg6MjI6MDYuNjY1WiIsImVtYWlsIjoidGVzdEBhYmMuY29tIiwicGFzc3dvcmQiOiIkMmIkMDYkSTMwamhwL2NaaTFERlA0R2JpZjQ5ZUl3YkwxM3U5VGFQR0ZWRFR6Vk5idWxkSW1XdlBLT3kiLCJsZXZlbCI6MiwibGV2ZWxQb2ludHMiOjE1LCJkaXNwbGF5TmFtZSI6IiIsImlzT25ib2FyZGVkIjpmYWxzZSwiaWF0IjoxNzA1MjMwMTIxfQ.JmARqB5EafcyTXU6R8UUyMHeKKRBaZvjFb_P48DyiIQ"
             },
             "tests": []
         },
@@ -308,17 +299,17 @@
             "_id": "3b3cfedc-ee80-4479-ba67-04db7970c861",
             "colId": "b933d179-c7ed-456e-9c3a-056d8b4bde40",
             "containerId": "",
-            "name": "get user",
+            "name": "login user",
             "url": "{{api_url}}/auth/login",
             "method": "POST",
             "sortNum": 71875,
             "created": "2024-01-11T16:58:36.392Z",
-            "modified": "2024-01-11T16:58:36.392Z",
+            "modified": "2024-01-14T11:02:01.669Z",
             "headers": [],
             "params": [],
             "body": {
                 "type": "json",
-                "raw": "{\n  \"email\": \"kir4agi@gmail.com\",\n  \"password\": \"123456\"\n}",
+                "raw": "{\n  \"email\": \"test@abc.com\",\n  \"password\": \"123456\"\n}",
                 "form": []
             },
             "tests": []
