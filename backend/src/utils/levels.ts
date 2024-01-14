@@ -19,10 +19,12 @@ export const EXP_GROWTH_FACTOR = 1.5;
 
 export function calculateExperienceForNextLevel(currentLevel: number): number {
   if (currentLevel >= 1 && currentLevel <= 3) {
-    return Math.pow(GROWTH_FACTOR, currentLevel - 1) * BASE_EXP;
+    return Math.floor(Math.pow(GROWTH_FACTOR, currentLevel - 1) * BASE_EXP);
   } else if (currentLevel > 3) {
     const experienceAtLevel3 = Math.pow(GROWTH_FACTOR, 2) * BASE_EXP;
-    return experienceAtLevel3 * Math.pow(EXP_GROWTH_FACTOR, currentLevel - 3);
+    return Math.floor(
+      experienceAtLevel3 * Math.pow(EXP_GROWTH_FACTOR, currentLevel - 3),
+    );
   } else {
     throw new Error('Invalid level. Level must be 1 or greater.');
   }
