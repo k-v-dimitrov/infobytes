@@ -41,6 +41,8 @@ const useRealtimeManager = () => {
 
   useEffect(() => {
     socket.on("connect", () => {
+      // TODO: This needs to be emitted not only on socked server connect but on login as well!
+      // Think about other possible failures...
       socket.emit("identity", { jwt: userToken })
     })
 

@@ -19,6 +19,7 @@ const UserModel = types.maybeNull(
 export const authInitialState = {
   user: null,
   token: null,
+  feedUserId: null,
 }
 
 export const AuthenticationStoreModel = types
@@ -26,6 +27,7 @@ export const AuthenticationStoreModel = types
   .props({
     user: UserModel,
     token: types.maybeNull(types.string),
+    feedUserId: types.maybeNull(types.string),
   })
   .views((store) => ({
     get isAuthenticated() {
@@ -33,6 +35,9 @@ export const AuthenticationStoreModel = types
     },
     get isOnboarded() {
       return Boolean(store?.user?.isOnboarded)
+    },
+    getUserfeedId() {
+      return store?.feedUserId
     },
   }))
   .actions((store) => ({
@@ -49,6 +54,7 @@ export const AuthenticationStoreModel = types
       yield remove(AUTH_TOKEN_KEY)
       store.token = authInitialState.token
       store.user = authInitialState.user
+      store.feedUserId = authInitialState.feedUserId
     }),
 
     sync: flow(function* sync() {
@@ -84,6 +90,10 @@ export const AuthenticationStoreModel = types
         store.user = authInitialState.user
       }
     }),
+
+    setFeedUserId: (feedUserId: string) => {
+      store.feedUserId = feedUserId
+    },
   }))
 
 export interface AuthenticationStore extends Instance<typeof AuthenticationStoreModel> {}
