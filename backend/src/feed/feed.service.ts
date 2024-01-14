@@ -38,10 +38,18 @@ export class FeedService {
   ) {}
 
   async subscribeUserToFeed(user: User) {
-    const feedUser = await this.db.feedUser.create({
+    const existingFeedUser = await this.db.feedUser.findUnique({
+      where: { user_id: user.id },
+    });
+
+    if (existingFeedUser) {
+      return { feedUserId: existingFeedUser.id };
+    }
+
+    const newFeedUser = await this.db.feedUser.create({
       data: { user_id: user.id },
     });
-    return { feedUserId: feedUser.id };
+    return { feedUserId: newFeedUser.id };
   }
 
   async getFeedForUser({ userFeedId, size = 5 }: UserFeedDto) {
