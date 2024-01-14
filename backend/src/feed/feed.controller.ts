@@ -27,8 +27,8 @@ export class FeedController {
   @Get('user')
   @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(InjectUser)
-  subscribeUserToFeed(@CurrentUser() user: User) {
-    return this.feedService.subscribeUserToFeed(user);
+  getFeedUser(@CurrentUser() user: User) {
+    return this.feedService.getOrCreateFeedUser(user);
   }
 
   // TODO: POTENTIAL SECURITY PROBLEM, userId should not be taken from QueryParams

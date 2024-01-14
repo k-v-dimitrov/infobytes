@@ -37,15 +37,25 @@ export class FeedService {
     private eventEmitter: EventEmitter2,
   ) {}
 
-  async subscribeUserToFeed(user: User) {
-    const existingFeedUser = await this.db.feedUser.findUnique({
+  async getOrCreateFeedUser(user: User) {
+    const existingFeedUser = this.tryGetExistingFeedUser(user);
+
+    if (existingFeedUser) {
+      return existingFeedUser;
+    }
+
+    return this.subscribeUserToFeed(user);
+  }
+
+  private async tryGetExistingFeedUser(user: User) {
+    const feedUser = await this.db.feedUser.findUnique({
       where: { user_id: user.id },
     });
 
-    if (existingFeedUser) {
-      return { feedUserId: existingFeedUser.id };
-    }
+    return { feedUserId: feedUser.id };
+  }
 
+  private async subscribeUserToFeed(user: User) {
     const newFeedUser = await this.db.feedUser.create({
       data: { user_id: user.id },
     });
