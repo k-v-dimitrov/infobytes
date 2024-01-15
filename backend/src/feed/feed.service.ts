@@ -38,13 +38,13 @@ export class FeedService {
   ) {}
 
   async getOrCreateFeedUser(user: User) {
-    const existingFeedUser = this.tryGetExistingFeedUser(user);
+    const existingFeedUser = await this.tryGetExistingFeedUser(user);
 
     if (existingFeedUser) {
       return existingFeedUser;
     }
 
-    return this.subscribeUserToFeed(user);
+    return await this.subscribeUserToFeed(user);
   }
 
   private async tryGetExistingFeedUser(user: User) {
