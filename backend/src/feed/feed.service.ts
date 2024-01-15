@@ -52,7 +52,7 @@ export class FeedService {
       where: { user_id: user.id },
     });
 
-    return { feedUserId: feedUser.id };
+    return { feedUserId: feedUser?.id };
   }
 
   private async subscribeUserToFeed(user: User) {
