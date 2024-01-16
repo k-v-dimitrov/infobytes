@@ -1,5 +1,4 @@
-import React, { useRef, useEffect, useState, ComponentRef } from "react"
-import { Text } from "react-native"
+import { useRef, useEffect, useState } from "react"
 import { autorun } from "mobx"
 import { useStores } from "app/models"
 import {
@@ -11,11 +10,7 @@ import {
   FeedQuestion,
 } from "app/services/api/feed"
 
-import { VideoPlayer } from "./VideoPlayer"
-import { TikTokList } from "./TiktokList"
-
 const ITEMS_TO_LOAD = 2
-type TikTokListRef = ReturnType<typeof useRef<ComponentRef<typeof TikTokList>>>
 
 const useItemIdTracker = () => {
   // Helper map to track occurances during rendering to assign to item keys
@@ -39,7 +34,7 @@ const useItemIdTracker = () => {
   return { getCurrentOcurrancesForItem }
 }
 
-const useFeedManager = ({ listRef }: { listRef: TikTokListRef }) => {
+const useFeedManager = () => {
   const { authenticationStore } = useStores()
   const [feedList, setFeedList] = useState<FeedItem[]>([])
   const currentItemIndexInView = useRef<number>(0)
@@ -85,17 +80,6 @@ const useFeedManager = ({ listRef }: { listRef: TikTokListRef }) => {
     return false
   }
 
-  // const shouldRenderFeedItem = (
-  //   currentlyRenderedItemIndex: number,
-  //   currentlyViewedItemIndex: number,
-  // ) => {
-  //   if (Math.abs(currentlyViewedItemIndex - currentlyRenderedItemIndex) < ITEMS_TO_PRELOAD) {
-  //     return true
-  //   }
-
-  //   return false
-  // }
-
   const handleCurrentItemInViewChange = (itemIndex: number) => {
     if (shouldPullNextFeedChunk(itemIndex)) {
       pullNextFeedChunk(authenticationStore.feedUserId)
@@ -113,42 +97,7 @@ const useFeedManager = ({ listRef }: { listRef: TikTokListRef }) => {
       },
     })
 
-  const renderFeedItem = ({
-    item,
-    isFullyInView,
-  }: {
-    item: FeedItem
-    index: number
-    isFullyInView: boolean
-  }) => {
-    // TODO: check calculation of currentItemIndexInView
-    // if (!shouldRenderFeedItem(index, currentItemIndexInView.current)) {
-    //   return null
-    // }
-
-    return processFeedItem(item, {
-      [FeedTypes.FEED_FACT]: (fact: FeedFact) => {
-        return (
-          isFullyInView && (
-            <VideoPlayer
-              onEnd={() => {
-                if (listRef.current) {
-                  listRef.current.playInviteToNextItemAnimation()
-                }
-              }}
-              factId={fact.id}
-              play
-            />
-          )
-        )
-      },
-      [FeedTypes.FEED_QUESTION]: (_question: FeedQuestion) => {
-        return <Text>QUestion</Text>
-      },
-    })
-  }
-
-  return { feedList, renderFeedItem, extractKeyFromFeedItem, handleCurrentItemInViewChange }
+  return { feedList, extractKeyFromFeedItem, handleCurrentItemInViewChange }
 }
 
 export default useFeedManager
