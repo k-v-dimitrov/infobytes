@@ -1,14 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { ComponentRef, useRef } from "react"
-import { Screen } from "app/components"
 
+import { Screen } from "app/components"
 import { FeedFact, FeedQuestion, FeedItem, processFeedItem, FeedTypes } from "app/services/api/feed"
 
 import { RenderFeedFact } from "./components/RenderFeedFact"
 import { RenderFeedQuestion } from "./components/RenderFeedQuestion"
 
-import { TikTokList, TikTokListRef } from "./TiktokList"
 import useFeedManager from "./useFeedManager"
+import { TikTokList, TikTokListRef } from "./TiktokList"
 
 const renderFeedItem = ({
   item,

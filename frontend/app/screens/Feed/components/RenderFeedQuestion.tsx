@@ -4,9 +4,10 @@ import { View, VStack, Heading } from "@gluestack-ui/themed"
 import LottieView from "lottie-react-native"
 
 import { FeedQuestion } from "app/services/api/feed"
-import QuizAppearAnim from "../../../../assets/lottie/quiz-appear.json"
 
 import { QuizButton } from "./QuizButton"
+
+import QuizAppearAnim from "../../../../assets/lottie/quiz-appear.json"
 
 export const RenderFeedQuestion = ({
   question,

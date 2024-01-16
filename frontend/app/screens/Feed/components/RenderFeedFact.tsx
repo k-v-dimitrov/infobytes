@@ -1,10 +1,10 @@
 import React from "react"
 
 import { FeedFact } from "app/services/api/feed"
-import { TikTokListRef } from "../TiktokList"
 
 import { VideoPlayer } from "./VideoPlayer"
 
+import { TikTokListRef } from "../TiktokList"
 export const RenderFeedFact = ({
   fact,
   isFullyInView,
