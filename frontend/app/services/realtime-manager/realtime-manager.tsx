@@ -8,7 +8,9 @@ import { Events } from "./events"
 const MAX_ALLOWED_LISTENERS = 10
 
 const useRealtimeManager = () => {
-  const { current: socket } = useRef(io(Config.SOCKET_URL, { reconnectionDelay: 10000 }))
+  const { current: socket } = useRef(
+    io(Config.SOCKET_URL, { reconnectionDelay: 10000, autoConnect: false }),
+  )
 
   const {
     authenticationStore: { token: userToken },
@@ -51,19 +53,31 @@ const useRealtimeManager = () => {
     }
   }, [socket])
 
-  return { addRealtimeListener, removeRealtimeListener }
+  const disconnect = () => {
+    socket.disconnect()
+  }
+
+  const reconnect = () => {
+    socket.connect()
+  }
+
+  return {
+    addRealtimeListener,
+    removeRealtimeListener,
+    disconnect,
+    reconnect,
+    isConnected: socket.connected,
+  }
 }
 
 type ContextType = ReturnType<typeof useRealtimeManager>
 const RealtimeContext = createContext<ContextType>(null)
 
 const RealtimeProvider = ({ children }: { children: React.ReactNode }) => {
-  const { addRealtimeListener, removeRealtimeListener } = useRealtimeManager()
+  const realtimeManagerInstance = useRealtimeManager()
 
   return (
-    <RealtimeContext.Provider value={{ addRealtimeListener, removeRealtimeListener }}>
-      {children}
-    </RealtimeContext.Provider>
+    <RealtimeContext.Provider value={realtimeManagerInstance}>{children}</RealtimeContext.Provider>
   )
 }
 
