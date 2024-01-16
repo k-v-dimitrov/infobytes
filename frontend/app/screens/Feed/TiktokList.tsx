@@ -7,6 +7,7 @@ import React, {
   forwardRef,
   useImperativeHandle,
   useEffect,
+  ComponentRef,
 } from "react"
 
 import { PanResponder } from "react-native"
@@ -46,14 +47,16 @@ type TiktokListProps<T> = {
   onCurrentItemInViewChange?: (itemIndex: number) => void
 }
 
-type TikTokListRef = ForwardedRef<{
+type TikTokListForwardRef = ForwardedRef<{
   playInviteToNextItemAnimation: () => void
   scrollToIndex: (index: number) => void
   advanceItem: () => void
   retreatItem: () => void
 }>
 
-export function TikTokListInner<T>(props: TiktokListProps<T>, ref: TikTokListRef) {
+export type TikTokListRef = ReturnType<typeof useRef<ComponentRef<typeof TikTokList>>>
+
+export function TikTokListInner<T>(props: TiktokListProps<T>, ref: TikTokListForwardRef) {
   const {
     data,
     keyExtractor,
@@ -219,5 +222,5 @@ export function TikTokListInner<T>(props: TiktokListProps<T>, ref: TikTokListRef
 }
 
 export const TikTokList = forwardRef(TikTokListInner) as <T>(
-  props: TiktokListProps<T> & { ref?: TikTokListRef },
+  props: TiktokListProps<T> & { ref?: TikTokListForwardRef },
 ) => ReturnType<typeof TikTokListInner>

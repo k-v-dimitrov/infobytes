@@ -65,10 +65,22 @@ const AppStack = observer(function AppStack() {
   const { isAuthenticated, isOnboarded } = authenticationStore
   const toast = useToast()
 
-  const { addRealtimeListener, removeRealtimeListener } = useRealtimeManagerContext()
+  const { addRealtimeListener, removeRealtimeListener, disconnect, reconnect, isConnected } =
+    useRealtimeManagerContext()
+
+  useEffect(() => {
+    if (!isAuthenticated && isConnected) {
+      disconnect()
+    }
+
+    if (isAuthenticated && !isConnected) {
+      reconnect()
+    }
+  }, [isAuthenticated])
 
   useEffect(() => {
     const handleConnect = () => {
+      console.log("User Connected!")
       toast.show({
         placement: "top",
         render: ({ id }) => {
@@ -86,6 +98,7 @@ const AppStack = observer(function AppStack() {
     }
 
     const handleUserChangeInXp = () => {
+      console.log("User change in XP")
       toast.show({
         placement: "top",
         render: ({ id }) => {
@@ -103,6 +116,7 @@ const AppStack = observer(function AppStack() {
     }
 
     const handleUserLevelUp = () => {
+      console.log("User leveled up!")
       toast.show({
         placement: "top",
         render: ({ id }) => {
@@ -118,11 +132,30 @@ const AppStack = observer(function AppStack() {
       })
     }
 
+    const handleUserDisconnect = () => {
+      console.log("User disconnected!")
+      toast.show({
+        placement: "top",
+        render: ({ id }) => {
+          const toastId = "toast" + id
+          return (
+            <Toast nativeID={toastId} action="attention" variant="solid">
+              <VStack space="xs">
+                <ToastTitle>Disconnect!</ToastTitle>
+              </VStack>
+            </Toast>
+          )
+        },
+      })
+    }
+
+    addRealtimeListener(Events.disconnect, handleUserDisconnect)
     addRealtimeListener(Events.connect, handleConnect)
     addRealtimeListener(Events.userChangeInXP, handleUserChangeInXp)
     addRealtimeListener(Events.userLevelUp, handleUserLevelUp)
 
     return () => {
+      removeRealtimeListener(Events.disconnect, handleUserDisconnect)
       removeRealtimeListener(Events.connect, handleConnect)
       removeRealtimeListener(Events.userChangeInXP, handleUserChangeInXp)
       removeRealtimeListener(Events.userLevelUp, handleUserLevelUp)

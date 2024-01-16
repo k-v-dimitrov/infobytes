@@ -1,24 +1,38 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, { ComponentRef, useRef } from "react"
-import { observer } from "mobx-react-lite"
+
 import { Screen } from "app/components"
-import { TikTokList } from "./TiktokList"
-import { VideoPlayer } from "./VideoPlayer"
-import { useStores } from "app/models"
+import { FeedFact, FeedQuestion, FeedItem, processFeedItem, FeedTypes } from "app/services/api/feed"
+
+import { RenderFeedFact } from "./components/RenderFeedFact"
+import { RenderFeedQuestion } from "./components/RenderFeedQuestion"
+
 import useFeedManager from "./useFeedManager"
+import { TikTokList, TikTokListRef } from "./TiktokList"
 
-export const Feed = observer<any>(() => {
-  const { feedList, pullNextFeedChunk, shouldPullNextFeedChunk } = useFeedManager()
-  const { authenticationStore } = useStores()
+const renderFeedItem = ({
+  item,
+  isFullyInView,
+  listRef,
+}: {
+  item: FeedItem
+  index: number
+  isFullyInView: boolean
+  listRef: TikTokListRef
+}) => {
+  return processFeedItem(item, {
+    [FeedTypes.FEED_FACT]: (fact: FeedFact) => (
+      <RenderFeedFact fact={fact} isFullyInView={isFullyInView} listRef={listRef} />
+    ),
+    [FeedTypes.FEED_QUESTION]: (question: FeedQuestion) => (
+      <RenderFeedQuestion question={question} isFullyInView={isFullyInView} />
+    ),
+  })
+}
 
-  const currentItemIndexInView = useRef<number>(0)
+export const Feed = () => {
   const listRef = useRef<ComponentRef<typeof TikTokList>>(null)
-
-  const handleCurrentItemInViewChange = (itemIndex: number) => {
-    if (shouldPullNextFeedChunk(itemIndex)) {
-      pullNextFeedChunk(authenticationStore.feedUserId)
-    }
-    currentItemIndexInView.current = itemIndex
-  }
+  const { feedList, extractKeyFromFeedItem, handleCurrentItemInViewChange } = useFeedManager()
 
   return (
     <Screen p="$0">
@@ -27,28 +41,11 @@ export const Feed = observer<any>(() => {
           if (ref) listRef.current = ref
         }}
         data={feedList}
-        keyExtractor={({ id }) => id}
-        renderItem={({ item, index, isFullyInView }) => {
-          // TODO: check calculation of currentItemIndexInView
-          // if (!shouldRenderFeedItem(index, currentItemIndexInView.current)) {
-          //   return null
-          // }
-          if (isFullyInView)
-            return (
-              <VideoPlayer
-                onEnd={() => {
-                  if (listRef.current) {
-                    listRef.current.playInviteToNextItemAnimation()
-                  }
-                }}
-                factId={item.id}
-                play={isFullyInView}
-              />
-            )
-        }}
+        keyExtractor={extractKeyFromFeedItem}
+        renderItem={(props) => renderFeedItem({ ...props, listRef })}
         itemContainerProps={{ bgColor: "$blueGray800" }}
         onCurrentItemInViewChange={handleCurrentItemInViewChange}
       />
     </Screen>
   )
-})
+}

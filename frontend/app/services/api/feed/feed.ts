@@ -1,5 +1,10 @@
 import { Api } from "../api"
-import { FeedFact, SubscribeUserToFeed } from "./feed.types"
+import {
+  CorrectAsnwerResponse,
+  FeedItem,
+  SubscribeUserToFeed,
+  WrongAnswerResponse,
+} from "./feed.types"
 
 class FeedApi extends Api {
   async subscribeUserToFeed() {
@@ -11,16 +16,28 @@ class FeedApi extends Api {
     }
   }
 
-  async getUserFeed(userFeedId: string) {
-    // TODO: handle feed questions
-    const { data, ok, status } = await this.protectedApisauce.get<FeedFact[]>("/feed", {
+  async getUserFeed(userFeedId: string, size: number) {
+    const { data, ok, status } = await this.protectedApisauce.get<FeedItem[]>("/feed", {
       userFeedId,
-      size: 2,
+      size,
     })
 
     return {
       data,
       error: ok ? null : status,
+    }
+  }
+
+  async answerFeedQuestion({ questionUri, answerId }: { questionUri: string; answerId: string }) {
+    const { data, ok } = await this.protectedApisauce.post<
+      CorrectAsnwerResponse | WrongAnswerResponse
+    >(questionUri, {
+      answerId,
+    })
+
+    return {
+      data,
+      error: ok ? null : (data as unknown as { message: string }).message,
     }
   }
 }
