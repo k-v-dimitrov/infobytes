@@ -2,13 +2,19 @@ import React, { useRef, useEffect, useState, ComponentRef } from "react"
 import { Text } from "react-native"
 import { autorun } from "mobx"
 import { useStores } from "app/models"
-import { feedApi, isFeedFact, isFeedQuestion, FeedItem } from "app/services/api/feed"
+import {
+  feedApi,
+  FeedItem,
+  processFeedItem,
+  FeedTypes,
+  FeedFact,
+  FeedQuestion,
+} from "app/services/api/feed"
 
 import { VideoPlayer } from "./VideoPlayer"
 import { TikTokList } from "./TiktokList"
 
-const ITEMS_TO_PRELOAD = 2
-
+const ITEMS_TO_LOAD = 2
 type TikTokListRef = ReturnType<typeof useRef<ComponentRef<typeof TikTokList>>>
 
 const useFeedManager = ({ listRef }: { listRef: TikTokListRef }) => {
@@ -43,18 +49,8 @@ const useFeedManager = ({ listRef }: { listRef: TikTokListRef }) => {
     })
   }, [feedList])
 
-  // TODO: when needed implement this function
-  // This will not work because it will shift the indecies of the items and will cause TikTok list to break
-
-  // const freeFeedItemsFromMemory = (threshold = 50, itemsToRemove = 10) => {
-  //   if (feedList.length >= threshold) {
-  //     setFeedList((prev) => prev.slice(undefined, itemsToRemove))
-  //   }
-  // }
-
   const pullNextFeedChunk = async (feedUserId: string) => {
-    // freeFeedItemsFromMemory()
-    const { data } = await feedApi.getUserFeed(feedUserId)
+    const { data } = await feedApi.getUserFeed(feedUserId, ITEMS_TO_LOAD)
     setFeedList((prev) => [...prev, ...data])
   }
 
@@ -66,16 +62,16 @@ const useFeedManager = ({ listRef }: { listRef: TikTokListRef }) => {
     return false
   }
 
-  const shouldRenderFeedItem = (
-    currentlyRenderedItemIndex: number,
-    currentlyViewedItemIndex: number,
-  ) => {
-    if (Math.abs(currentlyViewedItemIndex - currentlyRenderedItemIndex) < ITEMS_TO_PRELOAD) {
-      return true
-    }
+  // const shouldRenderFeedItem = (
+  //   currentlyRenderedItemIndex: number,
+  //   currentlyViewedItemIndex: number,
+  // ) => {
+  //   if (Math.abs(currentlyViewedItemIndex - currentlyRenderedItemIndex) < ITEMS_TO_PRELOAD) {
+  //     return true
+  //   }
 
-    return false
-  }
+  //   return false
+  // }
 
   const handleCurrentItemInViewChange = (itemIndex: number) => {
     if (shouldPullNextFeedChunk(itemIndex)) {
@@ -84,25 +80,19 @@ const useFeedManager = ({ listRef }: { listRef: TikTokListRef }) => {
     currentItemIndexInView.current = itemIndex
   }
 
-  const extractKeyFromFeedItem = (feedItem: FeedItem) => {
-    if (isFeedFact(feedItem)) {
-      const feedFact = feedItem
-      return feedFact.id
-    }
-
-    if (isFeedQuestion(feedItem)) {
-      const feedQuestion = feedItem
-      return feedQuestion.data.id
-    }
-
-    console.warn("Unknown feed item was encountered:", feedItem)
-
-    return null
-  }
+  const extractKeyFromFeedItem = (feedItem: FeedItem) =>
+    processFeedItem(feedItem, {
+      [FeedTypes.FEED_FACT]: (item: FeedFact) => {
+        return item.id
+      },
+      [FeedTypes.FEED_QUESTION]: (item: FeedQuestion) => {
+        return item.data.id
+      },
+    })
 
   const renderFeedItem = ({
     item,
-    _index,
+    index: _index,
     isFullyInView,
   }: {
     item: FeedItem
@@ -114,31 +104,26 @@ const useFeedManager = ({ listRef }: { listRef: TikTokListRef }) => {
     //   return null
     // }
 
-    if (isFullyInView) {
-      if (isFeedFact(item)) {
-        const feedFact = item
-
+    return processFeedItem(item, {
+      [FeedTypes.FEED_FACT]: (fact: FeedFact) => {
         return (
-          <VideoPlayer
-            onEnd={() => {
-              if (listRef.current) {
-                listRef.current.playInviteToNextItemAnimation()
-              }
-            }}
-            factId={feedFact.id}
-            play
-          />
+          isFullyInView && (
+            <VideoPlayer
+              onEnd={() => {
+                if (listRef.current) {
+                  listRef.current.playInviteToNextItemAnimation()
+                }
+              }}
+              factId={fact.id}
+              play
+            />
+          )
         )
-      }
-
-      if (isFeedQuestion(item)) {
-        return <Text>Feed Qustion!</Text>
-      }
-
-      console.warn("Uknown feed item was encountered:", item)
-    }
-
-    return null
+      },
+      [FeedTypes.FEED_QUESTION]: (_question: FeedQuestion) => {
+        return <Text>QUestion</Text>
+      },
+    })
   }
 
   return { feedList, renderFeedItem, extractKeyFromFeedItem, handleCurrentItemInViewChange }

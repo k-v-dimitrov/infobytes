@@ -42,3 +42,21 @@ export interface Answer {
 export function isFeedQuestion(obj: FeedItem): obj is FeedQuestion {
   return obj.type === FeedTypes.FEED_QUESTION
 }
+
+export function processFeedItem<T>(
+  obj: FeedItem,
+  handlers: { [key in FeedTypes]: (feedItem: FeedItem) => T },
+): T {
+  const currentObjType = obj.type
+
+  if (!Object.values(FeedTypes).includes(currentObjType)) {
+    console.warn(`Encountered unknown Feed Item Type: ${currentObjType}`)
+    return null
+  }
+
+  if (!Object.keys(handlers).includes(currentObjType)) {
+    console.log(`No handler provided for Feed Item of Type: ${currentObjType}`)
+  }
+
+  return handlers?.[currentObjType](obj as FeedFact | FeedQuestion)
+}

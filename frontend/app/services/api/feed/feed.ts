@@ -11,11 +11,11 @@ class FeedApi extends Api {
     }
   }
 
-  async getUserFeed(userFeedId: string) {
+  async getUserFeed(userFeedId: string, size: number) {
     // TODO: handle feed questions
     const { data, ok, status } = await this.protectedApisauce.get<FeedItem[]>("/feed", {
       userFeedId,
-      size: 2,
+      size,
     })
 
     return {
