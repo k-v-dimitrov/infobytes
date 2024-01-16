@@ -4,27 +4,21 @@ import {
   Avatar,
   Heading,
   Icon,
-  Progress,
-  ProgressFilledTrack,
-  Text,
-  VStack,
-  View,
+  VStack
 } from "@gluestack-ui/themed"
 import { Screen } from "app/components"
 import { User } from "app/icons"
 import { useStores } from "app/models"
-import { getProgressPercentage } from "./utils/progressPercentage"
 import { ProfileButton } from "./components/ProfileButton"
 
 import type { NativeStackScreenProps } from "@react-navigation/native-stack"
+import { LevelProgressBar } from "app/components/LevelProgressBar"
 import type { ProfileStackParamList } from "./ProfileNavigator"
 
 export const Profile = observer<NativeStackScreenProps<ProfileStackParamList, "Root">>(
   ({ navigation }) => {
     const { authenticationStore } = useStores()
-    const { displayName, level, levelPoints, requiredPointsForNextLevel } = authenticationStore.user
-
-    const progressPercentage = getProgressPercentage(levelPoints, requiredPointsForNextLevel)
+    const { displayName } = authenticationStore.user
 
     const navigateToMyReviewCollection = () => {
       navigation.navigate("ReviewCollection")
@@ -44,17 +38,7 @@ export const Profile = observer<NativeStackScreenProps<ProfileStackParamList, "R
             <Heading size="xl">{displayName}</Heading>
           </VStack>
 
-          <VStack>
-            <View flexDirection="row" justifyContent="space-between">
-              <Text>Level {level}</Text>
-              <Text>
-                {levelPoints}/{requiredPointsForNextLevel}
-              </Text>
-            </View>
-            <Progress width={250} value={progressPercentage} size="md">
-              <ProgressFilledTrack></ProgressFilledTrack>
-            </Progress>
-          </VStack>
+          <LevelProgressBar />
         </VStack>
 
         <VStack space="xl">

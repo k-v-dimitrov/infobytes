@@ -4,22 +4,23 @@
  * Generally speaking, it will contain an auth flow (registration, login, forgot password)
  * and a "main" flow which the user will use once logged in.
  */
-import { observer } from "mobx-react-lite"
+import React, { useEffect } from "react"
 import { NavigationContainer } from "@react-navigation/native"
+import { observer } from "mobx-react-lite"
+import { config } from "@gluestack-ui/config"
 import {
   createBottomTabNavigator,
   BottomTabNavigationProp,
   BottomTabNavigationOptions,
 } from "@react-navigation/bottom-tabs"
 import { Toast, ToastDescription, ToastTitle, VStack, useToast } from "@gluestack-ui/themed"
-import React, { useEffect } from "react"
-import Config from "../config"
-import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
-import { Auth, Feed, Onboarding, ProfileNavigator } from "app/screens"
-import { useStores } from "app/models"
 import { useRealtimeManagerContext } from "app/services/realtime-manager"
 import { Events } from "app/services/realtime-manager/events"
-import { config } from "@gluestack-ui/config"
+import { Auth, Feed, Onboarding, ProfileNavigator } from "app/screens"
+import { useStores } from "app/models"
+import { FeedIcon } from "app/icons"
+import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
+import Config from "../config"
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -167,10 +168,8 @@ const AppStack = observer(function AppStack() {
       initialRouteName={isAuthenticated ? "Feed" : "Auth"}
       screenOptions={{
         headerShown: false,
+        tabBarShowLabel: false,
         tabBarItemStyle: { backgroundColor: config.tokens.colors.backgroundDark700 },
-        tabBarLabelStyle: {
-          fontSize: config.tokens.fontSizes.sm,
-        },
       }}
     >
       {isAuthenticated && !isOnboarded && (
@@ -181,8 +180,20 @@ const AppStack = observer(function AppStack() {
 
       {isAuthenticated && isOnboarded && (
         <>
-          <Tab.Screen name="Feed" component={Feed} />
-          <Tab.Screen name="Profile" component={ProfileNavigator} />
+          <Tab.Screen
+            name="Feed"
+            component={Feed}
+            options={{
+              tabBarIcon: ({ focused }) => (
+                <FeedIcon color={focused ? "$blue500" : "$white"} height="$12" width="$12" />
+              ),
+            }}
+          />
+          <Tab.Screen
+            name="Profile"
+            component={ProfileNavigator}
+            options={{ tabBarButton: () => null }}
+          />
         </>
       )}
 
