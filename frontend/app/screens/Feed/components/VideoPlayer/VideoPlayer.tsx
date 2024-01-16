@@ -1,12 +1,28 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useReducer, useRef, useState } from "react"
-import { View, Button, Spinner, Text } from "@gluestack-ui/themed"
+import {
+  View,
+  Button,
+  Spinner,
+  Text,
+  ButtonIcon,
+  HStack,
+  Progress,
+  ProgressFilledTrack,
+  Avatar,
+  VStack,
+  Pressable,
+} from "@gluestack-ui/themed"
 import Video from "react-native-video"
 import LottieView from "lottie-react-native"
 
 import { VideoActionKind, initialVideoState, videoStateReducer } from "./video-state-reducer"
+import { User } from "app/icons"
+import { Icon } from "@gluestack-ui/themed"
+import { LevelProgressBar } from "app/components/LevelProgressBar"
 
 import RepeatVideoLottie from "../../../../../assets/lottie/repeat-video.json"
+import { navigate } from "app/navigators"
 
 const SOURCE_BASE = "https://s3.eu-central-1.amazonaws.com/infobytes.app-storage/fact-video/"
 const VIDEO_EXTENSION = ".mp4"
@@ -58,6 +74,10 @@ export const VideoPlayer = ({
       videoRef.current.seek(0)
       dispatch({ type: VideoActionKind.REPLAY })
     }
+  }
+
+  const navigateToProfile = () => {
+    navigate({ name: "Profile", params: undefined })
   }
 
   return (
@@ -156,6 +176,25 @@ export const VideoPlayer = ({
           <Text color="$red400">{videoState?.error?.error?.errorString}</Text>
         </View>
       )}
+
+      <HStack
+        zIndex={2}
+        position="absolute"
+        top={25}
+        left={0}
+        right={0}
+        alignItems="center"
+        justifyContent="center"
+        space="lg"
+      >
+        <LevelProgressBar />
+
+        <Pressable onPressOut={navigateToProfile}>
+          <Avatar bgColor="$blue500" borderRadius="$full" size="md">
+            <Icon as={User} color="white" size="xl" />
+          </Avatar>
+        </Pressable>
+      </HStack>
 
       <View
         onLayout={(e) => setProgressContainerWidth(e.nativeEvent.layout.width || 0)}
