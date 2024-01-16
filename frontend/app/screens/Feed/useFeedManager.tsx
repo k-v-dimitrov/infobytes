@@ -17,10 +17,33 @@ import { TikTokList } from "./TiktokList"
 const ITEMS_TO_LOAD = 2
 type TikTokListRef = ReturnType<typeof useRef<ComponentRef<typeof TikTokList>>>
 
+const useItemIdTracker = () => {
+  // Helper map to track occurances during rendering to assign to item keys
+  const renderTracker = useRef<Record<string, number>>({})
+
+  const getCurrentOcurrancesForItem = (id: string) => {
+    let currentOccurances = 0
+    if (!isNaN(renderTracker.current[id])) {
+      renderTracker.current[id] += 1
+      currentOccurances = renderTracker.current[id]
+    } else {
+      renderTracker.current[id] = 0
+    }
+    return currentOccurances
+  }
+  // Reset render tracker after every render
+  useEffect(() => () => {
+    renderTracker.current = {}
+  })
+
+  return { getCurrentOcurrancesForItem }
+}
+
 const useFeedManager = ({ listRef }: { listRef: TikTokListRef }) => {
   const { authenticationStore } = useStores()
   const [feedList, setFeedList] = useState<FeedItem[]>([])
   const currentItemIndexInView = useRef<number>(0)
+  const { getCurrentOcurrancesForItem } = useItemIdTracker()
 
   useEffect(() => {
     autorun(() => {
@@ -82,17 +105,16 @@ const useFeedManager = ({ listRef }: { listRef: TikTokListRef }) => {
 
   const extractKeyFromFeedItem = (feedItem: FeedItem) =>
     processFeedItem(feedItem, {
-      [FeedTypes.FEED_FACT]: (item: FeedFact) => {
-        return item.id
+      [FeedTypes.FEED_FACT]: (fact: FeedFact) => {
+        return `${fact.id} - ${getCurrentOcurrancesForItem(fact.id)}`
       },
-      [FeedTypes.FEED_QUESTION]: (item: FeedQuestion) => {
-        return item.data.id
+      [FeedTypes.FEED_QUESTION]: (question: FeedQuestion) => {
+        return `${question.data.id} - ${getCurrentOcurrancesForItem(question.data.id)}`
       },
     })
 
   const renderFeedItem = ({
     item,
-    index: _index,
     isFullyInView,
   }: {
     item: FeedItem
