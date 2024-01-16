@@ -4,7 +4,7 @@ import { View, Button, Spinner, Text } from "@gluestack-ui/themed"
 import Video from "react-native-video"
 import LottieView from "lottie-react-native"
 
-import RepeatVideoLottie from "../../../../assets/lottie/repeat-video.json"
+import RepeatVideoLottie from "../../../../../assets/lottie/repeat-video.json"
 import { VideoActionKind, initialVideoState, videoStateReducer } from "./video-state-reducer"
 
 const SOURCE_BASE = "https://s3.eu-central-1.amazonaws.com/infobytes.app-storage/fact-video/"
