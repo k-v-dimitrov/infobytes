@@ -60,3 +60,24 @@ export function processFeedItem<T>(
 
   return handlers?.[currentObjType](obj as FeedFact | FeedQuestion)
 }
+
+export interface CorrectAsnwerResponse {
+  isCorrect: boolean
+}
+
+export interface WrongAnswerResponse extends CorrectAsnwerResponse {
+  correctAnswerId: string
+}
+
+export function isCorrectAnswerResponse(obj: object): obj is CorrectAsnwerResponse {
+  return "isCorrect" in obj && obj.isCorrect === true
+}
+
+export function isWrongAnswerResponse(obj: object): obj is WrongAnswerResponse {
+  return (
+    "isCorrect" in obj &&
+    obj.isCorrect === false &&
+    "correctAnswerId" in obj &&
+    typeof obj.correctAnswerId === "string"
+  )
+}
