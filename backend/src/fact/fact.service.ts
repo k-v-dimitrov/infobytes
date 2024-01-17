@@ -228,10 +228,10 @@ export class FactService {
     const hasProvidedPageableProps = dto.page && dto.size;
 
     const factReviewList = await this.db.factReview.findMany({
-      skip: hasProvidedPageableProps && (dto.page - 1) * dto.size,
+      skip: hasProvidedPageableProps && (dto.page! - 1) * dto.size,
       where: { userId: user.id },
       include: { fact: true },
-      orderBy,
+      orderBy: orderBy || undefined,
       take: hasProvidedPageableProps && dto.size,
     });
 
@@ -243,7 +243,7 @@ export class FactService {
       hasProvidedPageableProps &&
       plainToInstance(
         PageableResponseDto,
-        new PageableResponseDto(dto.page, dto.size, factReviewTotalEntries),
+        new PageableResponseDto(dto.page!, dto.size, factReviewTotalEntries),
       );
 
     const factsForReview = plainToInstance(

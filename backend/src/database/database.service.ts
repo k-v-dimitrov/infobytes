@@ -44,9 +44,9 @@ export class DatabaseService extends PrismaClient {
         if (error.code === PrismaError.RecordsNotFound) {
           throw new UserNotFoundError();
         }
-      } else {
-        throw error;
       }
+
+      throw error;
     }
   }
 }

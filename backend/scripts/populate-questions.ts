@@ -1,3 +1,4 @@
+//@ts-nocheck
 // Populates the questions from prisma/questions.json to a live (non-fresh) database
 import { PrismaClient } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';

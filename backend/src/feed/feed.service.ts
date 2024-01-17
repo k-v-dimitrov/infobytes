@@ -116,6 +116,20 @@ export class FeedService {
       ({ isCorrect }) => isCorrect,
     );
 
+    if (!userAnswerToQuestion) {
+      throw new HttpException(
+        `user provided answer id is not part of the question being answered!`,
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    if (!correctAnswerToQuestion) {
+      throw new HttpException(
+        `user provided answer id is not part of the question being answered!`,
+        HttpStatus.CONFLICT,
+      );
+    }
+
     const isUserCorrect =
       userAnswerToQuestion.id === correctAnswerToQuestion.id;
 
@@ -197,7 +211,16 @@ export class FeedService {
     const questionsByAlreadyViewedFacts =
       await this.getQuestionsOfAlreadyViewedFacts(randomAlreadyViewedFacts);
 
-    const { user } = await this.getUserByUserFeedId(userFeedId);
+    const possibleUser = await this.getUserByUserFeedId(userFeedId);
+
+    if (!possibleUser) {
+      throw new HttpException(
+        'Could not find user to generate question feed!',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const { user } = possibleUser;
 
     const feedQuestions = await this.db.$transaction(
       questionsByAlreadyViewedFacts.map(
