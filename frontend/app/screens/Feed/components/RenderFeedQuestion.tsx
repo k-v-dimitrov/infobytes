@@ -16,13 +16,17 @@ import { QuizButton } from "./QuizButton"
 import QuizAppearAnim from "../../../../assets/lottie/quiz-appear.json"
 import { useApi } from "app/hooks"
 
+interface RenderFeedQuestonProps {
+  question: FeedQuestion
+  isFullyInView: boolean
+  topInset?: number
+}
+
 export const RenderFeedQuestion = ({
   question,
   isFullyInView,
-}: {
-  question: FeedQuestion
-  isFullyInView: boolean
-}) => {
+  topInset = 0,
+}: RenderFeedQuestonProps) => {
   const [animFinished, setAnimFinished] = useState(false)
   const [selectedAnswer, setSelectedAnswer] = useState<Answer | null>(null)
   const [correctAnswerId, setCorrectAnswerId] = useState(null)
@@ -78,7 +82,7 @@ export const RenderFeedQuestion = ({
   }, [isFullyInView])
 
   return (
-    <View p="$10" alignItems="center" flex={1} borderWidth={3} gap="$16">
+    <View marginTop={topInset} px="$10" alignItems="center" flex={1} gap="$8">
       {!animFinished ? (
         <View flex={1} width="$full">
           <LottieView resizeMode="contain" source={QuizAppearAnim} autoPlay style={{ flex: 1 }} />
@@ -96,7 +100,7 @@ export const RenderFeedQuestion = ({
               <QuizButton
                 key={answer.id}
                 text={answer.text}
-                onClick={handleSelectedAnswer(answer)}
+                onPress={handleSelectedAnswer(answer)}
                 isWrong={
                   correctAnswerId &&
                   selectedAnswer.id === answer.id &&

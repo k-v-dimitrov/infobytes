@@ -9,28 +9,32 @@ import { RenderFeedQuestion } from "./components/RenderFeedQuestion"
 
 import useFeedManager from "./useFeedManager"
 import { TikTokList, TikTokListRef } from "./TiktokList"
+import { useHeaderToolbar } from "app/utils/useHeaderToolbar"
 
 const renderFeedItem = ({
   item,
   isFullyInView,
   listRef,
+  topInset,
 }: {
   item: FeedItem
   index: number
   isFullyInView: boolean
   listRef: TikTokListRef
+  topInset?: number
 }) => {
   return processFeedItem(item, {
     [FeedTypes.FEED_FACT]: (fact: FeedFact) => (
       <RenderFeedFact fact={fact} isFullyInView={isFullyInView} listRef={listRef} />
     ),
     [FeedTypes.FEED_QUESTION]: (question: FeedQuestion) => (
-      <RenderFeedQuestion question={question} isFullyInView={isFullyInView} />
+      <RenderFeedQuestion question={question} isFullyInView={isFullyInView} topInset={topInset} />
     ),
   })
 }
 
 export const Feed = () => {
+  const { topInset } = useHeaderToolbar()
   const listRef = useRef<ComponentRef<typeof TikTokList>>(null)
   const { feedList, extractKeyFromFeedItem, handleCurrentItemInViewChange } = useFeedManager()
 
@@ -42,7 +46,7 @@ export const Feed = () => {
         }}
         data={feedList}
         keyExtractor={extractKeyFromFeedItem}
-        renderItem={(props) => renderFeedItem({ ...props, listRef })}
+        renderItem={(props) => renderFeedItem({ ...props, listRef, topInset })}
         itemContainerProps={{ bgColor: "$blueGray800" }}
         onCurrentItemInViewChange={handleCurrentItemInViewChange}
       />
