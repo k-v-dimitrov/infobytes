@@ -1,11 +1,6 @@
 import React from "react"
 import { observer } from "mobx-react-lite"
-import {
-  Avatar,
-  Heading,
-  Icon,
-  VStack
-} from "@gluestack-ui/themed"
+import { Avatar, Divider, Heading, Icon, Text, VStack } from "@gluestack-ui/themed"
 import { Screen } from "app/components"
 import { User } from "app/icons"
 import { useStores } from "app/models"
@@ -36,6 +31,8 @@ export const Profile = observer<NativeStackScreenProps<ProfileStackParamList, "R
               <Icon as={User} color="white" width="$24" height="$24" />
             </Avatar>
             <Heading size="xl">{displayName}</Heading>
+            <Text size="sm">#email: {authenticationStore.user.email}</Text>
+            <Divider />
           </VStack>
 
           <LevelProgressBar />
