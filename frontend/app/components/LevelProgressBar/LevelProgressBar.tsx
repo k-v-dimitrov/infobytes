@@ -51,11 +51,11 @@ export const LevelProgressBar = observer(() => {
       </Progress>
 
       {/* button for testing animation start */}
-      <View position="absolute" gap="$5" top={50}>
+      {/* <View position="absolute" gap="$5" top={50}>
         <Button onPressOut={animate}>
           <ButtonText>trigger animation</ButtonText>
         </Button>
-      </View>
+      </View> */}
       {/* button for testing animation end */}
     </VStack>
   )
