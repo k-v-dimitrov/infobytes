@@ -118,7 +118,7 @@ export function TikTokListInner<T>(props: TiktokListProps<T>, ref: TikTokListFor
     }
 
     return PanResponder.create({
-      onMoveShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (evt, { dy }) => Math.abs(dy) > 5,
       onPanResponderGrant: handleGrant,
       onPanResponderMove: handleMove,
       onPanResponderEnd: handleEnd,
@@ -200,7 +200,7 @@ export function TikTokListInner<T>(props: TiktokListProps<T>, ref: TikTokListFor
   }, [currentItemIndexInView])
 
   return (
-    <View flex={1} {...panResponder.panHandlers}>
+    <Animated.View flex={1} {...panResponder.panHandlers}>
       {data.map((item, index) => (
         <View key={keyExtractor(item)}>
           <Animated.View style={animatedStyles}>
@@ -217,7 +217,7 @@ export function TikTokListInner<T>(props: TiktokListProps<T>, ref: TikTokListFor
           </Animated.View>
         </View>
       ))}
-    </View>
+    </Animated.View>
   )
 }
 
