@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { observer } from "mobx-react-lite"
 import {
   Button,
@@ -12,6 +12,8 @@ import {
 import { useStores } from "app/models"
 import Animated, { BounceInLeft, FadeOut } from "react-native-reanimated"
 import { getProgressPercentage } from "./utils"
+import { useRealtimeManagerContext } from "app/services/realtime-manager"
+import { Events } from "app/services/realtime-manager/events"
 
 export const LevelProgressBar = observer(() => {
   const [showAnimation, setShowAnimation] = useState(false)
@@ -19,6 +21,16 @@ export const LevelProgressBar = observer(() => {
   const { level, levelPoints, requiredPointsForNextLevel } = authenticationStore.user
 
   const progressPercentage = getProgressPercentage(levelPoints, requiredPointsForNextLevel)
+
+  const { addRealtimeListener, removeRealtimeListener } = useRealtimeManagerContext()
+
+  useEffect(() => {
+    addRealtimeListener(Events.userChangeInXP, animate)
+
+    return () => {
+      removeRealtimeListener(Events.userChangeInXP, animate)
+    }
+  }, [])
 
   const animate = () => {
     setShowAnimation(true)
@@ -35,7 +47,7 @@ export const LevelProgressBar = observer(() => {
           <Animated.View entering={BounceInLeft} exiting={FadeOut}>
             <View position="absolute" right="50%" bottom={5}>
               <Text fontWeight="$bold" color="$green400" size="xl">
-                +50
+                +15
               </Text>
             </View>
           </Animated.View>
@@ -49,14 +61,6 @@ export const LevelProgressBar = observer(() => {
       <Progress width={250} value={progressPercentage} size="md">
         <ProgressFilledTrack bg="$green400" />
       </Progress>
-
-      {/* button for testing animation start */}
-      {/* <View position="absolute" gap="$5" top={50}>
-        <Button onPressOut={animate}>
-          <ButtonText>trigger animation</ButtonText>
-        </Button>
-      </View> */}
-      {/* button for testing animation end */}
     </VStack>
   )
 })
