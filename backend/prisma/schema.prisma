@@ -118,6 +118,7 @@ model FactReview {
   user   User   @relation(fields: [userId], references: [id])
   userId String
 
+  @@unique([userId, factId], name: "userAddedFactForReviewIdentifier")
   @@map("fact_reviews")
 }
 

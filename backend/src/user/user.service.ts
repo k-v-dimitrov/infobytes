@@ -9,6 +9,7 @@ import { DatabaseService } from 'src/database/database.service';
 
 import { PatchUserDto, UserResponseDto } from './dto';
 import { AddFactForReviewDto, DeleteFactForReviewDto } from 'src/fact/dto';
+import { PrismaError } from 'prisma-error-enum';
 
 @Injectable()
 export class UserService {
@@ -32,7 +33,19 @@ export class UserService {
       });
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
-        throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+        if (error.code === PrismaError.ForeignConstraintViolation) {
+          throw new HttpException(
+            'There was an error adding fact for review. Either such user or fact does not exist.',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+
+        if (error.code === PrismaError.UniqueConstraintViolation) {
+          throw new HttpException(
+            'This fact has already been added in reviews for the current user!',
+            HttpStatus.CONFLICT,
+          );
+        }
       }
 
       throw error;
