@@ -17,13 +17,7 @@ import Video from "react-native-video"
 import LottieView from "lottie-react-native"
 
 import { VideoActionKind, initialVideoState, videoStateReducer } from "./video-state-reducer"
-import { User } from "app/icons"
-import { Icon } from "@gluestack-ui/themed"
-import { LevelProgressBar } from "app/components/LevelProgressBar"
-
 import RepeatVideoLottie from "../../../../../assets/lottie/repeat-video.json"
-import { navigate } from "app/navigators"
-
 const SOURCE_BASE = "https://s3.eu-central-1.amazonaws.com/infobytes.app-storage/fact-video/"
 const VIDEO_EXTENSION = ".mp4"
 
@@ -74,10 +68,6 @@ export const VideoPlayer = ({
       videoRef.current.seek(0)
       dispatch({ type: VideoActionKind.REPLAY })
     }
-  }
-
-  const navigateToProfile = () => {
-    navigate({ name: "Profile", params: undefined })
   }
 
   return (
@@ -177,7 +167,7 @@ export const VideoPlayer = ({
         </View>
       )}
 
-      <HStack
+      {/* <HStack
         zIndex={2}
         position="absolute"
         top={25}
@@ -194,7 +184,7 @@ export const VideoPlayer = ({
             <Icon as={User} color="white" size="xl" />
           </Avatar>
         </Pressable>
-      </HStack>
+      </HStack> */}
 
       <View
         onLayout={(e) => setProgressContainerWidth(e.nativeEvent.layout.width || 0)}
