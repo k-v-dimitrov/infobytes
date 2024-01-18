@@ -11,7 +11,7 @@ export class SendGridService {
   constructor(private configService: ConfigService) {
     const apiKey = configService.get<string>('SENDGRID_API_KEY');
 
-    if (apiKey) {
+    if (!apiKey) {
       throw new Error('SendGrid ApiKey not provided!');
     }
 
