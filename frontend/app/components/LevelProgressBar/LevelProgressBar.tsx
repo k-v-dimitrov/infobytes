@@ -1,14 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { observer } from "mobx-react-lite"
-import {
-  Button,
-  ButtonText,
-  Progress,
-  ProgressFilledTrack,
-  Text,
-  VStack,
-  View,
-} from "@gluestack-ui/themed"
+import { Progress, ProgressFilledTrack, Text, VStack, View } from "@gluestack-ui/themed"
 import { useStores } from "app/models"
 import Animated, { BounceInLeft, FadeOut } from "react-native-reanimated"
 import { getProgressPercentage } from "./utils"
