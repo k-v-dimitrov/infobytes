@@ -9,7 +9,13 @@ const NO_REPLY = 'no-reply@infobytes.app';
 @Injectable()
 export class SendGridService {
   constructor(private configService: ConfigService) {
-    sgMail.setApiKey(configService.get<string>('SENDGRID_API_KEY'));
+    const apiKey = configService.get<string>('SENDGRID_API_KEY');
+
+    if (apiKey) {
+      throw new Error('SendGrid ApiKey not provided!');
+    }
+
+    sgMail.setApiKey(apiKey!);
   }
 
   async sendResetPasswordMail({

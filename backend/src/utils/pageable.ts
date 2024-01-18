@@ -47,8 +47,12 @@ export const validateSortKeys = ({
   keys,
 }: {
   knownKeys: string[];
-  keys: string[];
+  keys?: string[];
 }) => {
+  if (!keys || keys.length === 0) {
+    return;
+  }
+
   const unknownKeys = getUnknownKeys(knownKeys, keys);
 
   if (unknownKeys.length > 0) {
@@ -69,9 +73,10 @@ export const generateOrderBySortKeys = (
 ) => {
   const orderBy = {};
 
-  sortBy.forEach((sortKey) => {
-    orderBy[sortKey] = order;
-  });
+  if (sortBy)
+    sortBy.forEach((sortKey) => {
+      orderBy[sortKey] = order;
+    });
 
   return orderBy;
 };

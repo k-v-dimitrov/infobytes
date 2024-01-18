@@ -20,7 +20,8 @@ export class ConnectionsPool {
   }
 
   destroyConnection(socketId: Socket['id']) {
-    delete this.userSocketTable[this.socketUserTable[socketId]];
+    if (this.socketUserTable[socketId] !== null)
+      delete this.userSocketTable[this.socketUserTable[socketId]!];
     delete this.socketUserTable[socketId];
   }
 
