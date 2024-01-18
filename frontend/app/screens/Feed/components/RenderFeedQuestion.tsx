@@ -10,22 +10,24 @@ import {
   isCorrectAnswerResponse,
   isWrongAnswerResponse,
 } from "app/services/api/feed"
-
-import { QuizButton } from "./QuizButton"
-
-import QuizAppearAnim from "../../../../assets/lottie/quiz-appear.json"
 import { useApi } from "app/hooks"
+
+import { TikTokListRef } from "../TiktokList"
+import { QuizButton } from "./QuizButton"
+import QuizAppearAnim from "../../../../assets/lottie/quiz-appear.json"
 
 interface RenderFeedQuestonProps {
   question: FeedQuestion
   isFullyInView: boolean
   topInset?: number
+  listRef: TikTokListRef
 }
 
 export const RenderFeedQuestion = ({
   question,
   isFullyInView,
   topInset = 0,
+  listRef,
 }: RenderFeedQuestonProps) => {
   const [animFinished, setAnimFinished] = useState(false)
   const [selectedAnswer, setSelectedAnswer] = useState<Answer | null>(null)
@@ -50,6 +52,10 @@ export const RenderFeedQuestion = ({
       if (!isCorrectAnswerResponse(answerResponse) && !isWrongAnswerResponse(answerResponse)) {
         console.warn("Unknown data for answer response: ", answerResponse)
       }
+
+      setTimeout(() => {
+        listRef.current.advanceItem()
+      }, 500)
     },
     onError: () => {
       // TODO: Show error to user
@@ -70,7 +76,7 @@ export const RenderFeedQuestion = ({
     }
   }, [selectedAnswer])
 
-  // Quiz animation useEffect
+  // Quiz enter animation useEffect
   useEffect(() => {
     let tId = null
 

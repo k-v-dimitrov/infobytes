@@ -28,7 +28,12 @@ const renderFeedItem = ({
       <RenderFeedFact fact={fact} isFullyInView={isFullyInView} listRef={listRef} />
     ),
     [FeedTypes.FEED_QUESTION]: (question: FeedQuestion) => (
-      <RenderFeedQuestion question={question} isFullyInView={isFullyInView} topInset={topInset} />
+      <RenderFeedQuestion
+        question={question}
+        isFullyInView={isFullyInView}
+        topInset={topInset}
+        listRef={listRef}
+      />
     ),
   })
 }
