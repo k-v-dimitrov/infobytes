@@ -1,11 +1,15 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useEffect, useReducer, useRef, useState } from "react"
-import { View, Button, Spinner, Text } from "@gluestack-ui/themed"
+import React, { useEffect, useReducer, useRef, useState, useCallback } from "react"
+import { useFocusEffect } from "@react-navigation/native"
+import { View, Button, Spinner, Text, Pressable, Icon } from "@gluestack-ui/themed"
 import Video from "react-native-video"
 import LottieView from "lottie-react-native"
 
 import { VideoActionKind, initialVideoState, videoStateReducer } from "./video-state-reducer"
 import RepeatVideoLottie from "../../../../../assets/lottie/repeat-video.json"
+
+import { Pause } from "app/icons"
+
 const SOURCE_BASE = "https://s3.eu-central-1.amazonaws.com/infobytes.app-storage/fact-video/"
 const VIDEO_EXTENSION = ".mp4"
 
@@ -29,6 +33,7 @@ export const VideoPlayer = ({
   const videoRef = useRef<Video>(null)
   const [videoState, dispatch] = useReducer(videoStateReducer, initialVideoState)
   const [progressContainerWidth, setProgressContainerWidth] = useState(0)
+  const calledOnEnd = useRef(false)
 
   useEffect(() => {
     if (repeatVideoBtnAnimRef) {
@@ -54,12 +59,36 @@ export const VideoPlayer = ({
   const handleReplay = () => {
     if (videoRef.current) {
       videoRef.current.seek(0)
+      calledOnEnd.current = false
       dispatch({ type: VideoActionKind.REPLAY })
     }
   }
 
+  useFocusEffect(
+    useCallback(() => {
+      // Magic fix that keeps the last frame when changing tab screens...
+      if (videoRef.current && videoState.hasFinished) {
+        videoRef.current.seek(videoState.currentProgress.currentTime)
+      }
+
+      // Pause on losing focus
+      return () => {
+        dispatch({ type: VideoActionKind.PAUSE })
+      }
+    }, []),
+  )
+
   return (
-    <View flex={1} position="relative" justifyContent="flex-end">
+    <Pressable
+      flex={1}
+      position="relative"
+      justifyContent="flex-end"
+      onPress={() => {
+        videoState.isPlaying
+          ? dispatch({ type: VideoActionKind.PAUSE })
+          : dispatch({ type: VideoActionKind.PLAY })
+      }}
+    >
       <Video
         ref={(ref) => {
           if (ref) videoRef.current = ref
@@ -73,23 +102,66 @@ export const VideoPlayer = ({
           zIndex: 1,
           ...(videoState.hasFinished ? { opacity: 0.25 } : {}),
         }}
-        useTextureView={true}
         source={{
           uri: getFullUri(factId),
           type: "mp4",
         }}
         resizeMode="stretch"
-        paused={!play && !videoState.isPlaying}
+        paused={!play || !videoState.isPlaying || videoState.hasFinished}
         onLoad={() => dispatch({ type: VideoActionKind.LOADING_FINISHED })}
         onLoadStart={() => dispatch({ type: VideoActionKind.LOADING_STARTED })}
         onProgress={(p) => dispatch({ type: VideoActionKind.PROGRESS, payload: p })}
         onEnd={() => {
           dispatch({ type: VideoActionKind.FINISHED })
-          if (onEnd) onEnd()
+          // Prevent multiple onEnd calls
+          if (!calledOnEnd.current) {
+            calledOnEnd.current = true
+            onEnd && onEnd()
+          }
         }}
         onError={(e) => dispatch({ type: VideoActionKind.ERROR, payload: e })}
         onAudioBecomingNoisy={() => dispatch({ type: VideoActionKind.PAUSE })}
       />
+
+      {videoState.isLoading && (
+        <View
+          position="absolute"
+          zIndex={2}
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Spinner zIndex={4} size="large" />
+        </View>
+      )}
+
+      {!videoState.isPlaying && !videoState.hasFinished && !videoState.isLoading && (
+        <View
+          position="absolute"
+          zIndex={2}
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Button
+            onPressOut={() => {
+              dispatch({ type: VideoActionKind.PLAY })
+            }}
+            w="$32"
+            height="$32"
+            borderWidth={10}
+            borderRadius={100}
+          >
+            <Icon as={Pause} color="$white" w="$10" h="$10" />
+          </Button>
+        </View>
+      )}
 
       {videoState.hasFinished && (
         <View
@@ -124,21 +196,6 @@ export const VideoPlayer = ({
         </View>
       )}
 
-      {videoState.isLoading && (
-        <View
-          position="absolute"
-          zIndex={2}
-          top={0}
-          left={0}
-          right={0}
-          bottom={0}
-          justifyContent="center"
-          alignItems="center"
-        >
-          <Spinner zIndex={4} size="large" />
-        </View>
-      )}
-
       {videoState.error && (
         <View
           position="absolute"
@@ -154,25 +211,6 @@ export const VideoPlayer = ({
           <Text color="$red400">{videoState?.error?.error?.errorString}</Text>
         </View>
       )}
-
-      {/* <HStack
-        zIndex={2}
-        position="absolute"
-        top={25}
-        left={0}
-        right={0}
-        alignItems="center"
-        justifyContent="center"
-        space="lg"
-      >
-        <LevelProgressBar />
-
-        <Pressable onPressOut={navigateToProfile}>
-          <Avatar bgColor="$blue500" borderRadius="$full" size="md">
-            <Icon as={User} color="white" size="xl" />
-          </Avatar>
-        </Pressable>
-      </HStack> */}
 
       <View
         onLayout={(e) => setProgressContainerWidth(e.nativeEvent.layout.width || 0)}
@@ -191,6 +229,6 @@ export const VideoPlayer = ({
           width={getProgressIndicatorWidth()}
         />
       </View>
-    </View>
+    </Pressable>
   )
 }

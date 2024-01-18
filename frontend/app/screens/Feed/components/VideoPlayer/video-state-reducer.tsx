@@ -79,6 +79,10 @@ const videoStateReducer = (state: VideoState, action: VideoAction<VideoActionKin
       }
 
     case VideoActionKind.PROGRESS:
+      if (!state.isPlaying) {
+        return state
+      }
+
       return {
         ...state,
         isPlaying: true,
