@@ -1,18 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useReducer, useRef, useState } from "react"
-import {
-  View,
-  Button,
-  Spinner,
-  Text,
-  ButtonIcon,
-  HStack,
-  Progress,
-  ProgressFilledTrack,
-  Avatar,
-  VStack,
-  Pressable,
-} from "@gluestack-ui/themed"
+import { View, Button, Spinner, Text } from "@gluestack-ui/themed"
 import Video from "react-native-video"
 import LottieView from "lottie-react-native"
 
