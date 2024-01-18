@@ -99,38 +99,11 @@ const AppStack = observer(function AppStack() {
     }
 
     const handleUserChangeInXp = () => {
-      console.log("User change in XP")
-      toast.show({
-        placement: "top",
-        render: ({ id }) => {
-          const toastId = "toast" + id
-          return (
-            <Toast nativeID={toastId} action="attention" variant="solid">
-              <VStack space="xs">
-                <ToastTitle>Tasty XP</ToastTitle>
-                <ToastDescription>You answered correctly and got level points!!</ToastDescription>
-              </VStack>
-            </Toast>
-          )
-        },
-      })
+      authenticationStore.sync()
     }
 
     const handleUserLevelUp = () => {
-      console.log("User leveled up!")
-      toast.show({
-        placement: "top",
-        render: ({ id }) => {
-          const toastId = "toast" + id
-          return (
-            <Toast nativeID={toastId} action="attention" variant="solid">
-              <VStack space="xs">
-                <ToastTitle>Level Up!</ToastTitle>
-              </VStack>
-            </Toast>
-          )
-        },
-      })
+      authenticationStore.sync()
     }
 
     const handleUserDisconnect = () => {
