@@ -36,7 +36,7 @@ interface VideoState {
 const initialVideoState: VideoState = {
   currentProgress: { currentTime: 0, playableDuration: 0, seekableDuration: 0 },
   hasFinished: false,
-  isLoading: false,
+  isLoading: true,
   hasFinishedLoading: false,
   isPlaying: false,
   error: null,
