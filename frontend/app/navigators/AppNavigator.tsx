@@ -77,7 +77,7 @@ const AppStack = observer(function AppStack() {
     if (isAuthenticated && !isConnected) {
       reconnect()
     }
-  }, [isAuthenticated])
+  }, [isAuthenticated, isConnected])
 
   useEffect(() => {
     const handleConnect = () => {
