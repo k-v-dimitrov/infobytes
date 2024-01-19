@@ -52,7 +52,7 @@ export const Feed = () => {
         data={feedList}
         keyExtractor={extractKeyFromFeedItem}
         renderItem={(props) => renderFeedItem({ ...props, listRef, topInset })}
-        itemContainerProps={{ bgColor: "$blueGray800" }}
+        itemContainerProps={{ bgColor: "$black" }}
         onCurrentItemInViewChange={handleCurrentItemInViewChange}
       />
     </Screen>

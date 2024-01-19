@@ -142,7 +142,7 @@ const AppStack = observer(function AppStack() {
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
-        tabBarItemStyle: { backgroundColor: config.tokens.colors.backgroundDark700 },
+        tabBarItemStyle: { backgroundColor: config.tokens.colors.black },
       }}
     >
       {isAuthenticated && !isOnboarded && (
@@ -160,6 +160,7 @@ const AppStack = observer(function AppStack() {
               tabBarIcon: ({ focused }) => (
                 <FeedIcon color={focused ? "$blue500" : "$white"} height="$12" width="$12" />
               ),
+              tabBarStyle: { borderTopWidth: 0 },
             }}
           />
           <Tab.Screen
