@@ -77,7 +77,16 @@ export const VideoPlayer = ({
           dispatch({ type: VideoActionKind.PAUSE })
         }
       }
-    }, [videoState.hasFinished, videoState.isPlaying]),
+    }, [videoState.hasFinished, videoState.isPlaying, factId]),
+  )
+
+  useFocusEffect(
+    useCallback(() => {
+      // No matter what dispatch pause on lose of focus
+      return () => {
+        dispatch({ type: VideoActionKind.PAUSE })
+      }
+    }, []),
   )
 
   return (
