@@ -68,14 +68,14 @@ export const VideoPlayer = ({
     useCallback(() => {
       // Magic fix that keeps the last frame when changing tab screens...
       if (videoRef.current && videoState.hasFinished) {
-        videoRef.current.seek(videoState.currentProgress.currentTime)
+        videoRef.current.seek(videoState.currentProgress.currentTime - 0.05)
       }
 
       // Pause on losing focus
       return () => {
         dispatch({ type: VideoActionKind.PAUSE })
       }
-    }, []),
+    }, [videoState.hasFinished]),
   )
 
   return (
