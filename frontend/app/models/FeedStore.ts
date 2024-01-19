@@ -39,6 +39,7 @@ export const FeedStoreModel = types
       const indexToRemove = state.answeredQuestions.findIndex(
         ({ questionId: answeredQuestionId }) => questionId === answeredQuestionId,
       )
+      console.log("removing question", questionId, "at", indexToRemove)
       if (indexToRemove !== -1) {
         state.answeredQuestions.splice(indexToRemove, 1)
       }
@@ -49,7 +50,13 @@ export const FeedStoreModel = types
       selectedAnswerId: string
       isUserCorrect: boolean
     }) {
-      state.answeredQuestions.push({ ...answeredQuestion, ...{ closedAddForReviewModal: false } })
+      const isPresent = state.answeredQuestions.find(
+        ({ questionId: answeredQuestionId }) => answeredQuestion.questionId === answeredQuestionId,
+      )
+
+      if (!isPresent) {
+        state.answeredQuestions.push({ ...answeredQuestion, ...{ closedAddForReviewModal: false } })
+      }
     },
     setClosedModalForReview: (questionId: string) => {
       const itemIndexToUpdate = state.answeredQuestions.findIndex(

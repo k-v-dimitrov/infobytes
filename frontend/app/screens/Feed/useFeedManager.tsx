@@ -35,7 +35,7 @@ const useItemIdTracker = () => {
 }
 
 const useFeedManager = () => {
-  const { authenticationStore } = useStores()
+  const { authenticationStore, feedStore } = useStores()
   const [feedList, setFeedList] = useState<FeedItem[]>([])
   const currentItemIndexInView = useRef<number>(0)
   const { getCurrentOcurrancesForItem } = useItemIdTracker()
@@ -69,8 +69,22 @@ const useFeedManager = () => {
 
   const pullNextFeedChunk = async (feedUserId: string) => {
     const { data } = await feedApi.getUserFeed(feedUserId, ITEMS_TO_LOAD)
-    setFeedList((prev) => [...prev, ...data])
+    const processedFeedItems = preProcessFeedItems(data)
+    setFeedList((prev) => [...prev, ...processedFeedItems])
   }
+
+  const preProcessFeedItems = (feedItems: FeedItem[]) => {
+    feedItems.forEach(resetAlreadyAnsweredQuestion)
+    return feedItems // can also alter feed items if needed, e.g. feedItems.map(processFunction)
+  }
+
+  const resetAlreadyAnsweredQuestion = (feedItem: FeedItem) =>
+    processFeedItem(feedItem, {
+      [FeedTypes.FEED_FACT]: () => undefined,
+      [FeedTypes.FEED_QUESTION]: ({ data: { id } }: FeedQuestion) => {
+        feedStore.removeAnsweredQuestion(id)
+      },
+    })
 
   const shouldPullNextFeedChunk = (currentViewedIndex: number) => {
     if (currentViewedIndex === feedList.length - 1) {

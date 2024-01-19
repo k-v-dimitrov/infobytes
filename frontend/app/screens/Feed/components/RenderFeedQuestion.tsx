@@ -43,11 +43,6 @@ interface RenderFeedQuestonProps {
 
 export const RenderFeedQuestion = observer(
   ({ question, isFullyInView, topInset = 0, listRef }: RenderFeedQuestonProps) => {
-    // TODO: remove this and fix perfomance issue introduced from observer
-    if (!isFullyInView) {
-      return null
-    }
-
     const { feedStore } = useStores()
     const maybeAnsweredQuestion = feedStore.getAnsweredQuestion(question.data.id)
 
@@ -154,6 +149,11 @@ export const RenderFeedQuestion = observer(
         })
       }
     }, [userAnswerResult, correctAnswerId])
+
+    // TODO: remove this and fix perfomance issue introduced from observer
+    if (!isFullyInView) {
+      return null
+    }
 
     return (
       <View marginTop={topInset} px="$10" alignItems="center" flex={1} gap="$8">
