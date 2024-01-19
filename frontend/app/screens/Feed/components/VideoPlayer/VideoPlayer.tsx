@@ -73,9 +73,11 @@ export const VideoPlayer = ({
 
       // Pause on losing focus
       return () => {
-        videoState.isPlaying && !videoState.hasFinished && dispatch({ type: VideoActionKind.PAUSE })
+        if (videoState.isPlaying) {
+          dispatch({ type: VideoActionKind.PAUSE })
+        }
       }
-    }, [videoState.hasFinished]),
+    }, [videoState.hasFinished, videoState.isPlaying]),
   )
 
   return (
