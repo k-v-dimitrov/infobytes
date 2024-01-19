@@ -200,7 +200,7 @@ export function TikTokListInner<T>(props: TiktokListProps<T>, ref: TikTokListFor
   }, [currentItemIndexInView])
 
   return (
-    <Animated.View flex={1} {...panResponder.panHandlers}>
+    <View flex={1} {...panResponder.panHandlers}>
       {data.map((item, index) => (
         <View key={keyExtractor(item)}>
           <Animated.View style={animatedStyles}>
@@ -217,7 +217,7 @@ export function TikTokListInner<T>(props: TiktokListProps<T>, ref: TikTokListFor
           </Animated.View>
         </View>
       ))}
-    </Animated.View>
+    </View>
   )
 }
 
