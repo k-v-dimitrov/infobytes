@@ -1,6 +1,20 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useRef } from "react"
-import { View, VStack, Heading } from "@gluestack-ui/themed"
+import {
+  View,
+  VStack,
+  Heading,
+  Modal,
+  Text,
+  ModalContent,
+  ModalHeader,
+  Center,
+  ModalBody,
+  ModalFooter,
+  Button,
+  ButtonText,
+  HStack,
+} from "@gluestack-ui/themed"
 import LottieView from "lottie-react-native"
 
 import {
@@ -107,8 +121,44 @@ export const RenderFeedQuestion = ({
     return () => clearInterval(timer)
   }, [userAnswerResult, exitAnimationProgress, setExitAnimationProgress])
 
+  useEffect(() => {
+    if (userAnswerResult && !userAnswerResult.isCorrect) {
+      setAddFactModal(true)
+    }
+  }, [userAnswerResult])
+
+  const [addFactModal, setAddFactModal] = useState(false)
+
   return (
     <View marginTop={topInset} px="$10" alignItems="center" flex={1} gap="$8">
+      <Modal isOpen={addFactModal} useRNModal>
+        <ModalContent>
+          <ModalHeader>
+            <Center>
+              <Text textAlign="center" size="md">
+                Oops, you got this wrong. Do you want to add Infobyte to review this fact?
+              </Text>
+            </Center>
+          </ModalHeader>
+
+          <ModalBody>
+            <HStack justifyContent="space-around" pt="$4">
+              <Button
+                onPress={() => {
+                  console.warn("Not Implemented...")
+                  setAddFactModal(false)
+                }}
+              >
+                <ButtonText>Yes</ButtonText>
+              </Button>
+              <Button onPress={() => setAddFactModal(false)} bgColor="$trueGray700">
+                <ButtonText>No</ButtonText>
+              </Button>
+            </HStack>
+          </ModalBody>
+          <ModalFooter />
+        </ModalContent>
+      </Modal>
       {!appearAnimFinished ? (
         <View flex={1} width="$full">
           <LottieView resizeMode="contain" source={QuizAppearAnim} autoPlay style={{ flex: 1 }} />
