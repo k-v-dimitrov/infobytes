@@ -1,10 +1,11 @@
 import React from "react"
 
 import { FeedFact } from "app/services/api/feed"
-
-import { VideoPlayer } from "./VideoPlayer"
+import { useStores } from "app/models"
 
 import { TikTokListRef } from "../TiktokList"
+import { VideoPlayer } from "./VideoPlayer"
+
 export const RenderFeedFact = ({
   fact,
   isFullyInView,
@@ -13,15 +14,23 @@ export const RenderFeedFact = ({
   fact: FeedFact
   isFullyInView: boolean
   listRef: TikTokListRef
-}) =>
-  isFullyInView && (
-    <VideoPlayer
-      onEnd={() => {
-        if (listRef.current) {
-          listRef.current.playInviteToNextItemAnimation()
-        }
-      }}
-      factId={fact.id}
-      play
-    />
+}) => {
+  const { feedStore } = useStores()
+
+  return (
+    isFullyInView && (
+      <VideoPlayer
+        onEnd={() => {
+          if (listRef.current) {
+            if (!feedStore.invitedToNextFeedItem) {
+              feedStore.setProp("invitedToNextFeedItem", true)
+              listRef.current.playInviteToNextItemAnimation()
+            }
+          }
+        }}
+        factId={fact.id}
+        play
+      />
+    )
   )
+}
