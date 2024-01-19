@@ -16,6 +16,7 @@ import {
   HStack,
 } from "@gluestack-ui/themed"
 import LottieView from "lottie-react-native"
+import { observer } from "mobx-react-lite"
 
 import {
   Answer,
@@ -31,6 +32,7 @@ import { QuizButton } from "./QuizButton"
 
 import QuizAppearAnim from "../../../../assets/lottie/quiz-appear.json"
 import GoodJobAnim from "../../../../assets/lottie/good-job.json"
+import { useStores } from "app/models"
 
 interface RenderFeedQuestonProps {
   question: FeedQuestion
@@ -39,178 +41,210 @@ interface RenderFeedQuestonProps {
   listRef: TikTokListRef
 }
 
-export const RenderFeedQuestion = ({
-  question,
-  isFullyInView,
-  topInset = 0,
-  listRef,
-}: RenderFeedQuestonProps) => {
-  const [appearAnimFinished, setAppearAnimFinished] = useState(false)
-  const [exitAnimationProgress, setExitAnimationProgress] = useState(0)
-  const [selectedAnswer, setSelectedAnswer] = useState<Answer | null>(null)
-  const [correctAnswerId, setCorrectAnswerId] = useState(null)
-  const [userAnswerResult, setUserAnswerResult] = useState<{ isCorrect: boolean } | null>(null)
-  const calledOnEnd = useRef(false)
-
-  const {
-    trigger: answerQuestion,
-    error,
-    loading,
-  } = useApi(feedApi.answerFeedQuestion, {
-    executeOnMount: false,
-    props: [{ answerId: selectedAnswer?.id, questionUri: question.data.answerURI }],
-    onSuccess: (answerResponse) => {
-      if (isCorrectAnswerResponse(answerResponse)) {
-        setUserAnswerResult({ isCorrect: true })
-        setCorrectAnswerId(selectedAnswer.id)
-      }
-
-      if (isWrongAnswerResponse(answerResponse)) {
-        setUserAnswerResult({ isCorrect: false })
-        setCorrectAnswerId(answerResponse.correctAnswerId)
-      }
-
-      if (!isCorrectAnswerResponse(answerResponse) && !isWrongAnswerResponse(answerResponse)) {
-        console.warn("Unknown data for answer response: ", answerResponse)
-      }
-    },
-    onError: () => {
-      // TODO: Show error to user
-      console.warn(error)
-    },
-  })
-
-  const handleSelectedAnswer = (answer: Answer) => () => {
-    if (!selectedAnswer) {
-      setSelectedAnswer(answer)
-    }
-  }
-
-  // Trigger api call
-  useEffect(() => {
-    if (selectedAnswer) {
-      answerQuestion()
-    }
-  }, [selectedAnswer])
-
-  // Quiz enter animation useEffect
-  useEffect(() => {
-    let tId = null
-
-    if (isFullyInView && !appearAnimFinished) {
-      tId = setTimeout(() => setAppearAnimFinished(true), 1000)
+export const RenderFeedQuestion = observer(
+  ({ question, isFullyInView, topInset = 0, listRef }: RenderFeedQuestonProps) => {
+    // TODO: remove this and fix perfomance issue introduced from observer
+    if (!isFullyInView) {
+      return null
     }
 
-    return () => clearTimeout(tId)
-  }, [isFullyInView])
+    const { feedStore } = useStores()
+    const maybeAnsweredQuestion = feedStore.getAnsweredQuestion(question.data.id)
 
-  // Exit Animation Controller
-  useEffect(() => {
-    let timer: string | number | NodeJS.Timeout
-    if (userAnswerResult && userAnswerResult?.isCorrect) {
-      timer = setInterval(() => {
-        if (exitAnimationProgress >= 0.8 && !calledOnEnd.current) {
-          listRef.current.advanceItem()
-          calledOnEnd.current = true
+    const [appearAnimFinished, setAppearAnimFinished] = useState(maybeAnsweredQuestion && true)
+    const [exitAnimationProgress, setExitAnimationProgress] = useState(0)
+    const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(
+      maybeAnsweredQuestion && maybeAnsweredQuestion.selectedAnswerId,
+    )
+    const [correctAnswerId, setCorrectAnswerId] = useState(
+      maybeAnsweredQuestion && maybeAnsweredQuestion.correctAnswerId,
+    )
+
+    const [userAnswerResult, setUserAnswerResult] = useState<{ isCorrect: boolean } | null>(
+      maybeAnsweredQuestion && { isCorrect: maybeAnsweredQuestion.isUserCorrect },
+    )
+
+    const [addFactModal, setAddFactModal] = useState(false)
+
+    const calledOnEnd = useRef(maybeAnsweredQuestion && true)
+
+    const {
+      trigger: answerQuestion,
+      error,
+      loading,
+    } = useApi(feedApi.answerFeedQuestion, {
+      executeOnMount: false,
+      props: [{ answerId: selectedAnswerId, questionUri: question.data.answerURI }],
+      onSuccess: (answerResponse) => {
+        if (isCorrectAnswerResponse(answerResponse)) {
+          setUserAnswerResult({ isCorrect: true })
+          setCorrectAnswerId(selectedAnswerId)
         }
 
-        setExitAnimationProgress((prevProgress) => prevProgress + 0.01)
-      }, 5)
+        if (isWrongAnswerResponse(answerResponse)) {
+          setUserAnswerResult({ isCorrect: false })
+          setCorrectAnswerId(answerResponse.correctAnswerId)
+        }
+
+        if (!isCorrectAnswerResponse(answerResponse) && !isWrongAnswerResponse(answerResponse)) {
+          console.warn("Unknown data for answer response: ", answerResponse)
+        }
+      },
+      onError: () => {
+        // TODO: Show error to user
+        console.warn(error)
+      },
+    })
+
+    const handleSelectedAnswer = (answer: Answer) => () => {
+      if (!selectedAnswerId) {
+        setSelectedAnswerId(answer.id)
+      }
     }
 
-    return () => clearInterval(timer)
-  }, [userAnswerResult, exitAnimationProgress, setExitAnimationProgress])
+    // Trigger api call
+    useEffect(() => {
+      if (selectedAnswerId && !userAnswerResult) {
+        answerQuestion()
+      }
+    }, [selectedAnswerId])
 
-  useEffect(() => {
-    if (userAnswerResult && !userAnswerResult.isCorrect) {
-      setAddFactModal(true)
-    }
-  }, [userAnswerResult])
+    // Quiz enter animation useEffect
+    useEffect(() => {
+      let tId = null
 
-  const [addFactModal, setAddFactModal] = useState(false)
+      if (isFullyInView && !appearAnimFinished) {
+        tId = setTimeout(() => setAppearAnimFinished(true), 1000)
+      }
 
-  return (
-    <View marginTop={topInset} px="$10" alignItems="center" flex={1} gap="$8">
-      <Modal isOpen={addFactModal} useRNModal>
-        <ModalContent>
-          <ModalHeader>
-            <Center>
-              <Text textAlign="center" size="md">
-                Oops, you got this wrong. Do you want to add Infobyte to review this fact?
-              </Text>
-            </Center>
-          </ModalHeader>
+      return () => clearTimeout(tId)
+    }, [isFullyInView])
 
-          <ModalBody>
-            <HStack justifyContent="space-around" pt="$4">
-              <Button
-                onPress={() => {
-                  console.warn("Not Implemented...")
-                  setAddFactModal(false)
-                }}
-              >
-                <ButtonText>Yes</ButtonText>
-              </Button>
-              <Button onPress={() => setAddFactModal(false)} bgColor="$trueGray700">
-                <ButtonText>No</ButtonText>
-              </Button>
-            </HStack>
-          </ModalBody>
-          <ModalFooter />
-        </ModalContent>
-      </Modal>
-      {!appearAnimFinished ? (
-        <View flex={1} width="$full">
-          <LottieView resizeMode="contain" source={QuizAppearAnim} autoPlay style={{ flex: 1 }} />
-        </View>
-      ) : (
-        <>
-          <VStack alignItems="center">
-            <Heading size="xl" textAlign="center" lineHeight="$lg">
-              {question.data.questionText}
-            </Heading>
-          </VStack>
+    // Exit Animation Controller
+    useEffect(() => {
+      let timer: string | number | NodeJS.Timeout
+      if (userAnswerResult && userAnswerResult?.isCorrect) {
+        timer = setInterval(() => {
+          if (exitAnimationProgress >= 0.8 && !calledOnEnd.current) {
+            listRef.current.advanceItem()
+            calledOnEnd.current = true
+          }
 
-          <VStack gap="$2" flex={1}>
-            {question.data.answers.map((answer) => (
-              <QuizButton
-                key={answer.id}
-                text={answer.text}
-                onPress={handleSelectedAnswer(answer)}
-                isWrong={
-                  correctAnswerId &&
-                  selectedAnswer.id === answer.id &&
-                  answer.id !== correctAnswerId
-                }
-                isCorrect={correctAnswerId && answer.id === correctAnswerId}
-                isLoading={loading}
-              />
-            ))}
-          </VStack>
-        </>
-      )}
-      {exitAnimationProgress ? (
-        <View
-          position="absolute"
-          top={0}
-          left={0}
-          right={0}
-          bottom={0}
-          justifyContent="center"
-          alignItems="center"
-        >
+          setExitAnimationProgress((prevProgress) => prevProgress + 0.01)
+        }, 1)
+      }
+
+      return () => clearInterval(timer)
+    }, [userAnswerResult, exitAnimationProgress, setExitAnimationProgress])
+
+    // On answer result
+    useEffect(() => {
+      // Show modal on not correct answer
+      if (userAnswerResult && !userAnswerResult.isCorrect) {
+        setAddFactModal(true)
+      }
+
+      // Save answered question to store
+      if (userAnswerResult && correctAnswerId) {
+        feedStore.addAnsweredQuestion({
+          correctAnswerId,
+          questionId: question.data.id,
+          selectedAnswerId,
+          isUserCorrect: userAnswerResult.isCorrect,
+        })
+      }
+    }, [userAnswerResult, correctAnswerId])
+
+    return (
+      <View marginTop={topInset} px="$10" alignItems="center" flex={1} gap="$8">
+        <Modal isOpen={addFactModal && !maybeAnsweredQuestion?.closedAddForReviewModal} useRNModal>
+          <ModalContent>
+            <ModalHeader>
+              <Center>
+                <Text textAlign="center" size="md">
+                  Oops, you got this wrong. Do you want to add Infobyte to review this fact?
+                </Text>
+              </Center>
+            </ModalHeader>
+
+            <ModalBody>
+              <HStack justifyContent="space-around" pt="$4">
+                <Button
+                  onPress={() => {
+                    console.warn("Not Implemented...")
+                    feedStore.setClosedModalForReview(question.data.id)
+                    setAddFactModal(false)
+                  }}
+                >
+                  <ButtonText>Yes</ButtonText>
+                </Button>
+                <Button
+                  onPress={() => {
+                    feedStore.setClosedModalForReview(question.data.id)
+                    setAddFactModal(false)
+                  }}
+                  bgColor="$trueGray700"
+                >
+                  <ButtonText>No</ButtonText>
+                </Button>
+              </HStack>
+            </ModalBody>
+            <ModalFooter />
+          </ModalContent>
+        </Modal>
+        {!appearAnimFinished ? (
           <View flex={1} width="$full">
-            <LottieView
-              resizeMode="contain"
-              source={GoodJobAnim}
-              colorFilters={[{ keypath: "GOOD JOB! Outlines", color: "white" }]}
-              style={{ flex: 1 }}
-              autoPlay
-              progress={exitAnimationProgress}
-            />
+            <LottieView resizeMode="contain" source={QuizAppearAnim} autoPlay style={{ flex: 1 }} />
           </View>
-        </View>
-      ) : null}
-    </View>
-  )
-}
+        ) : (
+          <>
+            <VStack alignItems="center">
+              <Heading size="xl" textAlign="center" lineHeight="$lg">
+                {question.data.questionText}
+              </Heading>
+            </VStack>
+
+            <VStack gap="$2" flex={1}>
+              {question.data.answers.map((answer) => (
+                <QuizButton
+                  key={answer.id}
+                  text={answer.text}
+                  onPress={handleSelectedAnswer(answer)}
+                  isWrong={
+                    correctAnswerId &&
+                    selectedAnswerId === answer.id &&
+                    answer.id !== correctAnswerId
+                  }
+                  isCorrect={correctAnswerId && answer.id === correctAnswerId}
+                  isLoading={loading}
+                />
+              ))}
+            </VStack>
+          </>
+        )}
+        {exitAnimationProgress && exitAnimationProgress < 1 && !maybeAnsweredQuestion ? (
+          <View
+            position="absolute"
+            top={0}
+            left={0}
+            right={0}
+            bottom={0}
+            justifyContent="center"
+            alignItems="center"
+          >
+            <View flex={1} width="$full">
+              <LottieView
+                resizeMode="contain"
+                source={GoodJobAnim}
+                colorFilters={[{ keypath: "GOOD JOB! Outlines", color: "white" }]}
+                style={{ flex: 1 }}
+                autoPlay
+                progress={exitAnimationProgress}
+              />
+            </View>
+          </View>
+        ) : null}
+      </View>
+    )
+  },
+)
