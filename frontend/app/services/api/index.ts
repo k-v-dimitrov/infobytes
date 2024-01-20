@@ -1,3 +1,5 @@
 export * from "./api"
 export * from "./api.types"
 export * from "./auth"
+export * from "./user"
+export * from "./fact"
