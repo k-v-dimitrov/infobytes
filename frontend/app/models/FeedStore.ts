@@ -39,7 +39,7 @@ export const FeedStoreModel = types
       const indexToRemove = state.answeredQuestions.findIndex(
         ({ questionId: answeredQuestionId }) => questionId === answeredQuestionId,
       )
-      console.log("removing question", questionId, "at", indexToRemove)
+
       if (indexToRemove !== -1) {
         state.answeredQuestions.splice(indexToRemove, 1)
       }

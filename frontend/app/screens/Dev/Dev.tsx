@@ -20,9 +20,7 @@ export const Dev = () => {
           loop={loop}
           useNativeLooping
           speed={1}
-          onAnimationLoop={() => {
-            console.log("Test")
-          }}
+          onAnimationLoop={() => {}}
           onAnimationFinish={() => console.log("finished")}
         />
       </View>
