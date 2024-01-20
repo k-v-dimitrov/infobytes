@@ -1,21 +1,27 @@
 import React from "react"
-import { Heading, Pressable, Spinner, Text, VStack, View } from "@gluestack-ui/themed"
+import { VirtualizedList } from "react-native"
+import { Heading, Pressable, Spinner, Text, View } from "@gluestack-ui/themed"
 import { Screen } from "app/components"
 import { useApi } from "app/hooks"
-import { userApi } from "app/services/api/user"
+import { factApi } from "app/services/api/fact"
 
 import type { NativeStackScreenProps } from "@react-navigation/native-stack"
 import type { ProfileStackParamList } from "../ProfileNavigator"
+import type { FactForReview } from "app/services/api/fact"
 
 export const ReviewCollection = ({
   navigation,
 }: NativeStackScreenProps<ProfileStackParamList, "ReviewCollection">) => {
-  const { data, loading } = useApi(userApi.getFactsForReview, {
+  const { data, loading } = useApi(factApi.getFactsForReview, {
     executeOnMount: true,
   })
 
-  const navigateToFactVideo = (factId: string) => {
-    navigation.navigate("FactVideo", { factId })
+  const navigateToFactVideo = (fact: FactForReview) => {
+    navigation.navigate("FactVideo", {
+      id: fact.id,
+      category: fact.categoryType,
+      title: fact.title,
+    })
   }
 
   if (loading) {
@@ -28,20 +34,23 @@ export const ReviewCollection = ({
 
   return (
     <Screen p={0}>
-      <VStack space="lg">
-        {data &&
-          data.map((fact) => (
-            <Pressable key={fact.id} onPress={() => navigateToFactVideo(fact.id)}>
-              {({ pressed }) => (
-                <View opacity={pressed ? "$30" : "$100"}>
-                  <Heading textTransform="uppercase">#{fact.categoryType}</Heading>
-                  <Heading size="md">{fact.title}</Heading>
-                  <Text isTruncated={true}>{fact.text}</Text>
-                </View>
-              )}
-            </Pressable>
-          ))}
-      </VStack>
+      <VirtualizedList
+        data={data || []}
+        keyExtractor={(fact) => fact.id}
+        getItemCount={(data) => data.length}
+        getItem={(data, index) => data[index]}
+        renderItem={({ item: fact }: { item: FactForReview }) => (
+          <Pressable onPress={() => navigateToFactVideo(fact)} my="$1">
+            {({ pressed }) => (
+              <View opacity={pressed ? "$30" : "$100"}>
+                <Heading textTransform="uppercase">#{fact.categoryType}</Heading>
+                <Heading size="md">{fact.title}</Heading>
+                <Text isTruncated={true}>{fact.text}</Text>
+              </View>
+            )}
+          </Pressable>
+        )}
+      />
     </Screen>
   )
 }
