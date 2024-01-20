@@ -92,7 +92,7 @@ export class FactController {
   @UseInterceptors(InjectUser)
   @Delete('review')
   deleteFactForReview(
-    @Body() dto: DeleteFactForReviewDto,
+    @Query() dto: DeleteFactForReviewDto,
     @CurrentUser() user: User,
   ) {
     return this.userService.deleteFactForReview(dto, user);
