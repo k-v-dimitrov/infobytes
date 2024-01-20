@@ -47,7 +47,9 @@ export const RenderFeedQuestion = observer(
     const maybeAnsweredQuestion = feedStore.getAnsweredQuestion(question.data.id)
 
     const [appearAnimFinished, setAppearAnimFinished] = useState(maybeAnsweredQuestion && true)
-    const [exitAnimationProgress, setExitAnimationProgress] = useState(0)
+    const [exitAnimationProgress, setExitAnimationProgress] = useState(
+      maybeAnsweredQuestion ? 1 : 0,
+    )
     const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(
       maybeAnsweredQuestion && maybeAnsweredQuestion.selectedAnswerId,
     )
@@ -222,7 +224,7 @@ export const RenderFeedQuestion = observer(
             </VStack>
           </>
         )}
-        {exitAnimationProgress && exitAnimationProgress < 1 && !maybeAnsweredQuestion ? (
+        {exitAnimationProgress && exitAnimationProgress < 1 ? (
           <View
             position="absolute"
             top={0}
