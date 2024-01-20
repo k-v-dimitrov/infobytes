@@ -169,7 +169,7 @@ const AppStack = observer(function AppStack() {
             component={ProfileNavigator}
             options={{ tabBarButton: () => null }}
           />
-          <Tab.Screen name="Dev" component={Dev} options={{ tabBarShowLabel: true }} />
+          {/* <Tab.Screen name="Dev" component={Dev} options={{ tabBarShowLabel: true }} /> */}
         </>
       )}
 
