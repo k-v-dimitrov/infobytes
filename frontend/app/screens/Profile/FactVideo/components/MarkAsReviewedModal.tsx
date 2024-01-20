@@ -30,7 +30,7 @@ export const MarkAsReviewedModal = ({ factId }: Props) => {
     props: [factId],
     executeOnMount: false,
     onSuccess: () => {
-      navigate({ name: "ReviewCollection", params: undefined })
+      navigate({ name: "ReviewCollection", params: undefined, key: Date.now().toString() })
       setIsOpen(false)
     },
   })
