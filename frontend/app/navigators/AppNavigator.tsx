@@ -16,7 +16,7 @@ import {
 import { Toast, ToastDescription, ToastTitle, VStack, useToast } from "@gluestack-ui/themed"
 import { useRealtimeManagerContext } from "app/services/realtime-manager"
 import { Events } from "app/services/realtime-manager/events"
-import { Auth, Feed, Onboarding, ProfileNavigator } from "app/screens"
+import { Auth, Feed, Onboarding, ProfileNavigator, Dev } from "app/screens"
 import { useStores } from "app/models"
 import { FeedIcon } from "app/icons"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
@@ -40,6 +40,7 @@ export type AppStackParamList = {
   Onboarding: undefined
   Feed: undefined
   Profile: undefined
+  Dev: undefined
 }
 
 /**
@@ -77,7 +78,7 @@ const AppStack = observer(function AppStack() {
     if (isAuthenticated && !isConnected) {
       reconnect()
     }
-  }, [isAuthenticated])
+  }, [isAuthenticated, isConnected])
 
   useEffect(() => {
     const handleConnect = () => {
@@ -99,38 +100,11 @@ const AppStack = observer(function AppStack() {
     }
 
     const handleUserChangeInXp = () => {
-      console.log("User change in XP")
-      toast.show({
-        placement: "top",
-        render: ({ id }) => {
-          const toastId = "toast" + id
-          return (
-            <Toast nativeID={toastId} action="attention" variant="solid">
-              <VStack space="xs">
-                <ToastTitle>Tasty XP</ToastTitle>
-                <ToastDescription>You answered correctly and got level points!!</ToastDescription>
-              </VStack>
-            </Toast>
-          )
-        },
-      })
+      authenticationStore.sync()
     }
 
     const handleUserLevelUp = () => {
-      console.log("User leveled up!")
-      toast.show({
-        placement: "top",
-        render: ({ id }) => {
-          const toastId = "toast" + id
-          return (
-            <Toast nativeID={toastId} action="attention" variant="solid">
-              <VStack space="xs">
-                <ToastTitle>Level Up!</ToastTitle>
-              </VStack>
-            </Toast>
-          )
-        },
-      })
+      authenticationStore.sync()
     }
 
     const handleUserDisconnect = () => {
@@ -169,7 +143,7 @@ const AppStack = observer(function AppStack() {
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
-        tabBarItemStyle: { backgroundColor: config.tokens.colors.backgroundDark700 },
+        tabBarItemStyle: { backgroundColor: config.tokens.colors.black },
       }}
     >
       {isAuthenticated && !isOnboarded && (
@@ -187,6 +161,7 @@ const AppStack = observer(function AppStack() {
               tabBarIcon: ({ focused }) => (
                 <FeedIcon color={focused ? "$blue500" : "$white"} height="$12" width="$12" />
               ),
+              tabBarStyle: { borderTopWidth: 0 },
             }}
           />
           <Tab.Screen
@@ -194,6 +169,7 @@ const AppStack = observer(function AppStack() {
             component={ProfileNavigator}
             options={{ tabBarButton: () => null }}
           />
+          {/* <Tab.Screen name="Dev" component={Dev} options={{ tabBarShowLabel: true }} /> */}
         </>
       )}
 

@@ -55,7 +55,7 @@ export function processFeedItem<T>(
   }
 
   if (!Object.keys(handlers).includes(currentObjType)) {
-    console.log(`No handler provided for Feed Item of Type: ${currentObjType}`)
+    console.warn(`No handler provided for Feed Item of Type: ${currentObjType}`)
   }
 
   return handlers?.[currentObjType](obj as FeedFact | FeedQuestion)

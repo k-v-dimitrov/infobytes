@@ -118,7 +118,7 @@ export function TikTokListInner<T>(props: TiktokListProps<T>, ref: TikTokListFor
     }
 
     return PanResponder.create({
-      onMoveShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (evt, { dy }) => Math.abs(dy) > 5,
       onPanResponderGrant: handleGrant,
       onPanResponderMove: handleMove,
       onPanResponderEnd: handleEnd,
