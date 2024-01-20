@@ -30,8 +30,8 @@ import { useApi } from "app/hooks"
 import { TikTokListRef } from "../TiktokList"
 import { QuizButton } from "./QuizButton"
 
-import QuizAppearAnim from "../../../../assets/lottie/quiz-appear.json"
-import GoodJobAnim from "../../../../assets/lottie/good-job.json"
+import QuizAppearAnim from "assets/lottie/quiz-appear.json"
+import GoodJobAnim from "assets/lottie/good-job.json"
 import { useStores } from "app/models"
 
 interface RenderFeedQuestonProps {
@@ -46,10 +46,10 @@ export const RenderFeedQuestion = observer(
     const { feedStore } = useStores()
     const maybeAnsweredQuestion = feedStore.getAnsweredQuestion(question.data.id)
 
-    const [appearAnimFinished, setAppearAnimFinished] = useState(maybeAnsweredQuestion && true)
-    const [exitAnimationProgress, setExitAnimationProgress] = useState(
-      maybeAnsweredQuestion ? 1 : 0,
-    )
+    const [appearAnimFinished, setAppearAnimFinished] = useState(!!maybeAnsweredQuestion)
+
+    const [startCongtratsAnimation, setStartCongratsAnimation] = useState(false)
+
     const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(
       maybeAnsweredQuestion && maybeAnsweredQuestion.selectedAnswerId,
     )
@@ -76,6 +76,7 @@ export const RenderFeedQuestion = observer(
         if (isCorrectAnswerResponse(answerResponse)) {
           setUserAnswerResult({ isCorrect: true })
           setCorrectAnswerId(selectedAnswerId)
+          setStartCongratsAnimation(true)
         }
 
         if (isWrongAnswerResponse(answerResponse)) {
@@ -108,31 +109,10 @@ export const RenderFeedQuestion = observer(
 
     // Quiz enter animation useEffect
     useEffect(() => {
-      let tId = null
-
       if (isFullyInView && !appearAnimFinished) {
-        tId = setTimeout(() => setAppearAnimFinished(true), 1000)
+        setAppearAnimFinished(true)
       }
-
-      return () => clearTimeout(tId)
     }, [isFullyInView])
-
-    // Exit Animation Controller
-    useEffect(() => {
-      let timer: string | number | NodeJS.Timeout
-      if (userAnswerResult && userAnswerResult?.isCorrect) {
-        timer = setInterval(() => {
-          if (exitAnimationProgress >= 0.8 && !calledOnEnd.current) {
-            listRef.current.advanceItem()
-            calledOnEnd.current = true
-          }
-
-          setExitAnimationProgress((prevProgress) => prevProgress + 0.01)
-        }, 1)
-      }
-
-      return () => clearInterval(timer)
-    }, [userAnswerResult, exitAnimationProgress, setExitAnimationProgress])
 
     // On answer result
     useEffect(() => {
@@ -151,11 +131,6 @@ export const RenderFeedQuestion = observer(
         })
       }
     }, [userAnswerResult, correctAnswerId])
-
-    // TODO: remove this and fix perfomance issue introduced from observer
-    if (!isFullyInView) {
-      return null
-    }
 
     return (
       <View marginTop={topInset} px="$10" alignItems="center" flex={1} gap="$8">
@@ -196,7 +171,13 @@ export const RenderFeedQuestion = observer(
         </Modal>
         {!appearAnimFinished ? (
           <View flex={1} width="$full">
-            <LottieView resizeMode="contain" source={QuizAppearAnim} autoPlay style={{ flex: 1 }} />
+            <LottieView
+              resizeMode="contain"
+              source={QuizAppearAnim}
+              autoPlay
+              style={{ flex: 1 }}
+              loop={!appearAnimFinished}
+            />
           </View>
         ) : (
           <>
@@ -224,7 +205,7 @@ export const RenderFeedQuestion = observer(
             </VStack>
           </>
         )}
-        {exitAnimationProgress && exitAnimationProgress < 1 ? (
+        {startCongtratsAnimation && !calledOnEnd.current ? (
           <View
             position="absolute"
             top={0}
@@ -241,7 +222,11 @@ export const RenderFeedQuestion = observer(
                 colorFilters={[{ keypath: "GOOD JOB! Outlines", color: "white" }]}
                 style={{ flex: 1 }}
                 autoPlay
-                progress={exitAnimationProgress}
+                loop={false}
+                onAnimationFinish={() => {
+                  calledOnEnd.current = true
+                  listRef.current.advanceItem()
+                }}
               />
             </View>
           </View>
