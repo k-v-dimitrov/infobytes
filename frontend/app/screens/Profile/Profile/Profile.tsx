@@ -8,9 +8,9 @@ import { LevelProgressBar } from "app/components/LevelProgressBar"
 import { ProfileButton } from "./components/ProfileButton"
 
 import type { NativeStackScreenProps } from "@react-navigation/native-stack"
-import type { ProfileStackParamList } from "../ProfileNavigator"
+import type { AppStackParamList } from "app/navigators"
 
-export const Profile = observer<NativeStackScreenProps<ProfileStackParamList, "Root">>(
+export const Profile = observer<NativeStackScreenProps<AppStackParamList, "Profile">>(
   ({ navigation }) => {
     const { authenticationStore } = useStores()
     const { displayName } = authenticationStore.user

@@ -6,12 +6,12 @@ import { useApi } from "app/hooks"
 import { factApi } from "app/services/api/fact"
 
 import type { NativeStackScreenProps } from "@react-navigation/native-stack"
-import type { ProfileStackParamList } from "../ProfileNavigator"
 import type { FactForReview } from "app/services/api/fact"
+import type { AppStackParamList } from "app/navigators"
 
 export const ReviewCollection = ({
   navigation,
-}: NativeStackScreenProps<ProfileStackParamList, "ReviewCollection">) => {
+}: NativeStackScreenProps<AppStackParamList, "ReviewCollection">) => {
   const { data, loading } = useApi(factApi.getFactsForReview, {
     executeOnMount: true,
   })

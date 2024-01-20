@@ -4,11 +4,9 @@ import { VideoPlayer } from "app/components"
 import { MarkAsReviewedModal } from "./components/MarkAsReviewedModal"
 
 import type { NativeStackScreenProps } from "@react-navigation/native-stack"
-import type { ProfileStackParamList } from "../ProfileNavigator"
+import type { AppStackParamList } from "app/navigators"
 
-export const FactVideo = ({
-  route,
-}: NativeStackScreenProps<ProfileStackParamList, "FactVideo">) => {
+export const FactVideo = ({ route }: NativeStackScreenProps<AppStackParamList, "FactVideo">) => {
   const { id, title, category } = route.params
 
   return (
