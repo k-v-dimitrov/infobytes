@@ -1,5 +1,5 @@
 import { Api } from "../api"
-import { GetFactsForReviewResponse, SyncResponse } from "./user.types"
+import { SyncResponse } from "./user.types"
 
 class UserApi extends Api {
   async sync() {
@@ -8,22 +8,6 @@ class UserApi extends Api {
     return {
       data,
       error: ok ? null : data?.message,
-    }
-  }
-
-  async getFactsForReview() {
-    const { data, ok } = await this.protectedApisauce.get<GetFactsForReviewResponse>(
-      "/fact/review",
-      {
-        sortBy: ["createdAt"],
-        page: 1,
-        size: 10,
-      },
-    )
-
-    return {
-      data: data.results,
-      error: ok ? null : data.message,
     }
   }
 }
