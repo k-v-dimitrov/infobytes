@@ -16,7 +16,7 @@ import {
 import { Toast, ToastDescription, ToastTitle, VStack, useToast } from "@gluestack-ui/themed"
 import { useRealtimeManagerContext } from "app/services/realtime-manager"
 import { Events } from "app/services/realtime-manager/events"
-import { Auth, Feed, Onboarding, ProfileNavigator, Dev } from "app/screens"
+import { Auth, Feed, Onboarding, Profile, ReviewCollection, FactVideo } from "app/screens"
 import { useStores } from "app/models"
 import { FeedIcon } from "app/icons"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
@@ -39,8 +39,15 @@ export type AppStackParamList = {
   Auth: undefined
   Onboarding: undefined
   Feed: undefined
-  Profile: undefined
   Dev: undefined
+
+  Profile: undefined
+  ReviewCollection: undefined
+  FactVideo: {
+    id: string
+    title: string
+    category: string
+  }
 }
 
 /**
@@ -164,11 +171,13 @@ const AppStack = observer(function AppStack() {
               tabBarStyle: { borderTopWidth: 0 },
             }}
           />
-          <Tab.Screen
-            name="Profile"
-            component={ProfileNavigator}
-            options={{ tabBarButton: () => null }}
-          />
+
+          <Tab.Group screenOptions={{ tabBarButton: () => null }}>
+            <Tab.Screen name="Profile" component={Profile} />
+            <Tab.Screen name="ReviewCollection" component={ReviewCollection} />
+            <Tab.Screen name="FactVideo" component={FactVideo} />
+          </Tab.Group>
+          
           {/* <Tab.Screen name="Dev" component={Dev} options={{ tabBarShowLabel: true }} /> */}
         </>
       )}
