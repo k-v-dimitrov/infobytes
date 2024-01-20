@@ -32,6 +32,14 @@ export const ReviewCollection = ({
     )
   }
 
+  if (data && data.length === 0) {
+    return (
+      <Screen justifyContent="center" alignItems="center">
+        <Text>No facts for review yet</Text>
+      </Screen>
+    )
+  }
+
   return (
     <Screen p={0}>
       <VirtualizedList
