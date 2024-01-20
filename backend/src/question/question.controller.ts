@@ -1,4 +1,11 @@
-import { Body, Controller, Delete, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateQuestionDto, DeleteQuestionDto } from './dto';
 import { QuestionService } from './question.service';
@@ -15,7 +22,7 @@ export class QuestionController {
 
   @UseGuards(AuthGuard('admin'))
   @Delete()
-  delete(@Body() dto: DeleteQuestionDto) {
+  delete(@Query() dto: DeleteQuestionDto) {
     return this.questionService.delete(dto);
   }
 }
