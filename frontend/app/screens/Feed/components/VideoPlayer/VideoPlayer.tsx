@@ -10,22 +10,12 @@ import RepeatVideoLottie from "../../../../../assets/lottie/repeat-video.json"
 
 import { Pause } from "app/icons"
 
-const SOURCE_BASE = "https://s3.eu-central-1.amazonaws.com/infobytes.app-storage/fact-video/"
-const VIDEO_EXTENSION = ".mp4"
-
-const getFullUri = (factId) => {
-  return `${SOURCE_BASE}${factId}${VIDEO_EXTENSION}`
-}
-
-// Fallback fact id
-const FACT_ID = "0e3fd411-07e4-4305-8d61-f15b2dc8217d"
-
 export const VideoPlayer = ({
-  factId = FACT_ID,
+  videoFilePath,
   play = false,
   onEnd,
 }: {
-  factId: string
+  videoFilePath?: string
   play: boolean
   onEnd?: () => void
 }) => {
@@ -77,7 +67,7 @@ export const VideoPlayer = ({
           dispatch({ type: VideoActionKind.PAUSE })
         }
       }
-    }, [videoState.hasFinished, videoState.isPlaying, factId]),
+    }, [videoState.hasFinished, videoState.isPlaying]),
   )
 
   useFocusEffect(
@@ -114,7 +104,7 @@ export const VideoPlayer = ({
           ...(videoState.hasFinished ? { opacity: 0.25 } : {}),
         }}
         source={{
-          uri: getFullUri(factId),
+          uri: videoFilePath,
           type: "mp4",
         }}
         resizeMode="stretch"
