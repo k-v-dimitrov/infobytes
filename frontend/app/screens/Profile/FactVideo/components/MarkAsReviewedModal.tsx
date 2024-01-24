@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React from "react"
 import {
   Button,
   ButtonText,
@@ -22,15 +22,16 @@ import { navigate } from "app/navigators"
 
 interface Props {
   factId: string
+  isOpen: boolean
+  setIsOpen: (arg1: boolean) => void
 }
 
-export const MarkAsReviewedModal = ({ factId }: Props) => {
-  const [isOpen, setIsOpen] = useState(false)
+export const MarkAsReviewedModal = ({ factId, isOpen, setIsOpen }: Props) => {
   const { trigger, loading } = useApi(factApi.deleteFactForReview, {
     props: [factId],
     executeOnMount: false,
     onSuccess: () => {
-      navigate({ name: "ReviewCollection", params: undefined, key: Date.now().toString() })
+      navigate({ name: "ReviewCollection", params: undefined })
       setIsOpen(false)
     },
   })
@@ -41,7 +42,7 @@ export const MarkAsReviewedModal = ({ factId }: Props) => {
 
   if (!isOpen) {
     return (
-      <Button onPress={openModal}>
+      <Button onPress={openModal} action="positive" borderRadius="$full" h="$16" w="$16">
         <ButtonIcon as={CheckIcon} size="lg" />
       </Button>
     )
