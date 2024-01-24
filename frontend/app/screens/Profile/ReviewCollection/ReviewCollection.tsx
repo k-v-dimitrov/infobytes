@@ -1,28 +1,15 @@
 import React from "react"
 import { VirtualizedList } from "react-native"
-import { Heading, Pressable, Spinner, Text, View } from "@gluestack-ui/themed"
+import { Spinner, Text } from "@gluestack-ui/themed"
 import { Screen } from "app/components"
 import { useApi } from "app/hooks"
 import { factApi } from "app/services/api/fact"
+import { SwipeableFact } from "./components/SwipeableFact"
 
-import type { NativeStackScreenProps } from "@react-navigation/native-stack"
 import type { FactForReview } from "app/services/api/fact"
-import type { AppStackParamList } from "app/navigators"
 
-export const ReviewCollection = ({
-  navigation,
-}: NativeStackScreenProps<AppStackParamList, "ReviewCollection">) => {
-  const { data, loading } = useApi(factApi.getFactsForReview, {
-    executeOnMount: true,
-  })
-
-  const navigateToFactVideo = (fact: FactForReview) => {
-    navigation.navigate("FactVideo", {
-      id: fact.id,
-      category: fact.categoryType,
-      title: fact.title,
-    })
-  }
+export const ReviewCollection = () => {
+  const { data, loading } = useApi(factApi.getFactsForReview)
 
   if (loading) {
     return (
@@ -47,17 +34,7 @@ export const ReviewCollection = ({
         keyExtractor={(fact) => fact.id}
         getItemCount={(data) => data.length}
         getItem={(data, index) => data[index]}
-        renderItem={({ item: fact }: { item: FactForReview }) => (
-          <Pressable onPress={() => navigateToFactVideo(fact)} my="$1">
-            {({ pressed }) => (
-              <View opacity={pressed ? "$30" : "$100"}>
-                <Heading textTransform="uppercase">#{fact.categoryType}</Heading>
-                <Heading size="md">{fact.title}</Heading>
-                <Text isTruncated={true}>{fact.text}</Text>
-              </View>
-            )}
-          </Pressable>
-        )}
+        renderItem={({ item: fact }: { item: FactForReview }) => <SwipeableFact fact={fact} />}
       />
     </Screen>
   )

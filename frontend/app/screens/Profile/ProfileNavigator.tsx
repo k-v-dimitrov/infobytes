@@ -4,14 +4,12 @@ import { Profile } from "./Profile/Profile"
 import { ReviewCollection } from "./ReviewCollection/ReviewCollection"
 import { FactVideo } from "./FactVideo/FactVideo"
 
+import type { FactForReview } from "app/services/api"
+
 export type ProfileStackParamList = {
   Root: undefined
   ReviewCollection: undefined
-  FactVideo: {
-    id: string
-    title: string
-    category: string
-  }
+  FactVideo: FactForReview
 }
 
 const Stack = createNativeStackNavigator<ProfileStackParamList>()

@@ -9,7 +9,7 @@ import type { AppStackParamList } from "app/navigators"
 export const FactVideo = ({ route }: NativeStackScreenProps<AppStackParamList, "FactVideo">) => {
   const [isOpen, setIsOpen] = useState(false)
 
-  const { id, title, category } = route.params
+  const { id, title, categoryType } = route.params
 
   return (
     <View flex={1}>
@@ -24,7 +24,7 @@ export const FactVideo = ({ route }: NativeStackScreenProps<AppStackParamList, "
       >
         <VStack>
           <Heading size="xl" textTransform="uppercase">
-            #{category}
+            #{categoryType}
           </Heading>
           <Heading isTruncated>{title}</Heading>
         </VStack>
