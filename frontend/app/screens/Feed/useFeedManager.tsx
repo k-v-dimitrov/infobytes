@@ -92,7 +92,6 @@ const useFeedManager = () => {
   const preloadVideos = (feedItem: FeedItem) =>
     processFeedItem(feedItem, {
       [FeedTypes.FEED_FACT]: (feedFact: FeedFact) => {
-        console.log(feedFact.id)
         cacheFileFromUrl(getFactVideoSourceUrl(feedFact.id), feedFact.id)
       },
       [FeedTypes.FEED_QUESTION]: () => undefined,
