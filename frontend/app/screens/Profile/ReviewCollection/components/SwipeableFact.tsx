@@ -1,8 +1,5 @@
-import { Box, Button, ButtonIcon, CheckIcon, Heading, Pressable, Text } from "@gluestack-ui/themed"
-import { useApi } from "app/hooks"
-import { navigate } from "app/navigators"
-import { FactForReview, factApi } from "app/services/api"
 import React, { useState } from "react"
+import { Box, Button, ButtonIcon, CheckIcon, Heading, Pressable, Text } from "@gluestack-ui/themed"
 import { Directions, Gesture, GestureDetector } from "react-native-gesture-handler"
 import Animated, {
   FadeOut,
@@ -12,6 +9,9 @@ import Animated, {
   withDelay,
   withTiming,
 } from "react-native-reanimated"
+import { useApi } from "app/hooks"
+import { navigate } from "app/navigators"
+import { FactForReview, factApi } from "app/services/api"
 
 const BUTTON_WIDTH = 150
 
