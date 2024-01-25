@@ -65,6 +65,9 @@ export class QuestionDataReponseDto {
 
   @Expose()
   answerURI: string;
+
+  @Expose()
+  factId: string;
 }
 
 export class UserFeedQuestionResponseDto {
