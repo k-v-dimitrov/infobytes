@@ -1,10 +1,11 @@
-import { Box, Button, ButtonIcon, CheckIcon, Heading, Text } from "@gluestack-ui/themed"
+import { Box, Button, ButtonIcon, CheckIcon, Heading, Pressable, Text } from "@gluestack-ui/themed"
 import { useApi } from "app/hooks"
 import { navigate } from "app/navigators"
 import { FactForReview, factApi } from "app/services/api"
 import React, { useState } from "react"
 import { Directions, Gesture, GestureDetector } from "react-native-gesture-handler"
 import Animated, {
+  FadeOut,
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
@@ -16,26 +17,23 @@ const BUTTON_WIDTH = 150
 
 interface Props {
   fact: FactForReview
+  onRemoveSuccess: (factId: string) => void
 }
 
-export const SwipeableFact = ({ fact }: Props) => {
+export const SwipeableFact = ({ fact, onRemoveSuccess }: Props) => {
   const { id, categoryType, title, text } = fact
   const { trigger } = useApi(factApi.deleteFactForReview, {
     props: [id],
     executeOnMount: false,
+    onSuccess: () => onRemoveSuccess(id),
   })
   const [isButtonVisible, setIsButtonVisible] = useState(false)
   const position = useSharedValue(0)
   const opacity = useSharedValue(1)
 
-  const tap = Gesture.Tap()
-    .onStart(() => {
-      opacity.value = withTiming(0.3, { duration: 100 })
-      runOnJS(navigate)({ name: "FactVideo", params: fact })
-    })
-    .onEnd(() => {
-      opacity.value = withDelay(100, withTiming(1, { duration: 100 }))
-    })
+  const handleOnPress = () => {
+    navigate({ name: "FactVideo", params: fact })
+  }
 
   const leftSwipe = Gesture.Fling()
     .direction(Directions.LEFT)
@@ -44,13 +42,13 @@ export const SwipeableFact = ({ fact }: Props) => {
       runOnJS(setIsButtonVisible)(true)
     })
 
-  const composed1 = Gesture.Exclusive(tap, leftSwipe)
-
   const doubleLeftSwipe = Gesture.Fling()
     .direction(Directions.LEFT)
     .onStart(() => {
-      position.value = withTiming(-1000, { duration: 100 })
+      position.value = withDelay(100, withTiming(-1000, { duration: 100 }))
       opacity.value = withTiming(0, { duration: 100 })
+
+      runOnJS(trigger)()
     })
 
   const rightSwipe = Gesture.Fling()
@@ -60,7 +58,7 @@ export const SwipeableFact = ({ fact }: Props) => {
       runOnJS(setIsButtonVisible)(false)
     })
 
-  const composed2 = Gesture.Exclusive(doubleLeftSwipe, rightSwipe)
+  const composed = Gesture.Exclusive(doubleLeftSwipe, rightSwipe)
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: position.value }],
@@ -68,26 +66,29 @@ export const SwipeableFact = ({ fact }: Props) => {
   }))
 
   return (
-    <GestureDetector  gesture={isButtonVisible ? composed2 : composed1}>
-      <Animated.View style={animatedStyle}>
-        <Box position="relative" p="$2" borderBottomWidth="$1" borderColor="$warmGray100">
-          <Heading textTransform="uppercase">#{categoryType}</Heading>
-          <Heading size="md">{title}</Heading>
-          <Text isTruncated={true}>{text} </Text>
+    <GestureDetector gesture={isButtonVisible ? composed : leftSwipe}>
+      <Pressable delayLongPress={80} onPress={handleOnPress}>
+        <Animated.View style={animatedStyle} exiting={FadeOut}>
+          <Box position="relative" p="$2" borderBottomWidth="$1" borderColor="$warmGray100">
+            <Heading textTransform="uppercase">#{categoryType}</Heading>
+            <Heading size="md">{title}</Heading>
+            <Text isTruncated={true}>{text} </Text>
 
-          <Button
-            borderRadius="$none"
-            position="absolute"
-            action="positive"
-            height="$full"
-            width={BUTTON_WIDTH}
-            left={"105%"}
-            top={"$4"}
-          >
-            <ButtonIcon as={CheckIcon} h="$8" w="$8" />
-          </Button>
-        </Box>
-      </Animated.View>
+            <Button
+              borderRadius="$none"
+              position="absolute"
+              action="positive"
+              height="$full"
+              width={BUTTON_WIDTH}
+              left={"105%"}
+              top={"$4"}
+              onPress={trigger}
+            >
+              <ButtonIcon as={CheckIcon} h="$8" w="$8" />
+            </Button>
+          </Box>
+        </Animated.View>
+      </Pressable>
     </GestureDetector>
   )
 }

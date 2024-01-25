@@ -9,7 +9,11 @@ import { SwipeableFact } from "./components/SwipeableFact"
 import type { FactForReview } from "app/services/api/fact"
 
 export const ReviewCollection = () => {
-  const { data, loading } = useApi(factApi.getFactsForReview)
+  const { data, loading, setData } = useApi(factApi.getFactsForReview)
+
+  const onRemoveSuccess = (factId: string) => {
+    setData((prev) => prev.filter((fact) => fact.id !== factId))
+  }
 
   if (loading) {
     return (
@@ -34,7 +38,9 @@ export const ReviewCollection = () => {
         keyExtractor={(fact) => fact.id}
         getItemCount={(data) => data.length}
         getItem={(data, index) => data[index]}
-        renderItem={({ item: fact }: { item: FactForReview }) => <SwipeableFact fact={fact} />}
+        renderItem={({ item: fact }: { item: FactForReview }) => (
+          <SwipeableFact fact={fact} onRemoveSuccess={onRemoveSuccess} />
+        )}
       />
     </Screen>
   )
