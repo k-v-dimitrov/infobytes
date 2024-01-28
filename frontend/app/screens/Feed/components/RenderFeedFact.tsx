@@ -2,9 +2,9 @@ import React from "react"
 
 import { FeedFact } from "app/services/api/feed"
 import { useStores } from "app/models"
+import { VideoPlayer } from "app/components"
 
 import { TikTokListRef } from "../TiktokList"
-import { VideoPlayer } from "./VideoPlayer"
 
 export const RenderFeedFact = ({
   fact,

@@ -16,7 +16,7 @@ import {
 import { Toast, ToastDescription, ToastTitle, VStack, useToast } from "@gluestack-ui/themed"
 import { useRealtimeManagerContext } from "app/services/realtime-manager"
 import { Events } from "app/services/realtime-manager/events"
-import { Auth, Feed, Onboarding, ProfileNavigator, Dev } from "app/screens"
+import { Auth, Feed, Onboarding, ProfileNavigator, ProfileStackParamList } from "app/screens"
 import { useStores } from "app/models"
 import { FeedIcon } from "app/icons"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
@@ -41,7 +41,7 @@ export type AppStackParamList = {
   Feed: undefined
   Profile: undefined
   Dev: undefined
-}
+} & ProfileStackParamList
 
 /**
  * This is a list of all the route names that will exit the app if the back button
@@ -164,10 +164,11 @@ const AppStack = observer(function AppStack() {
               tabBarStyle: { borderTopWidth: 0 },
             }}
           />
+
           <Tab.Screen
             name="Profile"
             component={ProfileNavigator}
-            options={{ tabBarButton: () => null }}
+            options={{ tabBarButton: () => null, unmountOnBlur: true }}
           />
           {/* <Tab.Screen name="Dev" component={Dev} options={{ tabBarShowLabel: true }} /> */}
         </>

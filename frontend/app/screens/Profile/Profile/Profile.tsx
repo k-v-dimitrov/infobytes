@@ -4,13 +4,13 @@ import { Avatar, Divider, Heading, Icon, Text, VStack } from "@gluestack-ui/them
 import { Screen } from "app/components"
 import { User } from "app/icons"
 import { useStores } from "app/models"
+import { LevelProgressBar } from "app/components/LevelProgressBar"
 import { ProfileButton } from "./components/ProfileButton"
 
 import type { NativeStackScreenProps } from "@react-navigation/native-stack"
-import { LevelProgressBar } from "app/components/LevelProgressBar"
-import type { ProfileStackParamList } from "./ProfileNavigator"
+import type { AppStackParamList } from "app/navigators"
 
-export const Profile = observer<NativeStackScreenProps<ProfileStackParamList, "Root">>(
+export const Profile = observer<NativeStackScreenProps<AppStackParamList, "Profile">>(
   ({ navigation }) => {
     const { authenticationStore } = useStores()
     const { displayName } = authenticationStore.user

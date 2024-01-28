@@ -21,14 +21,14 @@ export function useApi<T extends Request>(request: T, config?: Config<T>) {
     setLoading(true)
 
     try {
-      const { data, error } = await request.call(api, ...(props as []))
+      const { data: responseData, error } = await request.call(api, ...(props as []))
 
       if (error) {
         throw new Error(error)
       }
 
-      setData(data)
-      onSuccess && onSuccess(data)
+      setData(responseData)
+      onSuccess && onSuccess(responseData)
     } catch (error) {
       setError(error.message)
       onError && onError(error.message)
@@ -43,5 +43,5 @@ export function useApi<T extends Request>(request: T, config?: Config<T>) {
     }
   }, [])
 
-  return { loading, error, data, trigger }
+  return { loading, error, data, trigger, setData }
 }

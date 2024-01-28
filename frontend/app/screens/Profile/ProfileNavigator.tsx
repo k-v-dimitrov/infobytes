@@ -1,15 +1,15 @@
 import React from "react"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
-import { Profile } from "./Profile"
+import { Profile } from "./Profile/Profile"
 import { ReviewCollection } from "./ReviewCollection/ReviewCollection"
 import { FactVideo } from "./FactVideo/FactVideo"
+
+import type { FactForReview } from "app/services/api"
 
 export type ProfileStackParamList = {
   Root: undefined
   ReviewCollection: undefined
-  FactVideo: {
-    factId: string
-  }
+  FactVideo: FactForReview
 }
 
 const Stack = createNativeStackNavigator<ProfileStackParamList>()

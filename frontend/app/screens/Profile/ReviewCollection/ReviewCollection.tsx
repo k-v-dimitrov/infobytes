@@ -1,21 +1,18 @@
 import React from "react"
-import { Heading, Pressable, Spinner, Text, VStack, View } from "@gluestack-ui/themed"
+import { VirtualizedList } from "react-native"
+import { Spinner, Text } from "@gluestack-ui/themed"
 import { Screen } from "app/components"
 import { useApi } from "app/hooks"
-import { userApi } from "app/services/api/user"
+import { factApi } from "app/services/api/fact"
+import { SwipeableFact } from "./components/SwipeableFact"
 
-import type { NativeStackScreenProps } from "@react-navigation/native-stack"
-import type { ProfileStackParamList } from "../ProfileNavigator"
+import type { FactForReview } from "app/services/api/fact"
 
-export const ReviewCollection = ({
-  navigation,
-}: NativeStackScreenProps<ProfileStackParamList, "ReviewCollection">) => {
-  const { data, loading } = useApi(userApi.getFactsForReview, {
-    executeOnMount: true,
-  })
+export const ReviewCollection = () => {
+  const { data, loading, setData } = useApi(factApi.getFactsForReview)
 
-  const navigateToFactVideo = (factId: string) => {
-    navigation.navigate("FactVideo", { factId })
+  const onRemoveSuccess = (factId: string) => {
+    setData((prev) => prev.filter((fact) => fact.id !== factId))
   }
 
   if (loading) {
@@ -26,22 +23,25 @@ export const ReviewCollection = ({
     )
   }
 
+  if (data && data.length === 0) {
+    return (
+      <Screen justifyContent="center" alignItems="center">
+        <Text>No facts for review yet</Text>
+      </Screen>
+    )
+  }
+
   return (
     <Screen p={0}>
-      <VStack space="lg">
-        {data &&
-          data.map((fact) => (
-            <Pressable key={fact.id} onPress={() => navigateToFactVideo(fact.id)}>
-              {({ pressed }) => (
-                <View opacity={pressed ? "$30" : "$100"}>
-                  <Heading textTransform="uppercase">#{fact.categoryType}</Heading>
-                  <Heading size="md">{fact.title}</Heading>
-                  <Text isTruncated={true}>{fact.text}</Text>
-                </View>
-              )}
-            </Pressable>
-          ))}
-      </VStack>
+      <VirtualizedList
+        data={data || []}
+        keyExtractor={(fact) => fact.id}
+        getItemCount={(data) => data.length}
+        getItem={(data, index) => data[index]}
+        renderItem={({ item: fact }: { item: FactForReview }) => (
+          <SwipeableFact fact={fact} onRemoveSuccess={onRemoveSuccess} />
+        )}
+      />
     </Screen>
   )
 }

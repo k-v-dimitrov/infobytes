@@ -1,18 +1,38 @@
-import React from "react"
-import { Text } from "@gluestack-ui/themed"
-import { Screen } from "app/components"
+import React, { useState } from "react"
+import { HStack, Heading, VStack, View } from "@gluestack-ui/themed"
+import { VideoPlayer } from "app/components"
+import { MarkAsReviewedModal } from "./components/MarkAsReviewedModal"
 
 import type { NativeStackScreenProps } from "@react-navigation/native-stack"
-import type { ProfileStackParamList } from "../ProfileNavigator"
+import type { AppStackParamList } from "app/navigators"
 
-export const FactVideo = ({
-  route,
-}: NativeStackScreenProps<ProfileStackParamList, "FactVideo">) => {
-  const { factId } = route.params
+export const FactVideo = ({ route }: NativeStackScreenProps<AppStackParamList, "FactVideo">) => {
+  const [isOpen, setIsOpen] = useState(false)
+
+  const { id, title, categoryType } = route.params
+
   return (
-    <Screen>
-      <Text>Video</Text>
-      <Text>{factId}</Text>
-    </Screen>
+    <View flex={1}>
+      <HStack
+        position="absolute"
+        zIndex={2}
+        width="$full"
+        px="$5"
+        justifyContent="space-between"
+        alignItems="center"
+        bottom={10}
+      >
+        <VStack>
+          <Heading size="xl" textTransform="uppercase">
+            #{categoryType}
+          </Heading>
+          <Heading isTruncated>{title}</Heading>
+        </VStack>
+
+        <MarkAsReviewedModal factId={id} isOpen={isOpen} setIsOpen={setIsOpen} />
+      </HStack>
+
+      <VideoPlayer factId={id} play={!isOpen} />
+    </View>
   )
 }

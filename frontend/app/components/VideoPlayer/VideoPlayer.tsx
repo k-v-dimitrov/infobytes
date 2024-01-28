@@ -6,7 +6,7 @@ import Video from "react-native-video"
 import LottieView from "lottie-react-native"
 
 import { VideoActionKind, initialVideoState, videoStateReducer } from "./video-state-reducer"
-import RepeatVideoLottie from "../../../../../assets/lottie/repeat-video.json"
+import RepeatVideoLottie from "../../../assets/lottie/repeat-video.json"
 
 import { Pause } from "app/icons"
 

@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable import/first */
 /**
  * Welcome to the main entry point of the app. In this file, we'll
@@ -16,6 +17,7 @@ if (__DEV__) {
   // to only execute this in development.
   require("./devtools/ReactotronConfig.ts")
 }
+import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { GluestackUIProvider } from "@gluestack-ui/themed"
 import { config } from "@gluestack-ui/config"
 import "./i18n"
@@ -91,17 +93,19 @@ function App(props: AppProps) {
   // otherwise, we're ready to render the app
   return (
     <GluestackUIProvider colorMode="dark" config={config}>
-      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-        <RealtimeProvider>
-          <ErrorBoundary catchErrors={Config.catchErrors}>
-            <AppNavigator
-              linking={linking}
-              initialState={initialNavigationState}
-              onStateChange={onNavigationStateChange}
-            />
-          </ErrorBoundary>
-        </RealtimeProvider>
-      </SafeAreaProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+          <RealtimeProvider>
+            <ErrorBoundary catchErrors={Config.catchErrors}>
+              <AppNavigator
+                linking={linking}
+                initialState={initialNavigationState}
+                onStateChange={onNavigationStateChange}
+              />
+            </ErrorBoundary>
+          </RealtimeProvider>
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
     </GluestackUIProvider>
   )
 }
