@@ -1,5 +1,5 @@
 # Infobytes
-Infobytes is a project aimed at exploring the potential of Large Language Models (LLMs) to generate engaging common knowledge facts. The core idea is to utilize these facts to captivate a user base, encouraging them to learn and share intriguing pieces of information. To complement this concept, we've developed a feed similar to TikTok's style, where generated facts are transformed into short videos. On top of that questions about already seen facts will appear as you progress in the feed to encourage learning. This is also gamified bu introducing player levels.
+Infobytes is a project aimed at exploring the potential of Large Language Models (LLMs) to generate engaging common knowledge facts. The core idea is to utilize these facts to captivate a user base, encouraging them to learn and share intriguing pieces of information. To complement this concept, we've developed a feed similar to TikTok's style, where generated fact videos are displayed. On top of that questions about already seen facts will appear as you progress in the feed to encourage learning.
 
 ## Modules
 Infobytes comprises three main modules:
@@ -15,3 +15,5 @@ The fact video generator is a crucial component responsible for transforming gen
 
 ## Video Demo
 Sadly, these video demos are not from the latest version.
+[feed.webm](https://github.com/k-v-dimitrov/infobytes/assets/79837187/48dfc347-2d7e-4f05-a5cc-b49a48d9c13a)
+[feed_question.webm](https://github.com/k-v-dimitrov/infobytes/assets/79837187/92aedeaa-53f0-4033-b5f0-de98a9710285)
