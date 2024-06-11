@@ -9,8 +9,10 @@ import {
   FeedFact,
   FeedQuestion,
 } from "app/services/api/feed"
+import { cacheFileFromUrl } from "app/utils/fileCache"
+import { getFactVideoSourceUrl } from "app/utils/factVideoUrl"
 
-const ITEMS_TO_LOAD = 2
+const ITEMS_TO_LOAD = 5
 
 const useItemIdTracker = () => {
   // Helper map to track occurances during rendering to assign to item keys
@@ -75,6 +77,7 @@ const useFeedManager = () => {
 
   const preProcessFeedItems = (feedItems: FeedItem[]) => {
     feedItems.forEach(resetAlreadyAnsweredQuestion)
+    feedItems.forEach(preloadVideos)
     return feedItems // can also alter feed items if needed, e.g. feedItems.map(processFunction)
   }
 
@@ -84,6 +87,14 @@ const useFeedManager = () => {
       [FeedTypes.FEED_QUESTION]: ({ data: { id } }: FeedQuestion) => {
         feedStore.removeAnsweredQuestion(id)
       },
+    })
+
+  const preloadVideos = (feedItem: FeedItem) =>
+    processFeedItem(feedItem, {
+      [FeedTypes.FEED_FACT]: (feedFact: FeedFact) => {
+        cacheFileFromUrl(getFactVideoSourceUrl(feedFact.id), feedFact.id)
+      },
+      [FeedTypes.FEED_QUESTION]: () => undefined,
     })
 
   const shouldPullNextFeedChunk = (currentViewedIndex: number) => {

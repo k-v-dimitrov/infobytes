@@ -118,7 +118,7 @@ export function TikTokListInner<T>(props: TiktokListProps<T>, ref: TikTokListFor
     }
 
     return PanResponder.create({
-      onMoveShouldSetPanResponder: (evt, { dy }) => Math.abs(dy) > 5,
+      onMoveShouldSetPanResponder: (evt, { dy }) => Math.abs(dy) > 3,
       onPanResponderGrant: handleGrant,
       onPanResponderMove: handleMove,
       onPanResponderEnd: handleEnd,
@@ -199,6 +199,9 @@ export function TikTokListInner<T>(props: TiktokListProps<T>, ref: TikTokListFor
     }
   }, [currentItemIndexInView])
 
+  const shouldSkipItemRendering = (currentRenderIndex: number) =>
+    Math.abs(currentRenderIndex - currentItemIndexInView) > 1
+
   return (
     <View flex={1} {...panResponder.panHandlers}>
       {data.map((item, index) => (
@@ -212,7 +215,8 @@ export function TikTokListInner<T>(props: TiktokListProps<T>, ref: TikTokListFor
               height="$full"
               {...itemContainerProps}
             >
-              {renderItem({ item, index, isFullyInView: currentItemIndexInView === index })}
+              {!shouldSkipItemRendering(index) &&
+                renderItem({ item, index, isFullyInView: currentItemIndexInView === index })}
             </View>
           </Animated.View>
         </View>
